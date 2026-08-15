@@ -3,7 +3,7 @@ extends CharacterBody2D
 
 @export var fire_rate: float = 1.0  # seconds between shots
 @export var move_speed: float = 250.0
-@export var preferred_distance: float = 300.0
+@export var preferred_distance: float = 150.0
 @export var distance_tolerance: float = 20.0
 
 var projectile_scene := preload("res://scenes/projectiles/enemybullet/enemybullet.tscn")

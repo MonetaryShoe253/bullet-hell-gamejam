@@ -6,7 +6,7 @@
 [ext_resource type="PackedScene" uid="uid://do4swhon6n2q2" path="res://scenes/components/health/health_component.tscn" id="3_8pc45"]
 
 [node name="Enemy" type="CharacterBody2D" unique_id=1203205508 groups=["enemy"]]
-scale = Vector2(0.27, 0.27)
+scale = Vector2(0.12, 0.12)
 collision_layer = 4
 script = ExtResource("1_hibra")
 
@@ -28,9 +28,10 @@ collision_mask = 3
 
 [node name="Components" type="Node" parent="." unique_id=1945686008]
 
-[node name="HurtBox" parent="Components" unique_id=1254363551 instance=ExtResource("2_2hfpr")]
+[node name="HurtBox" parent="Components" unique_id=1254363551 node_paths=PackedStringArray("health_component") instance=ExtResource("2_2hfpr")]
 collision_layer = 4
 collision_mask = 8
+health_component = NodePath("../HealthComponent")
 
 [node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="Components/HurtBox" unique_id=1906039955]
 visible = false
