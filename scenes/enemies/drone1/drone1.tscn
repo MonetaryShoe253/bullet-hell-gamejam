@@ -1,10 +1,12 @@
 [gd_scene format=3 uid="uid://b0dqu40lbqcsx"]
 
 [ext_resource type="Texture2D" uid="uid://b1s2ce2eptq00" path="res://assets/Drones/Enemies T1 Sprite Sheet.png" id="1_q22yy"]
+[ext_resource type="PackedScene" uid="uid://hamwnbllhiuu" path="res://scenes/components/hurtbox/hurt_box.tscn" id="2_2hfpr"]
+[ext_resource type="PackedScene" uid="uid://do4swhon6n2q2" path="res://scenes/components/health/health_component.tscn" id="3_8pc45"]
 
 [node name="Enemy" type="CharacterBody2D" unique_id=1203205508]
-position = Vector2(200, 200)
 scale = Vector2(0.27, 0.27)
+collision_layer = 4
 
 [node name="Sprite2D" type="Sprite2D" parent="." unique_id=605565021]
 texture_filter = 1
@@ -17,14 +19,18 @@ region_rect = Rect2(4.3186493, 9.172549, 23.040314, 17.235855)
 visible = false
 polygon = PackedVector2Array(-159, -93, -160, -55, -33, 81, 38, 81, 168, -58, 165, -95, 57, -97, 58, -113, 39, -113, 38, -173, -35, -168, -33, -115, -54, -111, -53, -96)
 
-[node name="Area2D" type="Area2D" parent="." unique_id=386381130]
-
-[node name="Hitbox" type="CollisionPolygon2D" parent="Area2D" unique_id=2031289247]
-visible = false
-polygon = PackedVector2Array(49, 71, 50, 109, 176, 246, 247, 246, 374, 109, 373, 71, 318, 72, 317, 90, 265, 89, 264, 50, 248, 50, 248, -4, 174, -3, 174, 53, 155, 51, 156, 90, 104, 90, 103, 70)
-
 [node name="Node2D" type="Node2D" parent="." unique_id=1111025143]
 
 [node name="Components" type="Node" parent="." unique_id=1945686008]
+
+[node name="HurtBox" parent="Components" unique_id=1254363551 instance=ExtResource("2_2hfpr")]
+collision_layer = 4
+collision_mask = 8
+
+[node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="Components/HurtBox" unique_id=1906039955]
+visible = false
+polygon = PackedVector2Array(-43, -25, -43, -15, -9, 22, 10, 22, 44, -15, 44, -25, 15, -25, 15, -30, 11, -30, 11, -45, -9, -44, -9, -31, -13, -30, -14, -20, -28, -20, -29, -25)
+
+[node name="HealthComponent" parent="Components" unique_id=1395210045 instance=ExtResource("3_8pc45")]
 
 [node name="AnimationPlayer" type="AnimationPlayer" parent="." unique_id=636039130]
