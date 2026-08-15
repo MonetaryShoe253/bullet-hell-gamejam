@@ -18,9 +18,9 @@ func _ready() -> void:
 func take_damage(amount: float) -> void:
 	if amount <= 0.0 or current_health <= 0.0:
 		return
-
 	current_health = max(current_health - amount, 0.0)
 
+	print("Damage taken! New health: " + str(current_health))
 	damaged.emit(amount)
 	health_changed.emit(current_health, max_health)
 

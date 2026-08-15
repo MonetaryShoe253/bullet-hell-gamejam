@@ -4,6 +4,8 @@
 [ext_resource type="Script" uid="uid://cp6c3je12muh4" path="res://scenes/projectiles/bullet1/bullet1.gd" id="1_mk0ff"]
 
 [node name="EnemyBullet" type="Area2D" unique_id=884955343]
+collision_layer = 16
+collision_mask = 3
 script = ExtResource("1_mk0ff")
 
 [node name="Sprite2D" type="Sprite2D" parent="." unique_id=1581674488]
