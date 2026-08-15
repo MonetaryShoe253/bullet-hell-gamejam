@@ -1,4 +1,5 @@
-extends CharacterBody2D   # changed from Node2D — needed for velocity/move_and_slide
+class_name Enemy
+extends CharacterBody2D
 
 @export var fire_rate: float = 1.0  # seconds between shots
 @export var move_speed: float = 250.0
@@ -9,6 +10,7 @@ var projectile_scene := preload("res://scenes/projectiles/enemybullet/enemybulle
 @export var player: Node2D  # reference to the player, set this however you're tracking it
 
 func _ready() -> void:
+	print("Enemy ready!")
 	var timer := Timer.new()
 	timer.wait_time = fire_rate
 	timer.timeout.connect(fire_at_player)
@@ -16,10 +18,27 @@ func _ready() -> void:
 	timer.start()
 
 func _physics_process(_delta: float) -> void:
-	_mirror_player_movement()
+	if can_see_player():
+		_mirror_player_movement()
+	else:
+		velocity = Vector2.ZERO
+		move_and_slide()
 
+func can_see_player() -> bool:
+	if player == null:
+		return false
+
+	var ray := $PlayerSight as RayCast2D
+
+	ray.target_position = ray.to_local(player.global_position)
+	ray.force_raycast_update()
+
+	return ray.is_colliding() and ray.get_collider() == player
+	
 func fire_at_player() -> void:
 	if player == null:
+		return		
+	if not can_see_player():
 		return
 	var proj: EnemyProjectile = projectile_scene.instantiate()
 	get_tree().current_scene.add_child(proj)

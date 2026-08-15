@@ -11,7 +11,7 @@ config_version=5
 [application]
 
 config/name="Bullethell gamejam"
-run/main_scene="uid://hcgyjiixmygn"
+run/main_scene="uid://ba16oqenxdk5j"
 config/features=PackedStringArray("4.7", "Mobile")
 config/icon="res://icon.svg"
 
@@ -69,6 +69,4 @@ move_right={
 textures/canvas_textures/default_texture_filter=0
 rendering_device/driver.windows="d3d12"
 renderer/rendering_method="mobile"
-; Matches the near-black the tileset bakes into its wall tiles, so any sliver of
-; viewport the tilemap doesn't cover reads as more solid rock instead of grey.
 environment/defaults/default_clear_color=Color(0.145098, 0.0745098, 0.101961, 1)

@@ -1,5 +1,6 @@
 [gd_scene format=3 uid="uid://b0dqu40lbqcsx"]
 
+[ext_resource type="Script" uid="uid://sc54sni26t8x" path="res://scenes/enemies/drone1/drone1.gd" id="1_hibra"]
 [ext_resource type="Texture2D" uid="uid://b1s2ce2eptq00" path="res://assets/Drones/Enemies T1 Sprite Sheet.png" id="1_q22yy"]
 [ext_resource type="PackedScene" uid="uid://hamwnbllhiuu" path="res://scenes/components/hurtbox/hurt_box.tscn" id="2_2hfpr"]
 [ext_resource type="PackedScene" uid="uid://do4swhon6n2q2" path="res://scenes/components/health/health_component.tscn" id="3_8pc45"]
@@ -7,6 +8,7 @@
 [node name="Enemy" type="CharacterBody2D" unique_id=1203205508]
 scale = Vector2(0.27, 0.27)
 collision_layer = 4
+script = ExtResource("1_hibra")
 
 [node name="Sprite2D" type="Sprite2D" parent="." unique_id=605565021]
 texture_filter = 1
@@ -20,6 +22,9 @@ visible = false
 polygon = PackedVector2Array(-159, -93, -160, -55, -33, 81, 38, 81, 168, -58, 165, -95, 57, -97, 58, -113, 39, -113, 38, -173, -35, -168, -33, -115, -54, -111, -53, -96)
 
 [node name="Node2D" type="Node2D" parent="." unique_id=1111025143]
+
+[node name="PlayerSight" type="RayCast2D" parent="." unique_id=917071951]
+collision_mask = 3
 
 [node name="Components" type="Node" parent="." unique_id=1945686008]
 
