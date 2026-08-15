@@ -19,7 +19,6 @@ extends Node2D
 
 @onready var tile_layer: TileMapLayer = $TileMapLayer
 @onready var prop_layer: TileMapLayer = $PropLayer
-@onready var camera: Camera2D = $Camera2D
 @onready var seed_label: Label = $HUD/SeedLabel
 
 @export var tile_source_id := 0   # the TileSetAtlasSource id for the tileset (0 if it's the only source)

@@ -4,6 +4,7 @@
 [ext_resource type="Texture2D" uid="uid://c1e3fx55smxsf" path="res://assets/Players/Dwarf/Dwarf_idle_forward.png" id="2_dovo2"]
 [ext_resource type="PackedScene" uid="uid://do4swhon6n2q2" path="res://scenes/components/health/health_component.tscn" id="3_gmlin"]
 [ext_resource type="PackedScene" uid="uid://hamwnbllhiuu" path="res://scenes/components/hurtbox/hurt_box.tscn" id="3_lvxji"]
+[ext_resource type="PackedScene" uid="uid://cfvi616pvm7t4" path="res://scenes/UI/player_health.tscn" id="5_p47bc"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_gmlin"]
 size = Vector2(12, 14)
@@ -39,6 +40,8 @@ shape = SubResource("RectangleShape2D_nehcj")
 max_health = 25.0
 
 [node name="AnimationPlayer" type="AnimationPlayer" parent="." unique_id=1940173901]
+
+[node name="HUD" parent="." unique_id=956263465 instance=ExtResource("5_p47bc")]
 
 [node name="Camera2D" type="Camera2D" parent="." unique_id=1105706883]
 zoom = Vector2(3, 3)

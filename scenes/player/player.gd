@@ -8,6 +8,19 @@ extends CharacterBody2D
 var projectile_scene: PackedScene = preload("res://scenes/projectiles/playerbullet/playerbullet.tscn")
 var time_since_last_shot: float = 0.0
 
+@onready var health_component: HealthComponent = $Components/HealthComponent
+@onready var health_bar: ProgressBar = $HUD/HealthBar
+
+func _ready() -> void:
+	health_bar.max_value = health_component.max_health
+	health_bar.value = health_component.current_health
+
+	health_component.health_changed.connect(_on_health_changed)
+
+func _on_health_changed(current_health: float, max_health: float) -> void:
+	health_bar.max_value = max_health
+	health_bar.value = current_health
+	
 func _physics_process(delta: float) -> void:
 	var direction := Input.get_vector(
 		"move_left",
