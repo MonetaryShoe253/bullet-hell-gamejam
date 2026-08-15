@@ -1,4 +1,5 @@
-extends CharacterBody2D   # changed from Node2D — needed for velocity/move_and_slide
+class_name Enemy
+extends CharacterBody2D
 
 @export var fire_rate: float = 1.0  # seconds between shots
 @export var move_speed: float = 250.0
@@ -9,6 +10,7 @@ var projectile_scene := preload("res://scenes/projectiles/bullet1/bullet1.tscn")
 @export var player: Node2D  # reference to the player, set this however you're tracking it
 
 func _ready() -> void:
+	print("Enemy ready!")
 	var timer := Timer.new()
 	timer.wait_time = fire_rate
 	timer.timeout.connect(fire_at_player)
@@ -19,6 +21,7 @@ func _physics_process(_delta: float) -> void:
 	_mirror_player_movement()
 
 func fire_at_player() -> void:
+	print("fire!")
 	if player == null:
 		return
 	var proj: Projectile = projectile_scene.instantiate()

@@ -35,6 +35,13 @@ extends Node2D
 ## Draws the ladder / wares / gate that mark out the start, shop and boss rooms.
 @export var show_room_props := true
 
+## Players and Enemies
+@export var player_scene: PackedScene
+var player: Node2D
+
+@export var enemy_scene: PackedScene
+
+
 # --- atlas coordinates (column, row) in the 16px grid ---
 
 ## Flat block of (37, 19, 26) - the same near-black baked into the wall tiles.
@@ -96,6 +103,32 @@ func _unhandled_input(event: InputEvent) -> void:
 			generate_dungeon()
 			get_viewport().set_input_as_handled()
 
+func _spawn_player() -> void:
+	player = player_scene.instantiate()
+	add_child(player)
+
+	var spawn_position := tile_layer.map_to_local(_generator.player_spawn)
+	player.position = spawn_position
+
+	print("Player spawned at: ", spawn_position)
+
+func _spawn_enemy() -> void:
+	var boss_room: Rect2i = _generator.boss_room
+
+	if boss_room.size == Vector2i.ZERO:
+		push_warning("No boss room generated!")
+		return
+
+	var enemy: Enemy = enemy_scene.instantiate()
+
+	enemy.player = player
+
+	add_child(enemy)
+
+	var spawn_tile := boss_room.position + boss_room.size / 2
+	enemy.position = tile_layer.map_to_local(spawn_tile)
+
+	print("Enemy spawned at: ", enemy.position)
 
 func generate_dungeon() -> void:
 	_generator = DungeonGenerator.new()
@@ -104,6 +137,10 @@ func generate_dungeon() -> void:
 	_generator.generate(-1 if use_random_seed else fixed_seed)
 
 	_paint(_generator)
+	
+	_spawn_player()	
+	_spawn_enemy()
+	
 
 	if fit_camera_to_map:
 		# One ring for the wall trim, then a little rock beyond it so the
