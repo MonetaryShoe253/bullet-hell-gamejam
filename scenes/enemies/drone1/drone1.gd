@@ -1,7 +1,7 @@
 extends CharacterBody2D   # changed from Node2D — needed for velocity/move_and_slide
 
-@export var fire_rate: float = 1.5  # seconds between shots
-@export var move_speed: float = 150.0
+@export var fire_rate: float = 1.0  # seconds between shots
+@export var move_speed: float = 250.0
 @export var preferred_distance: float = 300.0
 @export var distance_tolerance: float = 20.0
 
