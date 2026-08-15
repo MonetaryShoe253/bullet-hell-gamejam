@@ -1,15 +1,13 @@
-[gd_scene format=3 uid="uid://hcgyjiixmygn"]
+[gd_scene format=3 uid="uid://b3vkn3ljed425"]
 
 [ext_resource type="PackedScene" uid="uid://cgkmebodaryei" path="res://scenes/player/player.tscn" id="1_w8frs"]
-[ext_resource type="PackedScene" uid="uid://b0dqu40lbqcsx" path="res://scenes/enemies/drone1/drone1.tscn" id="2_mx8sn"]
-[ext_resource type="Script" uid="uid://sc54sni26t8x" path="res://scenes/enemies/drone1/drone1.gd" id="3_ppgk2"]
+[ext_resource type="PackedScene" uid="uid://b0dqu40lbqcsx" path="res://scenes/enemies/enemy/enemy.tscn" id="2_mx8sn"]
 
 [node name="Level" type="Node2D" unique_id=266048962]
 
 [node name="Player" parent="." unique_id=1277505981 instance=ExtResource("1_w8frs")]
-texture_filter = 1
+position = Vector2(500, 300)
 
 [node name="Enemy" parent="." unique_id=1203205508 node_paths=PackedStringArray("player") instance=ExtResource("2_mx8sn")]
 texture_filter = 1
-script = ExtResource("3_ppgk2")
 player = NodePath("../Player")

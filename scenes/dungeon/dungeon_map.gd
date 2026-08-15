@@ -19,7 +19,6 @@ extends Node2D
 
 @onready var tile_layer: TileMapLayer = $TileMapLayer
 @onready var prop_layer: TileMapLayer = $PropLayer
-@onready var camera: Camera2D = $Camera2D
 @onready var seed_label: Label = $HUD/SeedLabel
 
 @export var tile_source_id := 0   # the TileSetAtlasSource id for the tileset (0 if it's the only source)
@@ -34,6 +33,13 @@ extends Node2D
 @export var show_hud := true
 ## Draws the ladder / wares / gate that mark out the start, shop and boss rooms.
 @export var show_room_props := true
+
+## Players and Enemies
+@export var player_scene: PackedScene
+var player: Node2D
+
+@export var enemy_scene: PackedScene
+
 
 # --- atlas coordinates (column, row) in the 16px grid ---
 
@@ -89,13 +95,39 @@ func _ready() -> void:
 	generate_dungeon()
 
 
-func _unhandled_input(event: InputEvent) -> void:
+func _unhandled_input(event: InputEvent) -> void: # DELETE LATER - HELPFUL FOR TESTING
 	if event is InputEventKey and event.pressed and not event.echo:
 		if event.keycode == KEY_R:
 			use_random_seed = true
 			generate_dungeon()
 			get_viewport().set_input_as_handled()
 
+func _spawn_player() -> void:
+	player = player_scene.instantiate()
+	add_child(player)
+
+	var spawn_position := tile_layer.map_to_local(_generator.player_spawn)
+	player.position = spawn_position
+
+	print("Player spawned at: ", spawn_position)
+
+func _spawn_enemy() -> void:
+	var boss_room: Rect2i = _generator.boss_room
+
+	if boss_room.size == Vector2i.ZERO:
+		push_warning("No boss room generated!")
+		return
+
+	var enemy: Enemy = enemy_scene.instantiate()
+
+	enemy.player = player
+
+	add_child(enemy)
+
+	var spawn_tile := boss_room.position + boss_room.size / 2
+	enemy.position = tile_layer.map_to_local(spawn_tile)
+
+	print("Enemy spawned at: ", enemy.position)
 
 func generate_dungeon() -> void:
 	_generator = DungeonGenerator.new()
@@ -104,11 +136,10 @@ func generate_dungeon() -> void:
 	_generator.generate(-1 if use_random_seed else fixed_seed)
 
 	_paint(_generator)
-
-	if fit_camera_to_map:
-		# One ring for the wall trim, then a little rock beyond it so the
-		# dungeon's outline doesn't sit flush against the screen edge.
-		_fit_camera(_generator.get_bounds().grow(3))
+	
+	_spawn_player()	
+	_spawn_enemy()
+	
 
 	seed_label.visible = show_hud
 	seed_label.text = "seed %d   ·   %d rooms   ·   boss arena %d×%d   ·   [R] regenerate" % [
@@ -295,14 +326,3 @@ func _variant(cell: Vector2i, options: Array[Vector2i]) -> Vector2i:
 func _variant_index(cell: Vector2i, count: int) -> int:
 	var hash_value: int = (cell.x * 73856093) ^ (cell.y * 19349663)
 	return (hash_value & 0x7fffffff) % count
-
-
-func _fit_camera(bounds: Rect2i) -> void:
-	var tile_size := Vector2(tile_layer.tile_set.tile_size)
-	var world_size := Vector2(bounds.size) * tile_size
-	if world_size.x <= 0.0 or world_size.y <= 0.0:
-		return
-
-	var viewport_size := get_viewport_rect().size
-	camera.position = ((Vector2(bounds.position) + Vector2(bounds.size) * 0.5) * tile_size).round()
-	camera.zoom = Vector2.ONE * minf(viewport_size.x / world_size.x, viewport_size.y / world_size.y)

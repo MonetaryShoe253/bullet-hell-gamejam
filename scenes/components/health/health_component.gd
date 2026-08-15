@@ -10,12 +10,16 @@ signal died
 
 var current_health: float
 
+var invulnerable: bool = false
 
 func _ready() -> void:
 	current_health = max_health
 
 
 func take_damage(amount: float) -> void:
+	if invulnerable:
+		return
+		
 	if amount <= 0.0 or current_health <= 0.0:
 		return
 	current_health = max(current_health - amount, 0.0)
@@ -25,7 +29,7 @@ func take_damage(amount: float) -> void:
 	health_changed.emit(current_health, max_health)
 
 	if current_health <= 0.0:
-		died.emit()
+		die()
 
 
 func heal(amount: float) -> void:
@@ -40,6 +44,11 @@ func heal(amount: float) -> void:
 	if actual_healing > 0.0:
 		healed.emit(actual_healing)
 		health_changed.emit(current_health, max_health)
+
+func die() -> void:
+	print("Entity died!")
+	died.emit()
+	get_owner().queue_free()
 
 
 func is_dead() -> bool:

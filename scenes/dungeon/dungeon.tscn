@@ -2,6 +2,8 @@
 
 [ext_resource type="Script" uid="uid://bk4xj87f0qe8a" path="res://scenes/dungeon/dungeon_map.gd" id="1_sub6p"]
 [ext_resource type="Texture2D" uid="uid://j766rkp3ucj" path="res://assets/2D Pixel Dungeon Asset Pack/character and tileset/Dungeon_Tileset.png" id="2_4f38h"]
+[ext_resource type="PackedScene" uid="uid://cgkmebodaryei" path="res://scenes/player/player.tscn" id="2_frwky"]
+[ext_resource type="PackedScene" uid="uid://b0dqu40lbqcsx" path="res://scenes/enemies/enemy/enemy.tscn" id="3_frwky"]
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_frwky"]
 texture = ExtResource("2_4f38h")
@@ -137,20 +139,20 @@ sources/0 = SubResource("TileSetAtlasSource_frwky")
 
 [node name="Dungeon" type="Node2D" unique_id=404679591]
 script = ExtResource("1_sub6p")
+player_scene = ExtResource("2_frwky")
+enemy_scene = ExtResource("3_frwky")
 
 [node name="TileMapLayer" type="TileMapLayer" parent="." unique_id=1260377071]
 texture_filter = 1
 tile_set = SubResource("TileSet_sg11a")
 
-[node name="PropLayer" type="TileMapLayer" parent="."]
+[node name="PropLayer" type="TileMapLayer" parent="." unique_id=1579483911]
 texture_filter = 1
 tile_set = SubResource("TileSet_sg11a")
 
-[node name="Camera2D" type="Camera2D" parent="."]
+[node name="HUD" type="CanvasLayer" parent="." unique_id=1108299953]
 
-[node name="HUD" type="CanvasLayer" parent="."]
-
-[node name="SeedLabel" type="Label" parent="HUD"]
+[node name="SeedLabel" type="Label" parent="HUD" unique_id=538708620]
 offset_left = 8.0
 offset_top = 6.0
 offset_right = 408.0

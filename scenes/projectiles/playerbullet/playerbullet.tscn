@@ -1,0 +1,21 @@
+[gd_scene format=3 uid="uid://d0tu6eohh56ju"]
+
+[ext_resource type="Script" uid="uid://bx2l0ng3ly0a0" path="res://scenes/projectiles/playerbullet/playerbullet.gd" id="1_86h7u"]
+[ext_resource type="Texture2D" uid="uid://cgdp617lwj1h8" path="res://assets/Bullets/sprites/bullet0.png" id="2_ch4me"]
+
+[node name="PlayerBullet" type="Area2D" unique_id=2118731839]
+scale = Vector2(0.5, 0.5)
+collision_layer = 8
+collision_mask = 5
+script = ExtResource("1_86h7u")
+metadata/_custom_type_script = "uid://cp6c3je12muh4"
+
+[node name="Sprite2D" type="Sprite2D" parent="." unique_id=598356583]
+texture_filter = 1
+rotation = 1.5707964
+texture = ExtResource("2_ch4me")
+
+[node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="." unique_id=1094932057]
+polygon = PackedVector2Array(15, 3, 15, -3, 8, -8, -1, -8, -9, -6, -15, -1, -15, 0, -11, 6, -1, 8, 8, 8)
+
+[node name="VisibleOnScreenNotifier2D" type="VisibleOnScreenNotifier2D" parent="." unique_id=979784695]

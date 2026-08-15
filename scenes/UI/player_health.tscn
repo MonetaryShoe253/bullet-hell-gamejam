@@ -1,0 +1,19 @@
+[gd_scene format=3 uid="uid://cfvi616pvm7t4"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_lvxji"]
+bg_color = Color(0.004019165, 0.004019165, 0.004019165, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_p47bc"]
+bg_color = Color(0, 1, 0, 1)
+
+[node name="HealthBar" type="CanvasLayer" unique_id=956263465]
+
+[node name="HealthBar" type="ProgressBar" parent="." unique_id=1103670671]
+offset_left = 10.0
+offset_top = 10.0
+offset_right = 260.0
+offset_bottom = 37.0
+theme_override_styles/background = SubResource("StyleBoxFlat_lvxji")
+theme_override_styles/fill = SubResource("StyleBoxFlat_p47bc")
+value = 50.0
+show_percentage = false

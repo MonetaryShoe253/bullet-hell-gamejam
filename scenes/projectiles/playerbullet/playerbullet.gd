@@ -1,7 +1,7 @@
 extends Area2D
-class_name Projectile
+class_name PlayerProjectile
 
-signal hit_player(player)
+signal hit_enemy(enemy)
 
 @export var speed: float = 400.0
 @export var damage: float = 5.0
@@ -19,7 +19,7 @@ func launch(start_position: Vector2, target_direction: Vector2) -> void:
 	rotation = direction.angle()
 
 func _on_body_entered(body: Node2D) -> void:
-	if body.is_in_group("player"):
+	if body.is_in_group("enemy"):
 		var hurt_box = body.get_node("Components/HurtBox")
 		hurt_box.take_damage(damage)
-		queue_free()
+	queue_free()
