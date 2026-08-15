@@ -4,6 +4,7 @@ class_name Projectile
 signal hit_player(player)
 
 @export var speed: float = 400.0
+@export var damage: float = 5.0
 var direction: Vector2 = Vector2.RIGHT
 
 func _ready() -> void:
@@ -19,5 +20,5 @@ func launch(start_position: Vector2, target_direction: Vector2) -> void:
 
 func _on_body_entered(body: Node2D) -> void:
 	if body.is_in_group("player"):
-		hit_player.emit(body)
+		hit_player.emit(damage)
 		queue_free()
