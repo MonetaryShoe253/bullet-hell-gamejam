@@ -18,12 +18,29 @@ func _ready() -> void:
 	timer.start()
 
 func _physics_process(_delta: float) -> void:
-	_mirror_player_movement()
+	if can_see_player():
+		_mirror_player_movement()
+	else:
+		velocity = Vector2.ZERO
+		move_and_slide()
 
-func fire_at_player() -> void:
-	print("fire!")
+func can_see_player() -> bool:
 	if player == null:
+		return false
+
+	var ray := $PlayerSight as RayCast2D
+
+	ray.target_position = ray.to_local(player.global_position)
+	ray.force_raycast_update()
+
+	return ray.is_colliding() and ray.get_collider() == player
+	
+func fire_at_player() -> void:
+	if player == null:
+		return		
+	if not can_see_player():
 		return
+		
 	var proj: Projectile = projectile_scene.instantiate()
 	get_tree().current_scene.add_child(proj)
 	var dir := (player.global_position - global_position).normalized()

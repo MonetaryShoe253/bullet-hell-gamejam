@@ -23,6 +23,9 @@ polygon = PackedVector2Array(-159, -93, -160, -55, -33, 81, 38, 81, 168, -58, 16
 
 [node name="Node2D" type="Node2D" parent="." unique_id=1111025143]
 
+[node name="PlayerSight" type="RayCast2D" parent="." unique_id=917071951]
+collision_mask = 3
+
 [node name="Components" type="Node" parent="." unique_id=1945686008]
 
 [node name="HurtBox" parent="Components" unique_id=1254363551 instance=ExtResource("2_2hfpr")]
