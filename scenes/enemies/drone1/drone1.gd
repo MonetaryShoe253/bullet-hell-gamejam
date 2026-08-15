@@ -5,7 +5,7 @@ extends CharacterBody2D   # changed from Node2D — needed for velocity/move_and
 @export var preferred_distance: float = 300.0
 @export var distance_tolerance: float = 20.0
 
-var projectile_scene := preload("res://scenes/projectiles/bullet1/bullet1.tscn")
+var projectile_scene := preload("res://scenes/projectiles/enemybullet/enemybullet.tscn")
 @export var player: Node2D  # reference to the player, set this however you're tracking it
 
 func _ready() -> void:
@@ -21,7 +21,7 @@ func _physics_process(_delta: float) -> void:
 func fire_at_player() -> void:
 	if player == null:
 		return
-	var proj: Projectile = projectile_scene.instantiate()
+	var proj: EnemyProjectile = projectile_scene.instantiate()
 	get_tree().current_scene.add_child(proj)
 	var dir := (player.global_position - global_position).normalized()
 	proj.launch(global_position, dir)
