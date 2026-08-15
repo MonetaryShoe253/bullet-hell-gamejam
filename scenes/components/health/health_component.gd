@@ -25,7 +25,7 @@ func take_damage(amount: float) -> void:
 	health_changed.emit(current_health, max_health)
 
 	if current_health <= 0.0:
-		died.emit()
+		die()
 
 
 func heal(amount: float) -> void:
@@ -40,6 +40,11 @@ func heal(amount: float) -> void:
 	if actual_healing > 0.0:
 		healed.emit(actual_healing)
 		health_changed.emit(current_health, max_health)
+
+func die() -> void:
+	print("Entity died!")
+	died.emit()
+	get_owner().queue_free()
 
 
 func is_dead() -> bool:
