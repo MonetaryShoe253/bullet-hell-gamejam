@@ -2,6 +2,8 @@ class_name Player
 extends CharacterBody2D
 
 @export var move_speed: float = 250.0
+@export var muzzle_offset: float = 30.0  # distance from player center to spawn point
+
 var projectile_scene: PackedScene = preload("res://scenes/projectiles/playerbullet/playerbullet.tscn")
 
 func _physics_process(_delta: float) -> void:
@@ -20,5 +22,8 @@ func _physics_process(_delta: float) -> void:
 func shoot() -> void:
 	var proj: PlayerProjectile = projectile_scene.instantiate()
 	get_tree().current_scene.add_child(proj)
-	var aim_direction := get_global_mouse_position() - global_position
-	proj.launch(global_position, aim_direction)
+
+	var aim_direction := (get_global_mouse_position() - global_position).normalized()
+	var spawn_position := global_position + aim_direction * muzzle_offset
+
+	proj.launch(spawn_position, aim_direction)

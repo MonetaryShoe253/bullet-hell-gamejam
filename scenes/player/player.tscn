@@ -15,6 +15,7 @@ size = Vector2(10, 12)
 texture_filter = 1
 collision_layer = 2
 script = ExtResource("1_8afob")
+muzzle_offset = 15.0
 
 [node name="Sprite2D" type="Sprite2D" parent="." unique_id=2147301644]
 texture_filter = 1
@@ -38,5 +39,10 @@ shape = SubResource("RectangleShape2D_nehcj")
 max_health = 25.0
 
 [node name="AnimationPlayer" type="AnimationPlayer" parent="." unique_id=1940173901]
+
+[node name="Camera2D" type="Camera2D" parent="." unique_id=1105706883]
+zoom = Vector2(3, 3)
+position_smoothing_enabled = true
+position_smoothing_speed = 10.0
 
 [editable path="Components/HurtBox"]
