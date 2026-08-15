@@ -16,6 +16,7 @@ size = Vector2(10, 12)
 texture_filter = 1
 collision_layer = 2
 script = ExtResource("1_8afob")
+move_speed = 125.0
 muzzle_offset = 15.0
 
 [node name="Sprite2D" type="Sprite2D" parent="." unique_id=2147301644]

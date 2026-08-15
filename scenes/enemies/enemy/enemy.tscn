@@ -9,6 +9,7 @@
 scale = Vector2(0.12, 0.12)
 collision_layer = 4
 script = ExtResource("1_hibra")
+fire_rate = 0.2
 
 [node name="Sprite2D" type="Sprite2D" parent="." unique_id=605565021]
 texture_filter = 1
