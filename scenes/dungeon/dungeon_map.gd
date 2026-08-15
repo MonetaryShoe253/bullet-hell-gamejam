@@ -142,11 +142,6 @@ func generate_dungeon() -> void:
 	_spawn_enemy()
 	
 
-	if fit_camera_to_map:
-		# One ring for the wall trim, then a little rock beyond it so the
-		# dungeon's outline doesn't sit flush against the screen edge.
-		_fit_camera(_generator.get_bounds().grow(3))
-
 	seed_label.visible = show_hud
 	seed_label.text = "seed %d   ·   %d rooms   ·   boss arena %d×%d   ·   [R] regenerate" % [
 			_generator.seed_used, _generator.rooms.size(),
@@ -332,14 +327,3 @@ func _variant(cell: Vector2i, options: Array[Vector2i]) -> Vector2i:
 func _variant_index(cell: Vector2i, count: int) -> int:
 	var hash_value: int = (cell.x * 73856093) ^ (cell.y * 19349663)
 	return (hash_value & 0x7fffffff) % count
-
-
-func _fit_camera(bounds: Rect2i) -> void:
-	var tile_size := Vector2(tile_layer.tile_set.tile_size)
-	var world_size := Vector2(bounds.size) * tile_size
-	if world_size.x <= 0.0 or world_size.y <= 0.0:
-		return
-
-	var viewport_size := get_viewport_rect().size
-	camera.position = ((Vector2(bounds.position) + Vector2(bounds.size) * 0.5) * tile_size).round()
-	camera.zoom = Vector2.ONE * minf(viewport_size.x / world_size.x, viewport_size.y / world_size.y)

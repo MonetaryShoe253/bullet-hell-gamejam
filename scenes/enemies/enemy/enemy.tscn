@@ -1,6 +1,6 @@
 [gd_scene format=3 uid="uid://b0dqu40lbqcsx"]
 
-[ext_resource type="Script" uid="uid://sc54sni26t8x" path="res://scenes/enemies/drone1/drone1.gd" id="1_hibra"]
+[ext_resource type="Script" uid="uid://sc54sni26t8x" path="res://scenes/enemies/enemy/enemy.gd" id="1_hibra"]
 [ext_resource type="Texture2D" uid="uid://b1s2ce2eptq00" path="res://assets/Drones/Enemies T1 Sprite Sheet.png" id="1_q22yy"]
 [ext_resource type="PackedScene" uid="uid://hamwnbllhiuu" path="res://scenes/components/hurtbox/hurt_box.tscn" id="2_2hfpr"]
 [ext_resource type="PackedScene" uid="uid://do4swhon6n2q2" path="res://scenes/components/health/health_component.tscn" id="3_8pc45"]

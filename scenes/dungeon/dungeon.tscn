@@ -3,7 +3,7 @@
 [ext_resource type="Script" uid="uid://bk4xj87f0qe8a" path="res://scenes/dungeon/dungeon_map.gd" id="1_sub6p"]
 [ext_resource type="Texture2D" uid="uid://j766rkp3ucj" path="res://assets/2D Pixel Dungeon Asset Pack/character and tileset/Dungeon_Tileset.png" id="2_4f38h"]
 [ext_resource type="PackedScene" uid="uid://cgkmebodaryei" path="res://scenes/player/player.tscn" id="2_frwky"]
-[ext_resource type="PackedScene" uid="uid://b0dqu40lbqcsx" path="res://scenes/enemies/drone1/drone1.tscn" id="3_frwky"]
+[ext_resource type="PackedScene" uid="uid://b0dqu40lbqcsx" path="res://scenes/enemies/enemy/enemy.tscn" id="3_frwky"]
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_frwky"]
 texture = ExtResource("2_4f38h")
@@ -139,14 +139,6 @@ sources/0 = SubResource("TileSetAtlasSource_frwky")
 
 [node name="Dungeon" type="Node2D" unique_id=404679591]
 script = ExtResource("1_sub6p")
-tile_source_id = null
-map_size = null
-use_random_seed = null
-fixed_seed = null
-void_margin = null
-fit_camera_to_map = null
-show_hud = null
-show_room_props = null
 player_scene = ExtResource("2_frwky")
 enemy_scene = ExtResource("3_frwky")
 
@@ -157,8 +149,6 @@ tile_set = SubResource("TileSet_sg11a")
 [node name="PropLayer" type="TileMapLayer" parent="." unique_id=1579483911]
 texture_filter = 1
 tile_set = SubResource("TileSet_sg11a")
-
-[node name="Camera2D" type="Camera2D" parent="." unique_id=2042831768]
 
 [node name="HUD" type="CanvasLayer" parent="." unique_id=1108299953]
 
