@@ -5,7 +5,6 @@ extends Area2D
 
 
 func take_damage(amount: float) -> void:	
-	print("test")
 	if health_component == null:
 		push_warning("HurtboxComponent has no HealthComponent assigned.")
 		return
