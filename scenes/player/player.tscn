@@ -1,0 +1,35 @@
+[gd_scene format=3 uid="uid://cgkmebodaryei"]
+
+[ext_resource type="Script" uid="uid://bxpm47jm72nwr" path="res://scenes/player/player.gd" id="1_8afob"]
+[ext_resource type="Texture2D" uid="uid://c1e3fx55smxsf" path="res://assets/Players/Dwarf/Dwarf_idle_forward.png" id="2_dovo2"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_gmlin"]
+size = Vector2(12, 14)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_lvxji"]
+size = Vector2(10, 12)
+
+[node name="Player" type="CharacterBody2D" unique_id=1277505981]
+position = Vector2(500, 300)
+collision_layer = 2
+script = ExtResource("1_8afob")
+
+[node name="Sprite2D" type="Sprite2D" parent="." unique_id=2147301644]
+texture_filter = 1
+texture = ExtResource("2_dovo2")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=1072646543]
+shape = SubResource("RectangleShape2D_gmlin")
+
+[node name="HurtBox" type="Area2D" parent="." unique_id=769132133]
+collision_layer = 2
+collision_mask = 20
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="HurtBox" unique_id=131984625]
+shape = SubResource("RectangleShape2D_lvxji")
+
+[node name="WeaponController" type="Node2D" parent="." unique_id=331834832]
+
+[node name="Components" type="Node" parent="." unique_id=2100966599]
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="." unique_id=1940173901]
