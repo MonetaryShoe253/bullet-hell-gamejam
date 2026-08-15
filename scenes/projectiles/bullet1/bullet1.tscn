@@ -1,0 +1,18 @@
+[gd_scene format=3 uid="uid://cxyxspte2w1mg"]
+
+[ext_resource type="Texture2D" uid="uid://blqk21eblm8ni" path="res://assets/Bullets/sprites/bullet4.png" id="1_51qx2"]
+[ext_resource type="Script" uid="uid://cp6c3je12muh4" path="res://scenes/projectiles/bullet1/bullet1.gd" id="1_mk0ff"]
+
+[node name="EnemyBullet" type="Area2D" unique_id=884955343]
+script = ExtResource("1_mk0ff")
+
+[node name="Sprite2D" type="Sprite2D" parent="." unique_id=1581674488]
+texture_filter = 1
+rotation = 1.5707964
+texture = ExtResource("1_51qx2")
+
+[node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="." unique_id=1945350566]
+visible = false
+polygon = PackedVector2Array(-8, -5, -6, -5, -6, -4, 11, -4, 11, -3, 14, -3, 14, -2, 15, -2, 15, 2, 14, 2, 14, 3, 11, 3, 11, 4, -6, 4, -6, 5, -8, 5, -8, 2, -10, 2, -10, 1, -13, 1, -13, 0, -15, 0, -15, -1, -12, -1, -12, -2, -8, -2)
+
+[node name="VisibleOnScreenNotifier2D" type="VisibleOnScreenNotifier2D" parent="." unique_id=1892516894]
