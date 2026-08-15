@@ -5,7 +5,7 @@
 [ext_resource type="PackedScene" uid="uid://hamwnbllhiuu" path="res://scenes/components/hurtbox/hurt_box.tscn" id="2_2hfpr"]
 [ext_resource type="PackedScene" uid="uid://do4swhon6n2q2" path="res://scenes/components/health/health_component.tscn" id="3_8pc45"]
 
-[node name="Enemy" type="CharacterBody2D" unique_id=1203205508]
+[node name="Enemy" type="CharacterBody2D" unique_id=1203205508 groups=["enemy"]]
 scale = Vector2(0.27, 0.27)
 collision_layer = 4
 script = ExtResource("1_hibra")
