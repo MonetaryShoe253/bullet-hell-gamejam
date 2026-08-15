@@ -92,7 +92,7 @@ The top-left 6×6 block is one worked example of a room, and that block *is* the
 mapping:
 
 ```
-        col 0        col 1..4              col 5
+		col 0        col 1..4              col 5
 row 0   west wall    NORTH WALL            east wall
 row 1   west wall    floor, north edge     east wall
 row 2   west wall    floor, no edge        east wall
