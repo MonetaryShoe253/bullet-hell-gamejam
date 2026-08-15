@@ -20,5 +20,6 @@ func launch(start_position: Vector2, target_direction: Vector2) -> void:
 
 func _on_body_entered(body: Node2D) -> void:
 	if body.is_in_group("player"):
-		body.take_damage(damage)
+		var hurt_box = body.get_node("Components/HurtBox")
+		hurt_box.take_damage(damage)
 		queue_free()
