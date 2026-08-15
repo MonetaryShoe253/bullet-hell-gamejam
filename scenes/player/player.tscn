@@ -2,6 +2,7 @@
 
 [ext_resource type="Script" uid="uid://bxpm47jm72nwr" path="res://scenes/player/player.gd" id="1_8afob"]
 [ext_resource type="Texture2D" uid="uid://c1e3fx55smxsf" path="res://assets/Players/Dwarf/Dwarf_idle_forward.png" id="2_dovo2"]
+[ext_resource type="PackedScene" uid="uid://do4swhon6n2q2" path="res://scenes/components/health/HealthComponent.tscn" id="3_gmlin"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_gmlin"]
 size = Vector2(12, 14)
@@ -31,5 +32,7 @@ shape = SubResource("RectangleShape2D_lvxji")
 [node name="WeaponController" type="Node2D" parent="." unique_id=331834832]
 
 [node name="Components" type="Node" parent="." unique_id=2100966599]
+
+[node name="HealthComponent" parent="Components" unique_id=1395210045 instance=ExtResource("3_gmlin")]
 
 [node name="AnimationPlayer" type="AnimationPlayer" parent="." unique_id=1940173901]
