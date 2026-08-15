@@ -10,12 +10,16 @@ signal died
 
 var current_health: float
 
+var invulnerable: bool = false
 
 func _ready() -> void:
 	current_health = max_health
 
 
 func take_damage(amount: float) -> void:
+	if invulnerable:
+		return
+		
 	if amount <= 0.0 or current_health <= 0.0:
 		return
 	current_health = max(current_health - amount, 0.0)

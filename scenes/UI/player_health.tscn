@@ -6,7 +6,7 @@ bg_color = Color(0.004019165, 0.004019165, 0.004019165, 1)
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_p47bc"]
 bg_color = Color(0, 1, 0, 1)
 
-[node name="HUD" type="CanvasLayer" unique_id=956263465]
+[node name="HealthBar" type="CanvasLayer" unique_id=956263465]
 
 [node name="HealthBar" type="ProgressBar" parent="." unique_id=1103670671]
 offset_left = 10.0

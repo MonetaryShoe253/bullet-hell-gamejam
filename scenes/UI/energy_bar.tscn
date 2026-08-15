@@ -1,0 +1,20 @@
+[gd_scene format=3 uid="uid://m7dvd11aqb4x"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_3nhhm"]
+bg_color = Color(0.004019165, 0.004019165, 0.004019165, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_8cdx8"]
+bg_color = Color(1, 0.6862745, 0, 1)
+
+[node name="EnergyBar" type="CanvasLayer" unique_id=1631118562]
+
+[node name="EnergyBar" type="ProgressBar" parent="." unique_id=526983989]
+offset_left = 10.0
+offset_top = 47.0
+offset_right = 260.0
+offset_bottom = 74.0
+theme_override_styles/background = SubResource("StyleBoxFlat_3nhhm")
+theme_override_styles/fill = SubResource("StyleBoxFlat_8cdx8")
+max_value = 1.0
+value = 1.0
+show_percentage = false
