@@ -4,6 +4,7 @@
 [ext_resource type="Texture2D" uid="uid://j766rkp3ucj" path="res://assets/2D Pixel Dungeon Asset Pack/character and tileset/Dungeon_Tileset.png" id="2_4f38h"]
 [ext_resource type="PackedScene" uid="uid://cgkmebodaryei" path="res://scenes/player/player.tscn" id="2_frwky"]
 [ext_resource type="PackedScene" path="res://scenes/UI/boss_health_bar.tscn" id="4_boss_hp"]
+[ext_resource type="Script" path="res://scenes/UI/minimap.gd" id="5_minimap"]
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_frwky"]
 texture = ExtResource("2_4f38h")
@@ -160,6 +161,17 @@ theme_override_colors/font_color = Color(1, 0.85, 0.2, 1)
 theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
 theme_override_constants/outline_size = 3
 theme_override_font_sizes/font_size = 22
-text = "Money: 0"
+text = "Cluck Coins: 0"
+
+[node name="Minimap" type="Control" parent="HUD"]
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -270.0
+offset_top = 10.0
+offset_right = -10.0
+offset_bottom = 190.0
+grow_horizontal = 0
+script = ExtResource("5_minimap")
 
 [node name="BossHealthBar" parent="." instance=ExtResource("4_boss_hp")]

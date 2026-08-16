@@ -8,6 +8,13 @@
         "start"
 	  ],
 	  "env": {}
+	},
+	"pixellab": {
+	  "type": "http",
+	  "url": "https://api.pixellab.ai/mcp",
+	  "headers": {
+		"Authorization": "Bearer ${PIXELLAB_API_KEY}"
+	  }
 	}
   }
 }
