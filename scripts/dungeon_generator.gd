@@ -19,11 +19,15 @@ enum Cell { FLOOR }
 enum RoomKind { NORMAL, START, SHOP, BOSS }
 
 # --- Tuning knobs (set these before calling generate()) ---
-var map_size := Vector2i(60, 40)
-var min_partition_size := 12      # keep this >= min_room_size + padding*2 + a margin
-var min_room_size := 7            # bullet-hell arenas want generous space, not tiny rooms
-var room_padding := 1             # gap between a room and its partition edge
-var corridor_width := 3           # wide enough to dodge while transitioning rooms
+# Room floor is sized so the smallest possible room (min_room_size squared)
+# still covers a 1920x1080 viewport at the player camera's 3x zoom - a 16px
+# tile means ~40x23 tiles are on screen at once, so 44 gives every room, not
+# just the boss arena, a margin beyond that in both axes.
+var map_size := Vector2i(260, 180)
+var min_partition_size := 52      # keep this >= min_room_size + padding*2 + a margin
+var min_room_size := 44           # bullet-hell arenas want generous space, not tiny rooms
+var room_padding := 2             # gap between a room and its partition edge
+var corridor_width := 5           # wide enough to dodge while transitioning rooms
 
 var rng := RandomNumberGenerator.new()
 var grid: Dictionary = {}         # Vector2i -> Cell.FLOOR
@@ -35,6 +39,17 @@ var start_room := Rect2i()
 var shop_room := Rect2i()
 var boss_room := Rect2i()
 var player_spawn := Vector2i.ZERO  # centre cell of start_room
+
+## A short dead-end appended beyond the boss room once it's known where that
+## room's own doorway landed - see _carve_stairs_room(). Zero-sized if the
+## boss room's exit couldn't be worked out (only possible with 1 room).
+var stairs_room := Rect2i()
+var stairs_cell := Vector2i.ZERO
+
+## The two doorway cells on the boss room's north wall, same spot the gate prop
+## is drawn on. Filled in by _carve_stairs_room() so the renderer and the room
+## gate/trigger logic don't each have to recompute where "the gate" is.
+var boss_gate_cells: Array[Vector2i] = []
 
 ## The leaf partition each entry of `rooms` came from, same order. Needed to
 ## grow the boss room out to fill its partition once the roles are handed out.
@@ -71,6 +86,8 @@ func generate(seed_value: int = -1) -> void:
 	shop_room = Rect2i()
 	boss_room = Rect2i()
 	player_spawn = Vector2i.ZERO
+	stairs_room = Rect2i()
+	stairs_cell = Vector2i.ZERO
 	seed_used = seed_value if seed_value >= 0 else randi()
 	rng.seed = seed_used
 
@@ -81,6 +98,7 @@ func generate(seed_value: int = -1) -> void:
 	# so the corridors that follow are routed to where its centre ends up.
 	_assign_roles()
 	_connect_rooms(root)
+	_carve_stairs_room()
 	_clean_up()
 
 
@@ -96,6 +114,51 @@ func kind_of(room: Rect2i) -> RoomKind:
 	if room == shop_room:
 		return RoomKind.SHOP
 	return RoomKind.NORMAL
+
+
+## Doorway cells where a room's rect meets a corridor: floor cells one step
+## outside `room`'s four edges, clustered into contiguous runs. Each run is one
+## physical opening a gate can block. Used by the room-gating system to know
+## where to put its colliders; has no effect on generation itself.
+func get_room_exits(room: Rect2i) -> Array:
+	var spans: Array = []
+	spans.append_array(_edge_spans(room, Vector2i(0, -1)))
+	spans.append_array(_edge_spans(room, Vector2i(0, 1)))
+	spans.append_array(_edge_spans(room, Vector2i(-1, 0)))
+	spans.append_array(_edge_spans(room, Vector2i(1, 0)))
+	return spans
+
+
+func _edge_spans(room: Rect2i, dir: Vector2i) -> Array:
+	var cells: Array[Vector2i] = []
+	if dir.x == 0:
+		var y: int = room.position.y - 1 if dir.y < 0 else room.end.y
+		for x in range(room.position.x, room.end.x):
+			var c := Vector2i(x, y)
+			if grid.has(c):
+				cells.append(c)
+	else:
+		var x: int = room.position.x - 1 if dir.x < 0 else room.end.x
+		for y in range(room.position.y, room.end.y):
+			var c := Vector2i(x, y)
+			if grid.has(c):
+				cells.append(c)
+
+	# `cells` comes out sorted along the edge, so a run breaks the moment the
+	# next cell isn't adjacent to the last one.
+	var spans: Array = []
+	var current: Array[Vector2i] = []
+	for c: Vector2i in cells:
+		if not current.is_empty():
+			var prev: Vector2i = current[-1]
+			var adjacent: bool = (dir.x == 0 and c.x == prev.x + 1) or (dir.y == 0 and c.y == prev.y + 1)
+			if not adjacent:
+				spans.append(current)
+				current = []
+		current.append(c)
+	if not current.is_empty():
+		spans.append(current)
+	return spans
 
 
 ## Every empty cell that touches a floor cell 8-directionally. This is the ring
@@ -318,6 +381,33 @@ func _connect_rooms(node: BSPNode) -> Array[Rect2i]:
 	all_rooms.append_array(left_rooms)
 	all_rooms.append_array(right_rooms)
 	return all_rooms
+
+
+## A small dead-end room latched onto the boss arena's north wall, at the same
+## spot _decorate_boss draws its gate prop - this is the "climb to the next
+## level" landing once the boss is dead. Not every seed has map space north of
+## the boss room for it; when it doesn't fit, stairs_room is left zero-sized
+## and the caller falls back to putting the level-up trigger at the gate itself.
+func _carve_stairs_room() -> void:
+	if boss_room.size == Vector2i.ZERO:
+		return
+
+	var gate_x: int = boss_room.position.x + boss_room.size.x / 2 - 1
+	var top: int = boss_room.position.y
+	boss_gate_cells = [Vector2i(gate_x, top), Vector2i(gate_x + 1, top)]
+
+	var stairs_w := 10
+	var stairs_h := 8
+	var candidate := Rect2i(
+			gate_x - stairs_w / 2 + 1, top - room_padding - 1 - stairs_h,
+			stairs_w, stairs_h)
+	if not _interior().encloses(candidate):
+		return
+
+	stairs_room = candidate
+	_carve_rect(stairs_room)
+	stairs_cell = _center(stairs_room)
+	_carve_corridor(Vector2i(gate_x, top - 1), stairs_cell)
 
 
 func _center(r: Rect2i) -> Vector2i:

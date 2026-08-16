@@ -25,6 +25,8 @@ var dash_cooldown_remaining: float = 0.0
 var projectile_scene: PackedScene = preload("res://scenes/projectiles/playerbullet/playerbullet.tscn")
 var time_since_last_shot: float = 0.0
 
+const GameOverScene := preload("res://scenes/UI/game_over.tscn")
+
 @onready var health_component: HealthComponent = $Components/HealthComponent
 @onready var health_bar: ProgressBar = $HealthBar/HealthBar
 @onready var dash_cooldown_bar: ProgressBar = $EnergyBar/EnergyBar
@@ -33,16 +35,24 @@ func _ready() -> void:
 	health_bar.value = health_component.current_health
 
 	health_component.health_changed.connect(_on_health_changed)
-	
+	health_component.died.connect(_on_died)
+
 	dash_cooldown_bar.min_value = 0.0
 	dash_cooldown_bar.max_value = 1.0
 	dash_cooldown_bar.value = 1.0
-	
-	
+
+
 func _on_health_changed(current_health: float, max_health: float) -> void:
 	health_bar.max_value = max_health
 	health_bar.value = current_health
-	
+
+
+func _on_died() -> void:
+	var game_over := GameOverScene.instantiate()
+	get_tree().root.add_child(game_over)
+	get_tree().paused = true
+
+
 func _physics_process(delta: float) -> void:
 	if is_dashing:
 		velocity = dash_direction * dash_speed

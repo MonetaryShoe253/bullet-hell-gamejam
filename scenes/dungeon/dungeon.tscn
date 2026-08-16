@@ -3,7 +3,6 @@
 [ext_resource type="Script" uid="uid://bk4xj87f0qe8a" path="res://scenes/dungeon/dungeon_map.gd" id="1_sub6p"]
 [ext_resource type="Texture2D" uid="uid://j766rkp3ucj" path="res://assets/2D Pixel Dungeon Asset Pack/character and tileset/Dungeon_Tileset.png" id="2_4f38h"]
 [ext_resource type="PackedScene" uid="uid://cgkmebodaryei" path="res://scenes/player/player.tscn" id="2_frwky"]
-[ext_resource type="PackedScene" uid="uid://b0dqu40lbqcsx" path="res://scenes/enemies/enemy/enemy.tscn" id="3_frwky"]
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_frwky"]
 texture = ExtResource("2_4f38h")
@@ -140,7 +139,6 @@ sources/0 = SubResource("TileSetAtlasSource_frwky")
 [node name="Dungeon" type="Node2D" unique_id=404679591]
 script = ExtResource("1_sub6p")
 player_scene = ExtResource("2_frwky")
-enemy_scene = ExtResource("3_frwky")
 
 [node name="TileMapLayer" type="TileMapLayer" parent="." unique_id=1260377071]
 texture_filter = 1
@@ -157,3 +155,14 @@ offset_left = 8.0
 offset_top = 6.0
 offset_right = 408.0
 offset_bottom = 29.0
+
+[node name="MoneyLabel" type="Label" parent="HUD"]
+offset_left = 8.0
+offset_top = 84.0
+offset_right = 300.0
+offset_bottom = 112.0
+theme_override_colors/font_color = Color(1, 0.85, 0.2, 1)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 3
+theme_override_font_sizes/font_size = 22
+text = "Money: 0"

@@ -15,14 +15,21 @@ extends Node2D
 ## the area beyond the dungeon read as solid rock that lines up seamlessly with
 ## the wall art, rather than showing the empty viewport background through it.
 ##
+## This also owns the run's room-gating: every NORMAL/BOSS room gets a
+## RoomController (see room_controller.gd) that seals its doorways the moment
+## the player steps in, and opens them again once EnemySpawner's enemies are
+## all dead. Beating the boss reveals a stairway that regenerates the whole
+## dungeon one level harder.
+##
 ## See docs/dungeon-generator.md for the full atlas map and how it was derived.
 
 @onready var tile_layer: TileMapLayer = $TileMapLayer
 @onready var prop_layer: TileMapLayer = $PropLayer
 @onready var seed_label: Label = $HUD/SeedLabel
+@onready var money_label: Label = $HUD/MoneyLabel
 
 @export var tile_source_id := 0   # the TileSetAtlasSource id for the tileset (0 if it's the only source)
-@export var map_size := Vector2i(60, 40)
+@export var map_size := Vector2i(260, 180)
 @export var use_random_seed := true
 @export var fixed_seed := 12345   # used when use_random_seed is false, for reproducible testing
 
@@ -38,7 +45,7 @@ extends Node2D
 @export var player_scene: PackedScene
 var player: Node2D
 
-@export var enemy_scene: PackedScene
+const DemonPortalScene := preload("res://scenes/dungeon/demon_portal.tscn")
 
 
 # --- atlas coordinates (column, row) in the 16px grid ---
@@ -89,9 +96,14 @@ const EAST := Vector2i(1, 0)
 const WEST := Vector2i(-1, 0)
 
 var _generator: DungeonGenerator
+var _spawner: EnemySpawner
+var _room_controllers: Array[RoomController] = []
+var _stairs_trigger: Area2D
 
 
 func _ready() -> void:
+	GameState.money_changed.connect(_on_money_changed)
+	_on_money_changed(GameState.money)
 	generate_dungeon()
 
 
@@ -111,40 +123,148 @@ func _spawn_player() -> void:
 
 	print("Player spawned at: ", spawn_position)
 
-func _spawn_enemy() -> void:
-	var boss_room: Rect2i = _generator.boss_room
 
-	if boss_room.size == Vector2i.ZERO:
-		push_warning("No boss room generated!")
-		return
+func _on_money_changed(total: int) -> void:
+	if money_label:
+		money_label.text = "Money: %d" % total
 
-	var enemy: Enemy = enemy_scene.instantiate()
 
-	enemy.player = player
+## Tears down everything from the previous dungeon (player, enemies, gates,
+## stairs) before a new layout is generated - both for the "R" debug regenerate
+## and for advancing to the next level.
+func _clear_level_entities() -> void:
+	if player and is_instance_valid(player):
+		player.queue_free()
+	player = null
 
-	add_child(enemy)
+	for enemy in get_tree().get_nodes_in_group("enemy"):
+		if is_instance_valid(enemy) and enemy.get_parent() == self:
+			enemy.queue_free()
 
-	var spawn_tile := boss_room.position + boss_room.size / 2
-	enemy.position = tile_layer.map_to_local(spawn_tile)
+	for rc: RoomController in _room_controllers:
+		if is_instance_valid(rc):
+			rc.queue_free()
+	_room_controllers.clear()
 
-	print("Enemy spawned at: ", enemy.position)
+	if _stairs_trigger and is_instance_valid(_stairs_trigger):
+		_stairs_trigger.queue_free()
+	_stairs_trigger = null
+
 
 func generate_dungeon() -> void:
+	_clear_level_entities()
+
 	_generator = DungeonGenerator.new()
 	_generator.map_size = map_size
 
 	_generator.generate(-1 if use_random_seed else fixed_seed)
 
 	_paint(_generator)
-	
-	_spawn_player()	
-	_spawn_enemy()
-	
+
+	_spawn_player()
+	_spawner = EnemySpawner.new(self, tile_layer, player)
+	_setup_rooms(_generator)
 
 	seed_label.visible = show_hud
 	seed_label.text = "seed %d   ·   %d rooms   ·   boss arena %d×%d   ·   [R] regenerate" % [
 			_generator.seed_used, _generator.rooms.size(),
 			_generator.boss_room.size.x, _generator.boss_room.size.y]
+
+
+## One RoomController per fight room. Start and shop never gate, so they don't
+## get one at all - the player can always walk straight through them.
+func _setup_rooms(gen: DungeonGenerator) -> void:
+	for room: Rect2i in gen.rooms:
+		var kind: DungeonGenerator.RoomKind = gen.kind_of(room)
+		if kind != DungeonGenerator.RoomKind.NORMAL and kind != DungeonGenerator.RoomKind.BOSS:
+			continue
+
+		var rc := RoomController.new()
+		rc.room_rect = room
+		rc.kind = kind
+		add_child(rc)
+		rc.setup(tile_layer, gen.get_room_exits(room))
+		rc.player_entered.connect(_on_room_player_entered)
+		rc.all_enemies_cleared.connect(_on_room_cleared)
+		_room_controllers.append(rc)
+
+
+func _on_room_player_entered(rc: RoomController) -> void:
+	if rc.cleared:
+		return
+
+	if not rc.spawned:
+		rc.spawned = true
+		if rc.kind == DungeonGenerator.RoomKind.BOSS:
+			_spawner.spawn_boss(rc.room_rect, rc)
+		else:
+			_spawner.spawn_room(_generator, rc.room_rect, rc)
+
+	rc.lock()
+	_paint_gate(rc, true)
+
+
+func _on_room_cleared(rc: RoomController) -> void:
+	_paint_gate(rc, false)
+	if rc.kind == DungeonGenerator.RoomKind.BOSS:
+		_spawn_stairs_trigger()
+
+
+## Overlays (or clears) the gate arch art at a room's doorways. The blocking
+## collider itself is owned by the RoomController; this only handles what the
+## player sees.
+func _paint_gate(rc: RoomController, locked: bool) -> void:
+	for span: Array in rc.exits:
+		for i in span.size():
+			var cell: Vector2i = span[i]
+			if locked:
+				prop_layer.set_cell(cell, tile_source_id, PROP_GATE[i % PROP_GATE.size()])
+			else:
+				prop_layer.set_cell(cell, -1)
+
+
+## A stairway up appears once the boss is dead, at the small landing carved
+## behind the arena (or right at the arena gate if that landing didn't fit -
+## see DungeonGenerator._carve_stairs_room()). Walking into it advances the run.
+func _spawn_stairs_trigger() -> void:
+	var gen := _generator
+	var cell: Vector2i
+	if gen.stairs_room.size != Vector2i.ZERO:
+		cell = gen.stairs_cell
+	elif not gen.boss_gate_cells.is_empty():
+		cell = gen.boss_gate_cells[0]
+	else:
+		return
+
+	_stairs_trigger = Area2D.new()
+	_stairs_trigger.collision_layer = 0
+	_stairs_trigger.collision_mask = 2  # Player
+	add_child(_stairs_trigger)
+
+	var shape := CollisionShape2D.new()
+	var circle := CircleShape2D.new()
+	circle.radius = 24.0
+	shape.shape = circle
+	_stairs_trigger.add_child(shape)
+	_stairs_trigger.position = tile_layer.map_to_local(cell)
+	_stairs_trigger.body_entered.connect(_on_stairs_entered)
+
+	prop_layer.set_cell(cell, tile_source_id, PROP_LADDER)
+
+
+func _on_stairs_entered(body: Node) -> void:
+	if not body.is_in_group("player"):
+		return
+	if _stairs_trigger and _stairs_trigger.body_entered.is_connected(_on_stairs_entered):
+		_stairs_trigger.body_entered.disconnect(_on_stairs_entered)
+	_advance_level()
+
+
+func _advance_level() -> void:
+	GameState.advance_level()
+	Fx.level_banner("LEVEL %d" % GameState.level)
+	await get_tree().create_timer(1.2).timeout
+	generate_dungeon()
 
 
 func _paint(gen: DungeonGenerator) -> void:
@@ -177,6 +297,7 @@ func _paint_props(gen: DungeonGenerator) -> void:
 	_decorate_start(gen)
 	_decorate_shop(gen)
 	_decorate_boss(gen)
+	_place_boss_portal(gen)
 
 
 func _decorate_start(gen: DungeonGenerator) -> void:
@@ -231,6 +352,30 @@ func _decorate_boss(gen: DungeonGenerator) -> void:
 	]
 	for i in corners.size():
 		_set_prop(gen, room, room.position + corners[i], PROP_BONES[i])
+
+
+## A demon portal at the boss room's *entrance* (never its stairs-side exit),
+## so a player approaching from the rest of the dungeon can tell what's behind
+## that door before they walk in. There is exactly one of these per dungeon.
+func _place_boss_portal(gen: DungeonGenerator) -> void:
+	var room: Rect2i = gen.boss_room
+	if room.size == Vector2i.ZERO:
+		return
+
+	var north_y: int = room.position.y - 1  # where the stairs corridor exits - not the entrance
+	var entrance_span: Array = []
+	for span: Array in gen.get_room_exits(room):
+		var cell: Vector2i = span[0]
+		if cell.y != north_y:
+			entrance_span = span
+			break
+	if entrance_span.is_empty():
+		return
+
+	var mid: Vector2i = entrance_span[entrance_span.size() / 2]
+	var portal := DemonPortalScene.instantiate()
+	add_child(portal)
+	portal.position = tile_layer.map_to_local(mid)
 
 
 ## Places a floor prop, but only on a cell that is both inside the room it
