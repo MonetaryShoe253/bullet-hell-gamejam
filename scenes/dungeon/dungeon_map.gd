@@ -27,6 +27,7 @@ extends Node2D
 @onready var prop_layer: TileMapLayer = $PropLayer
 @onready var money_label: Label = $HUD/MoneyLabel
 @onready var boss_health_bar: CanvasLayer = $BossHealthBar
+@onready var shop_ui: ShopUI = $ShopUI
 @onready var minimap: Control = $HUD/Minimap
 
 @export var tile_source_id := 0   # the TileSetAtlasSource id for the tileset (0 if it's the only source)
@@ -115,6 +116,7 @@ var _generator: DungeonGenerator
 var _spawner: EnemySpawner
 var _room_controllers: Array[RoomController] = []
 var _stairs_trigger: Area2D
+var _shop_trigger: Area2D
 
 
 func _ready() -> void:
@@ -131,13 +133,22 @@ func _unhandled_input(event: InputEvent) -> void: # DELETE LATER - HELPFUL FOR T
 			get_viewport().set_input_as_handled()
 
 func _spawn_player() -> void:
-	player = player_scene.instantiate()
-	add_child(player)
-
 	var spawn_position := tile_layer.map_to_local(_generator.player_spawn)
+
+	if player == null or not is_instance_valid(player):
+		# First dungeon - create the player.
+		player = player_scene.instantiate()
+		add_child(player)
+
+		print("Player created")
+	else:
+		# Next dungeon - keep existing player.
+		print("Reusing existing player")
+
+	# Move existing/new player to the new dungeon spawn.
 	player.position = spawn_position
 
-	print("Player spawned at: ", spawn_position)
+	print("Player positioned at: ", spawn_position)
 
 
 func _on_money_changed(total: int) -> void:
@@ -149,9 +160,6 @@ func _on_money_changed(total: int) -> void:
 ## stairs) before a new layout is generated - both for the "R" debug regenerate
 ## and for advancing to the next level.
 func _clear_level_entities() -> void:
-	if player and is_instance_valid(player):
-		player.queue_free()
-	player = null
 
 	for enemy in get_tree().get_nodes_in_group("enemy"):
 		if is_instance_valid(enemy) and enemy.get_parent() == self:
@@ -165,6 +173,10 @@ func _clear_level_entities() -> void:
 	if _stairs_trigger and is_instance_valid(_stairs_trigger):
 		_stairs_trigger.queue_free()
 	_stairs_trigger = null
+	
+	if _shop_trigger and is_instance_valid(_shop_trigger):
+		_shop_trigger.queue_free()
+	_shop_trigger = null
 
 	# Godot uniquifies sibling names ("DemonPortal", "DemonPortal2", ...) since
 	# there can be several, so match by prefix rather than tracking an array.
@@ -187,10 +199,18 @@ func generate_dungeon() -> void:
 
 	_spawn_player()
 	_spawner = EnemySpawner.new(self, tile_layer, player)
+
 	_setup_rooms(_generator)
 	_scatter_decorations(_generator)
 	_spawn_shopkeeper(_generator)
+	
+	_spawn_shop_trigger()	
+	
+	shop_ui.reset_shop()
+
+
 	minimap.setup(_generator, _room_controllers, tile_layer, player)
+
 
 
 ## One RoomController per fight room. Start and shop never gate, so they don't
@@ -306,7 +326,7 @@ func _on_room_player_entered(rc: RoomController) -> void:
 func _on_room_cleared(rc: RoomController) -> void:
 	_paint_gate(rc, false)
 	if rc.kind == DungeonGenerator.RoomKind.BOSS:
-		_spawn_stairs_trigger()
+		_spawn_stairs_trigger.call_deferred()
 
 
 ## Overlays (or clears) the gate arch art at a room's doorways. The blocking
@@ -350,7 +370,57 @@ func _spawn_stairs_trigger() -> void:
 
 	prop_layer.set_cell(cell, tile_source_id, PROP_LADDER)
 
+func _spawn_shop_trigger() -> void:
+	var room: Rect2i = _generator.shop_room
 
+	if room.size == Vector2i.ZERO:
+		return
+
+	_shop_trigger = Area2D.new()
+	_shop_trigger.name = "ShopTrigger"
+
+	# The trigger itself doesn't physically collide with anything.
+	_shop_trigger.collision_layer = 0
+
+	# Your Player is physics layer 2.
+	_shop_trigger.collision_mask = 2
+
+	add_child(_shop_trigger)
+
+	var collision_shape := CollisionShape2D.new()
+	var rectangle := RectangleShape2D.new()
+
+	# Convert the shop room from tiles into pixels.
+	var tile_size := tile_layer.tile_set.tile_size
+
+	rectangle.size = Vector2(
+		room.size.x * tile_size.x,
+		room.size.y * tile_size.y
+	)
+
+	collision_shape.shape = rectangle
+	_shop_trigger.add_child(collision_shape)
+
+	# Put the Area2D in the centre of the generated shop room.
+	var center_cell: Vector2i = room.position + room.size / 2
+	_shop_trigger.position = tile_layer.map_to_local(center_cell)
+
+	_shop_trigger.body_entered.connect(_on_shop_entered)
+	_shop_trigger.body_exited.connect(_on_shop_exited)
+
+func _on_shop_entered(body: Node2D) -> void:
+	if not body.is_in_group("player"):
+		return
+
+	shop_ui.open(body)
+
+
+func _on_shop_exited(body: Node2D) -> void:
+	if not body.is_in_group("player"):
+		return
+
+	shop_ui.close()
+	
 func _on_stairs_entered(body: Node) -> void:
 	if not body.is_in_group("player"):
 		return

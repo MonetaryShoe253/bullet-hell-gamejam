@@ -15,6 +15,18 @@ func add_money(amount: int) -> void:
 		return
 	money += amount
 	money_changed.emit(money)
+	
+func spend_money(amount: int) -> bool:
+	if amount <= 0:
+		return false
+
+	if money < amount:
+		return false
+
+	money -= amount
+	money_changed.emit(money)
+
+	return true
 
 
 func advance_level() -> void:

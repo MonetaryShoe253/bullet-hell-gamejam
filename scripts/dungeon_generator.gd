@@ -24,9 +24,9 @@ enum RoomKind { NORMAL, START, SHOP, BOSS }
 # of a screen - so ordinary rooms vary from "smaller than the view" up to
 # whatever a big partition can hold, rather than every room being arena-sized.
 var map_size := Vector2i(260, 180)
-var min_partition_size := 52      # keep this >= min_room_size + padding*2 + a margin
+var min_partition_size := 60      # keep this >= min_room_size + padding*2 + a margin
 var min_room_size := 30           # bullet-hell arenas want generous space, not tiny rooms
-var room_padding := 2             # gap between a room and its partition edge
+var room_padding := 5           # gap between a room and its partition edge
 var corridor_width := 5           # wide enough to dodge while transitioning rooms
 
 ## The start room is deliberately small and cozy rather than arena-sized -

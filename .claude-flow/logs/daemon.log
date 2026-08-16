@@ -212,3 +212,29 @@
 [2026-08-16T15:22:58.875Z] [INFO] Worker optimize deferred: Memory too low: 7.9% free
 [2026-08-16T15:25:58.866Z] [INFO] Worker audit deferred: Memory too low: 8.0% free
 [2026-08-16T15:31:58.788Z] [INFO] Worker testgaps deferred: Memory too low: 9.0% free
+[2026-08-16T15:33:58.974Z] [INFO] Starting worker: map (1/2 concurrent)
+[2026-08-16T15:33:58.975Z] [INFO] Worker map completed in 2ms
+[2026-08-16T15:33:58.988Z] [INFO] Starting worker: audit (1/2 concurrent)
+[2026-08-16T15:33:58.988Z] [INFO] Worker audit completed in 1ms
+[2026-08-16T15:33:58.990Z] [INFO] Starting worker: map (1/2 concurrent)
+[2026-08-16T15:33:58.991Z] [INFO] Starting worker: audit (2/2 concurrent)
+[2026-08-16T15:33:58.991Z] [INFO] Worker map completed in 2ms
+[2026-08-16T15:33:58.992Z] [INFO] Worker audit completed in 2ms
+[2026-08-16T15:33:58.994Z] [INFO] Starting worker: optimize (1/2 concurrent)
+[2026-08-16T15:33:58.995Z] [INFO] Starting worker: consolidate (2/2 concurrent)
+[2026-08-16T15:33:58.995Z] [INFO] Starting worker: testgaps (3/2 concurrent)
+[2026-08-16T15:33:59.020Z] [INFO] Consolidate worker: distillation skipped (no-db)
+[2026-08-16T15:33:59.021Z] [INFO] Starting worker: audit (4/2 concurrent)
+[2026-08-16T15:33:59.022Z] [INFO] Worker optimize completed in 29ms
+[2026-08-16T15:33:59.022Z] [INFO] Worker consolidate completed in 28ms
+[2026-08-16T15:33:59.023Z] [INFO] Worker testgaps completed in 28ms
+[2026-08-16T15:33:59.024Z] [INFO] Worker audit completed in 4ms
+[2026-08-16T15:33:59.025Z] [INFO] Starting worker: map (1/2 concurrent)
+[2026-08-16T15:33:59.065Z] [INFO] Starting worker: optimize (2/2 concurrent)
+[2026-08-16T15:33:59.103Z] [INFO] Starting worker: audit (3/2 concurrent)
+[2026-08-16T15:33:59.125Z] [INFO] Starting worker: testgaps (4/2 concurrent)
+[2026-08-16T15:33:59.126Z] [INFO] Worker map completed in 101ms
+[2026-08-16T15:33:59.127Z] [INFO] Worker optimize completed in 101ms
+[2026-08-16T15:33:59.127Z] [INFO] Worker audit completed in 25ms
+[2026-08-16T15:33:59.128Z] [INFO] Worker testgaps completed in 25ms
+[2026-08-16T15:35:58.880Z] [INFO] Worker audit deferred: Memory too low: 9.7% free
