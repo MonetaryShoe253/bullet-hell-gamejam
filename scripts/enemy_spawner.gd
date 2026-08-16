@@ -14,7 +14,7 @@ const SLIME_TYPES: Array[Dictionary] = [
 		"health": 18.0,
 		"damage": 4.0,
 		"move_speed": 90.0,
-		"fire_rate": 1.3,
+		"fire_rate": 0.8,
 		"money_reward": 4,
 		"shot_pattern": Enemy.ShotPattern.SINGLE
 	},
@@ -23,7 +23,7 @@ const SLIME_TYPES: Array[Dictionary] = [
 		"health": 12.0,
 		"damage": 3.0,
 		"move_speed": 150.0,
-		"fire_rate": 0.8,
+		"fire_rate": 0.5,
 		"money_reward": 5,
 		"shot_pattern": Enemy.ShotPattern.BURST
 	},
@@ -32,7 +32,7 @@ const SLIME_TYPES: Array[Dictionary] = [
 		"health": 32.0,
 		"damage": 7.0,
 		"move_speed": 55.0,
-		"fire_rate": 1.8,
+		"fire_rate": 1.0,
 		"money_reward": 7,
 		"shot_pattern": Enemy.ShotPattern.SPREAD
 	},

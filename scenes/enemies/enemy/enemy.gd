@@ -25,6 +25,8 @@ var projectile_scene := preload("res://scenes/projectiles/enemybullet/enemybulle
 @export var circle_projectiles: int = 12
 @export var circle_rotation_speed: float = 7.0 # degrees per volley
 var circle_rotation: float = 0.0
+@export var circle_rotation_min: float = 0.0
+@export var circle_rotation_max: float = 120.0
 
 @export var burst_count: int = 3
 @export var burst_delay: float = 0.1
@@ -157,10 +159,16 @@ func fire_circle() -> void:
 		var direction := Vector2.RIGHT.rotated(angle)
 		spawn_projectile(direction)
 
-	circle_rotation = fmod(
-		circle_rotation + circle_rotation_speed,
-		360.0
-	)
+	# Update rotation
+	circle_rotation += circle_rotation_speed
+
+	if circle_rotation >= circle_rotation_max:
+		circle_rotation = circle_rotation_max
+		circle_rotation_speed = -abs(circle_rotation_speed)
+
+	elif circle_rotation <= circle_rotation_min:
+		circle_rotation = circle_rotation_min
+		circle_rotation_speed = abs(circle_rotation_speed)
 
 func fire_burst(_direction: Vector2) -> void:
 	for i in range(burst_count):
