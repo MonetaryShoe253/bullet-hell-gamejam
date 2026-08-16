@@ -237,7 +237,7 @@ func _on_room_player_entered(rc: RoomController) -> void:
 func _on_room_cleared(rc: RoomController) -> void:
 	_paint_gate(rc, false)
 	if rc.kind == DungeonGenerator.RoomKind.BOSS:
-		_spawn_stairs_trigger()
+		_spawn_stairs_trigger.call_deferred()
 
 
 ## Overlays (or clears) the gate arch art at a room's doorways. The blocking
