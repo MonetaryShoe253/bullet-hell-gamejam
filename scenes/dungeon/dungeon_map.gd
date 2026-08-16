@@ -25,6 +25,13 @@ extends Node2D
 
 @onready var tile_layer: TileMapLayer = $TileMapLayer
 @onready var prop_layer: TileMapLayer = $PropLayer
+## y_sort_enabled - player, enemies and obstacles all live here so a tall
+## pillar can actually be walked behind (and hide the player/an enemy behind
+## it) rather than always drawing in front or behind by sheer luck of add
+## order. Cosmetic decorations deliberately stay OUT of this layer - they're
+## floor clutter, not cover, and always belong under everything (see
+## _spawn_decoration()).
+@onready var gameplay_layer: Node2D = $GameplayLayer
 @onready var money_label: Label = $HUD/MoneyLabel
 @onready var boss_health_bar: CanvasLayer = $BossHealthBar
 @onready var shop_ui: ShopUI = $ShopUI
@@ -55,12 +62,44 @@ const DECORATION_PATHS: Array[String] = [
 	"res://assets/Wing/decorations/condiment_station.png",
 	"res://assets/Wing/decorations/jukebox.png",
 	"res://assets/Wing/decorations/potted_plant.png",
-	"res://assets/Wing/decorations/oil_barrel.png",
 	"res://assets/Wing/decorations/trash_can.png",
 	"res://assets/Wing/decorations/wing_crate.png",
 	"res://assets/Wing/vending_machine.png",
 ]
+
+## Extra decorations per NORMAL room theme, mixed in alongside the neutral
+## pool above so a themed room reads as e.g. "the burger room" at a glance
+## while still keeping some baseline diner clutter.
+const THEME_DECORATIONS: Dictionary = {
+	DungeonGenerator.RoomTheme.BURGER: [
+		"res://assets/Wing/decorations/burger_grill.png",
+		"res://assets/Wing/decorations/burger_stack.png",
+	],
+	DungeonGenerator.RoomTheme.TACO: [
+		"res://assets/Wing/decorations/taco_salsa.png",
+		"res://assets/Wing/decorations/taco_tortillas.png",
+	],
+	DungeonGenerator.RoomTheme.PIZZA: [
+		"res://assets/Wing/decorations/pizza_oven.png",
+		"res://assets/Wing/decorations/pizza_boxes.png",
+	],
+}
+
+## Cover the player and enemies can physically hide behind (collision_layer 1,
+## same as walls - blocks movement, line of sight, and bullets for free with
+## no custom scripting). See _scatter_obstacles().
+const OBSTACLE_PATHS: Array[String] = [
+	"res://assets/Wing/obstacles/kitchen_pillar.png",
+	"res://assets/Wing/obstacles/supply_stack.png",
+]
+
 const ShopkeeperTexture := preload("res://assets/Wing/shopkeeper.png")
+const ExplodingBarrelScene := preload("res://scenes/dungeon/exploding_barrel/exploding_barrel.tscn")
+
+## Chance any given NORMAL room gets one of the exploding barrels - favoured
+## heavily per the brief so it shows up as a recurring tool/hazard rather
+## than a rare novelty.
+const BARREL_CHANCE := 0.6
 
 var _decoration_rng := RandomNumberGenerator.new()
 
@@ -138,7 +177,7 @@ func _spawn_player() -> void:
 	if player == null or not is_instance_valid(player):
 		# First dungeon - create the player.
 		player = player_scene.instantiate()
-		add_child(player)
+		gameplay_layer.add_child(player)
 
 		print("Player created")
 	else:
@@ -162,7 +201,7 @@ func _on_money_changed(total: int) -> void:
 func _clear_level_entities() -> void:
 
 	for enemy in get_tree().get_nodes_in_group("enemy"):
-		if is_instance_valid(enemy) and enemy.get_parent() == self:
+		if is_instance_valid(enemy) and enemy.get_parent() == gameplay_layer:
 			enemy.queue_free()
 
 	for rc: RoomController in _room_controllers:
@@ -173,16 +212,25 @@ func _clear_level_entities() -> void:
 	if _stairs_trigger and is_instance_valid(_stairs_trigger):
 		_stairs_trigger.queue_free()
 	_stairs_trigger = null
-	
+
 	if _shop_trigger and is_instance_valid(_shop_trigger):
 		_shop_trigger.queue_free()
 	_shop_trigger = null
 
 	# Godot uniquifies sibling names ("DemonPortal", "DemonPortal2", ...) since
 	# there can be several, so match by prefix rather than tracking an array.
+	# Decorations/obstacles/barrels are named "Decoration" wherever they live
+	# (self for cosmetic sprites, gameplay_layer for anything with collision -
+	# see _spawn_decoration()/_spawn_obstacle()/_spawn_barrel()), so both
+	# parents need the same sweep; the player is gameplay_layer's only other
+	# child and doesn't match either prefix.
 	for child in get_children():
 		if child.name.begins_with("DemonPortal") or child.name.begins_with("Decoration"):
 			child.queue_free()
+	for child in gameplay_layer.get_children():
+		if child.name.begins_with("Decoration"):
+			child.queue_free()
+	_occupied_cells.clear()
 
 	boss_health_bar.visible = false
 
@@ -198,13 +246,15 @@ func generate_dungeon() -> void:
 	_paint(_generator)
 
 	_spawn_player()
-	_spawner = EnemySpawner.new(self, tile_layer, player)
+	_spawner = EnemySpawner.new(gameplay_layer, tile_layer, player)
 
 	_setup_rooms(_generator)
+	_scatter_obstacles(_generator)
 	_scatter_decorations(_generator)
+	_scatter_barrels(_generator)
 	_spawn_shopkeeper(_generator)
-	
-	_spawn_shop_trigger()	
+
+	_spawn_shop_trigger()
 	
 	shop_ui.reset_shop()
 
@@ -234,6 +284,33 @@ func _setup_rooms(gen: DungeonGenerator) -> void:
 		_room_controllers.append(rc)
 
 
+## Cells any scatter pass (obstacles/decorations/barrels) has already claimed
+## this generation, keyed by room - shared across all three so they never
+## stack on the same tile. Obstacles run first (see _scatter_obstacles()) so
+## cover always wins the spot; decorations and barrels then work around it.
+var _occupied_cells: Dictionary = {}
+
+
+## Cover the player and enemies can physically hide behind - a StaticBody2D
+## on the same physics layer as the tileset's walls, so it blocks movement,
+## enemy sightlines (PlayerSight already masks in that layer) and both
+## projectile types for free, no custom scripting needed. Cell positions come
+## from the generator itself (gen.obstacle_cells) rather than being rolled
+## here, since it already knows which rooms/spots are safe once the grid is
+## finished; this only turns that data into nodes.
+func _scatter_obstacles(gen: DungeonGenerator) -> void:
+	_decoration_rng.seed = gen.seed_used
+	_occupied_cells.clear()
+	for room: Rect2i in gen.obstacle_cells:
+		var placed: Array[Vector2i] = []
+		placed.assign(_occupied_cells.get(room, []))
+		for cell: Vector2i in gen.obstacle_cells[room]:
+			var path: String = OBSTACLE_PATHS[_decoration_rng.randi_range(0, OBSTACLE_PATHS.size() - 1)]
+			_spawn_obstacle(load(path), cell)
+			placed.append(cell)
+		_occupied_cells[room] = placed
+
+
 ## Cosmetic clutter (no collision) scattered across ordinary fight rooms so
 ## they read as distinct spaces instead of repeats of the same bare arena.
 ## Start/shop/boss already get their own hand-placed dressing via
@@ -242,7 +319,6 @@ func _setup_rooms(gen: DungeonGenerator) -> void:
 ## art pieces don't live in Dungeon_Tileset.png's atlas, and a handful of
 ## loose sprites per floor is cheap.
 func _scatter_decorations(gen: DungeonGenerator) -> void:
-	_decoration_rng.seed = gen.seed_used
 	for room: Rect2i in gen.rooms:
 		if gen.kind_of(room) == DungeonGenerator.RoomKind.NORMAL:
 			_scatter_room(gen, room)
@@ -253,14 +329,45 @@ func _scatter_room(gen: DungeonGenerator, room: Rect2i) -> void:
 	if room.size.x <= margin * 2 or room.size.y <= margin * 2:
 		return
 
+	var pool: Array = DECORATION_PATHS.duplicate()
+	var theme: DungeonGenerator.RoomTheme = gen.theme_of(room)
+	if THEME_DECORATIONS.has(theme):
+		pool.append_array(THEME_DECORATIONS[theme])
+
 	var count: int = _decoration_rng.randi_range(1, 3)
-	var min_spacing := 5
+	for cell: Vector2i in _claim_cells(gen, room, margin, count, 5):
+		var path: String = pool[_decoration_rng.randi_range(0, pool.size() - 1)]
+		_spawn_decoration(load(path), cell)
+
+
+## One exploding barrel in most rooms - favoured heavily (BARREL_CHANCE) per
+## the brief so it's a recurring tool/hazard, not a rare novelty.
+func _scatter_barrels(gen: DungeonGenerator) -> void:
+	for room: Rect2i in gen.rooms:
+		if gen.kind_of(room) != DungeonGenerator.RoomKind.NORMAL:
+			continue
+		if _decoration_rng.randf() >= BARREL_CHANCE:
+			continue
+		var margin := 3
+		if room.size.x <= margin * 2 or room.size.y <= margin * 2:
+			continue
+		var cells: Array[Vector2i] = _claim_cells(gen, room, margin, 1, 5)
+		if not cells.is_empty():
+			_spawn_barrel(cells[0])
+
+
+## Reserves up to `count` well-spaced floor cells in `room` for a scatter
+## pass, skipping anything an earlier pass this generation already claimed
+## (see _occupied_cells) so props never stack on the same tile.
+func _claim_cells(gen: DungeonGenerator, room: Rect2i, margin: int, count: int, min_spacing: int) -> Array[Vector2i]:
 	var placed: Array[Vector2i] = []
+	placed.assign(_occupied_cells.get(room, []))
+	var claimed: Array[Vector2i] = []
 
 	for i in count:
 		var cell := Vector2i.ZERO
 		var found := false
-		for attempt in 10:
+		for attempt in 12:
 			cell = Vector2i(
 					_decoration_rng.randi_range(room.position.x + margin, room.end.x - margin),
 					_decoration_rng.randi_range(room.position.y + margin, room.end.y - margin))
@@ -276,10 +383,11 @@ func _scatter_room(gen: DungeonGenerator, room: Rect2i) -> void:
 				break
 		if not found:
 			break  # room's too tight for another - stop rather than keep retrying
-
-		var path: String = DECORATION_PATHS[_decoration_rng.randi_range(0, DECORATION_PATHS.size() - 1)]
-		_spawn_decoration(load(path), cell)
 		placed.append(cell)
+		claimed.append(cell)
+
+	_occupied_cells[room] = placed
+	return claimed
 
 
 ## A shopkeeper standing at the shop's counter, just behind the wares
@@ -295,13 +403,54 @@ func _spawn_shopkeeper(gen: DungeonGenerator) -> void:
 		_spawn_decoration(ShopkeeperTexture, cell)
 
 
+## Floor clutter only - no collision, and z_index -1 keeps it under the
+## floor's own default-z sprites (player, enemies, projectiles) regardless of
+## sibling/add order, since a plain Sprite2D here isn't part of
+## gameplay_layer's y-sort group.
 func _spawn_decoration(texture: Texture2D, cell: Vector2i) -> void:
 	var sprite := Sprite2D.new()
 	sprite.name = "Decoration"
 	sprite.texture = texture
 	sprite.texture_filter = 1
+	sprite.z_index = -1
 	sprite.position = tile_layer.map_to_local(cell)
 	add_child(sprite)
+
+
+## Cover: a StaticBody2D on the tileset's own wall physics layer, so it blocks
+## movement/sightlines/bullets exactly like a wall with zero extra scripting.
+## Lives in gameplay_layer (y-sort) so the player and enemies can actually be
+## occluded by - and hide behind - a tall pillar instead of it always
+## drawing in front or behind by luck of add order.
+func _spawn_obstacle(texture: Texture2D, cell: Vector2i) -> void:
+	var body := StaticBody2D.new()
+	body.name = "Decoration"  # reuses _clear_level_entities()'s prefix sweep
+	body.collision_layer = 1
+	body.collision_mask = 0
+	body.position = tile_layer.map_to_local(cell)
+	gameplay_layer.add_child(body)
+
+	var shape := CollisionShape2D.new()
+	var rect := RectangleShape2D.new()
+	rect.size = Vector2(20, 20)
+	shape.shape = rect
+	body.add_child(shape)
+
+	var sprite := Sprite2D.new()
+	sprite.texture = texture
+	sprite.texture_filter = 1
+	# Anchor the sprite's *base* to the collider so a tall pillar's sprite
+	# extends upward from where it physically stands, matching where the
+	# y-sort actually occludes from.
+	sprite.offset = Vector2(0, -texture.get_height() / 2.0 + 8.0)
+	body.add_child(sprite)
+
+
+func _spawn_barrel(cell: Vector2i) -> void:
+	var barrel := ExplodingBarrelScene.instantiate()
+	barrel.name = "Decoration"  # reuses _clear_level_entities()'s prefix sweep
+	barrel.position = tile_layer.map_to_local(cell)
+	gameplay_layer.add_child(barrel)
 
 
 func _on_room_player_entered(rc: RoomController) -> void:

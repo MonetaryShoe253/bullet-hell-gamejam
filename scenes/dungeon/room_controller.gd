@@ -23,6 +23,14 @@ var cleared: bool = false
 var locked: bool = false
 var exits: Array = []  ## exit spans (Array[Array[Vector2i]]), for the caller to paint gate art on
 
+## How many MORE waves are queued behind the one currently alive (0 = the
+## current wave is the last one). Set by EnemySpawner.spawn_room() before its
+## first _spawn_wave() call. spawn_next_wave is what actually spawns the next
+## batch - kept as a Callable rather than a direct EnemySpawner reference so
+## this file doesn't need to know anything about how spawning works.
+var waves_remaining: int = 0
+var spawn_next_wave: Callable = Callable()
+
 var _enemies_alive: int = 0
 var _gate_bodies: Array[StaticBody2D] = []
 var _trigger: Area2D
@@ -112,7 +120,15 @@ func _on_trigger_body_entered(body: Node) -> void:
 
 func _on_enemy_died() -> void:
 	_enemies_alive -= 1
-	if _enemies_alive <= 0:
-		cleared = true
-		unlock()
-		all_enemies_cleared.emit(self)
+	if _enemies_alive > 0:
+		return
+
+	if waves_remaining > 0:
+		waves_remaining -= 1
+		if spawn_next_wave.is_valid():
+			spawn_next_wave.call()
+		return
+
+	cleared = true
+	unlock()
+	all_enemies_cleared.emit(self)

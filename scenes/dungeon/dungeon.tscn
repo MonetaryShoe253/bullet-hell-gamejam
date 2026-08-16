@@ -151,6 +151,9 @@ tile_set = SubResource("TileSet_sg11a")
 texture_filter = 1
 tile_set = SubResource("TileSet_sg11a")
 
+[node name="GameplayLayer" type="Node2D" parent="." unique_id=2839104623]
+y_sort_enabled = true
+
 [node name="HUD" type="CanvasLayer" parent="." unique_id=1108299953]
 
 [node name="MoneyLabel" type="Label" parent="HUD" unique_id=698900194]

@@ -18,6 +18,12 @@ enum Cell { FLOOR }
 ## Three of the rooms get a job. Everything else is an ordinary fight room.
 enum RoomKind { NORMAL, START, SHOP, BOSS }
 
+## Cosmetic identity for NORMAL rooms only - which competitor food-stand this
+## room's decorations/enemies belong to. Assigned in _assign_themes(); the
+## renderer and enemy spawner both read it via theme_of() to keep a room's
+## props and its enemies matching.
+enum RoomTheme { NONE, BURGER, TACO, PIZZA }
+
 # --- Tuning knobs (set these before calling generate()) ---
 # A 16px tile at the player camera's 3x zoom on a 1920x1080 viewport shows
 # ~40x23 tiles at once. min_room_size is the floor of that range - about 3/4
@@ -65,6 +71,15 @@ var boss_gate_cells: Array[Vector2i] = []
 ## Used by the minimap to know which unexplored rooms are worth showing as
 ## "next room, contents unknown" versus leaving fully hidden.
 var room_adjacency: Dictionary = {}
+
+## Rect2i -> RoomTheme, NORMAL rooms only. See RoomTheme.
+var room_themes: Dictionary = {}
+
+## Rect2i -> Array[Vector2i], cover-obstacle (pillar/crate stack) spots per
+## NORMAL room. Decided here rather than by the renderer since this is the
+## only place that knows the *final* grid - the renderer just turns these
+## into StaticBody2D nodes (see dungeon_map.gd's _scatter_obstacles()).
+var obstacle_cells: Dictionary = {}
 
 ## The leaf partition each entry of `rooms` came from, same order. Needed to
 ## grow the boss room out to fill its partition once the roles are handed out.
@@ -121,7 +136,20 @@ func generate(seed_value: int = -1) -> void:
 	# Roles before connection: the boss arena grows to fill its partition here,
 	# so the corridors that follow are routed to where its centre ends up.
 	_assign_roles()
+	_assign_themes()
 	_connect_rooms(root)
+	# Rooms connect via the nearest-pair-per-split BSP join above, which
+	# already keeps any one corridor about as short as the tree allows -
+	# an earlier version of this also tried adding direct shortcuts between
+	# rooms that ended up close but unconnected, on the theory that it'd cut
+	# hallway time further. It didn't hold up: rooms close enough to trigger
+	# it are often close enough that no doorway-width opening between them is
+	# achievable at all (every attempt either disconnects the map or seals
+	# rock into an unreachable pocket - see _try_trim()'s connectivity and
+	# _rock_reached_from_border() checks), so it mostly produced whole-wall
+	# openings and, chasing a fix for those, several seconds of wasted
+	# generation time per affected seed. Removed rather than kept as a
+	# half-working feature.
 	_carve_stairs_room()
 	# Cleanup has to run before the trim below: is_fully_connected() is a
 	# strict 4-directional flood fill, and the raw pre-cleanup grid can have
@@ -135,6 +163,7 @@ func generate(seed_value: int = -1) -> void:
 	_clean_up()
 	if _trim_wide_exits():
 		_clean_up()
+	_place_obstacles()
 
 
 ## What job a room has, looked up by its rect. Room rects come from disjoint BSP
@@ -149,6 +178,12 @@ func kind_of(room: Rect2i) -> RoomKind:
 	if room == shop_room:
 		return RoomKind.SHOP
 	return RoomKind.NORMAL
+
+
+## NONE for every non-NORMAL room (start/shop/boss keep their own hand-placed
+## dressing); a random competitor food-stand theme for every NORMAL room.
+func theme_of(room: Rect2i) -> RoomTheme:
+	return room_themes.get(room, RoomTheme.NONE)
 
 
 ## Doorway cells where a room's rect meets a corridor: floor cells one step
@@ -386,6 +421,55 @@ func _assign_roles() -> void:
 	_room_nodes[shop_index].room = shop_room
 
 
+## Hands every NORMAL room a random competitor food-stand theme. Call after
+## _assign_roles() so start/shop/boss are already excluded by kind_of().
+func _assign_themes() -> void:
+	room_themes.clear()
+	var themes: Array = [RoomTheme.BURGER, RoomTheme.TACO, RoomTheme.PIZZA]
+	for room: Rect2i in rooms:
+		if kind_of(room) == RoomKind.NORMAL:
+			room_themes[room] = themes[rng.randi_range(0, themes.size() - 1)]
+
+
+## One or two cover spots per NORMAL room, so a room reads as more than a
+## bare rectangle to fight in. Runs last, after the grid is completely
+## finished (cleanup/trim can still reshape a room's edges up to that point),
+## picking cells the same "random spot, skip if too close to an already-
+## picked one" way _random_room_cell()-style helpers already use elsewhere -
+## just kept here instead since this generator has no Node/scene access to
+## place the actual obstacle nodes itself.
+func _place_obstacles() -> void:
+	obstacle_cells.clear()
+	var margin := 4
+	var min_spacing := 8
+
+	for room: Rect2i in rooms:
+		if kind_of(room) != RoomKind.NORMAL:
+			continue
+		if room.size.x <= margin * 2 or room.size.y <= margin * 2:
+			continue  # too small to spare floor for cover without choking the arena
+
+		var count: int = rng.randi_range(1, 2)
+		var placed: Array[Vector2i] = []
+		for i in count:
+			for attempt in 12:
+				var cell := Vector2i(
+						rng.randi_range(room.position.x + margin, room.end.x - margin),
+						rng.randi_range(room.position.y + margin, room.end.y - margin))
+				if not grid.has(cell):
+					continue
+				var too_close := false
+				for other: Vector2i in placed:
+					if cell.distance_squared_to(other) < min_spacing * min_spacing:
+						too_close = true
+						break
+				if not too_close:
+					placed.append(cell)
+					break
+		if not placed.is_empty():
+			obstacle_cells[room] = placed
+
+
 ## The largest room the partition behind `rooms[index]` could possibly hold.
 func _arena_for(index: int) -> Rect2i:
 	return _room_nodes[index].rect.grow(-room_padding)
@@ -458,6 +542,7 @@ func _connect_rooms(node: BSPNode) -> Array[Rect2i]:
 	all_rooms.append_array(left_rooms)
 	all_rooms.append_array(right_rooms)
 	return all_rooms
+
 
 
 ## A small dead-end room latched onto the boss arena's north wall, at the same
@@ -546,6 +631,15 @@ func _trim_wide_exits() -> bool:
 	return changed
 
 
+## Each attempt costs two full-map flood fills (_try_trim's connectivity and
+## enclosed-pocket checks), so an exhaustive search - every width up to the
+## span's full size, three positions each - is unbounded on a wide enough
+## span (60+ cells wide, i.e. 12+ widths, isn't rare on a big room). Capping
+## the attempt count means a genuinely stubborn span just stays wide instead
+## of costing seconds of generation time chasing a fix that, empirically,
+## usually doesn't exist anyway once the cheap widths have failed.
+const MAX_TRIM_ATTEMPTS := 9
+
 ## Tries progressively wider keep-windows (starting at corridor_width) until
 ## one keeps the map connected, sealing everything outside the kept window
 ## `seal_depth` cells into `dir` each time. Cheap seeds settle on the first
@@ -560,18 +654,33 @@ func _trim_wide_exits() -> bool:
 ## the end, and keeps whichever succeeds first.
 func _trim_span(span: Array, dir: Vector2i, seal_depth: int) -> bool:
 	var keep_width: int = corridor_width
+	var attempts := 0
 	while keep_width < span.size():
 		var starts: Array[int] = [0, span.size() - keep_width, (span.size() - keep_width) / 2]
 		for keep_start in starts:
+			attempts += 1
 			if _try_trim(span, dir, seal_depth, keep_start, keep_width):
 				return true
+			if attempts >= MAX_TRIM_ATTEMPTS:
+				return false
 		keep_width += corridor_width
 	return false
 
 
 ## Seals everything in `span` outside [keep_start, keep_start + keep_width)
-## `seal_depth` cells into `dir`, keeps the change if the map is still fully
-## connected afterwards, and reverts (returning false) otherwise.
+## `seal_depth` cells into `dir`, and keeps the change only if it clears two
+## checks - reverting (returning false) otherwise:
+##
+##  1. The map is still fully connected (is_fully_connected()) - the usual
+##     guard against this being the only route between two regions.
+##  2. The seal itself doesn't wall any rock into an enclosed pocket - i.e.
+##     every cell just sealed is still reachable from the map border through
+##     other rock (_rock_reached_from_border()). A seal deep enough to touch
+##     rock on its far side can end up fully encircled by floor if that far
+##     side turns out to already be close to more floor - which is precisely
+##     what _carve_enclosed_pockets() exists to find and reopen. Skipping
+##     this check would mean the very next cleanup pass quietly undoes the
+##     trim, for a seed-dependent reason that'd be miserable to debug later.
 func _try_trim(span: Array, dir: Vector2i, seal_depth: int, keep_start: int, keep_width: int) -> bool:
 	var removed: Array[Vector2i] = []
 	for i in span.size():
@@ -583,7 +692,15 @@ func _try_trim(span: Array, dir: Vector2i, seal_depth: int, keep_start: int, kee
 					grid.erase(seal_cell)
 					removed.append(seal_cell)
 
-	if is_fully_connected():
+	var ok: bool = is_fully_connected()
+	if ok:
+		var rock_reached: Dictionary = _rock_reached_from_border()
+		for cell: Vector2i in removed:
+			if not rock_reached.has(cell):
+				ok = false
+				break
+
+	if ok:
 		return true
 
 	for cell: Vector2i in removed:
@@ -681,6 +798,24 @@ func _carve_pinched_walls() -> int:
 ## carving everything the flood cannot reach clears them all in one go.
 func _carve_enclosed_pockets() -> int:
 	var area: Rect2i = Rect2i(Vector2i.ZERO, map_size).grow(1)
+	var reached: Dictionary = _rock_reached_from_border()
+
+	var carved: int = 0
+	for y in range(area.position.y, area.end.y):
+		for x in range(area.position.x, area.end.x):
+			var cell := Vector2i(x, y)
+			if not grid.has(cell) and not reached.has(cell) and _set_floor(cell):
+				carved += 1
+	return carved
+
+
+## Every ROCK cell reachable from the map border by flooding through other
+## rock - i.e. genuinely "outside", as opposed to a pocket walled in by
+## floor. Shared by _carve_enclosed_pockets() (which floors whatever this
+## doesn't reach) and _try_trim() (which uses it to refuse a seal that would
+## wall a chunk of rock into exactly that kind of pocket - see its comment).
+func _rock_reached_from_border() -> Dictionary:
+	var area: Rect2i = Rect2i(Vector2i.ZERO, map_size).grow(1)
 
 	# Floor is confined to _interior(), so the whole border of `area` is rock and
 	# is guaranteed to be a valid starting point.
@@ -703,13 +838,7 @@ func _carve_enclosed_pockets() -> int:
 				reached[n] = true
 				queue.push_back(n)
 
-	var carved: int = 0
-	for y in range(area.position.y, area.end.y):
-		for x in range(area.position.x, area.end.x):
-			var cell := Vector2i(x, y)
-			if not grid.has(cell) and not reached.has(cell) and _set_floor(cell):
-				carved += 1
-	return carved
+	return reached
 
 
 ## Floor one cell thick has no tile either: the art shades a north edge or a
