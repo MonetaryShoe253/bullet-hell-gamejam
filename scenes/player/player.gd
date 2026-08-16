@@ -4,7 +4,8 @@ extends CharacterBody2D
 @export var muzzle_offset: float = 30.0  # distance from player center to spawn point
 
 @export_category("Attack")
-@export var fire_rate: float = 0.3  # seconds between shots
+@export var damage: float = 5.0
+@export var fire_rate: float = 0.3
 
 @export_category("Speed")
 @export var move_speed: float = 250.0
@@ -116,25 +117,30 @@ func start_dash() -> void:
 	
 func shoot() -> void:
 	var proj: PlayerProjectile = projectile_scene.instantiate()
+
+	proj.damage = damage
+
 	get_tree().current_scene.add_child(proj)
-	var aim_direction := (get_global_mouse_position() - global_position).normalized()
+
+	var aim_direction := (
+		get_global_mouse_position() - global_position
+	).normalized()
+
 	var spawn_position := global_position + aim_direction * muzzle_offset
+
 	proj.launch(spawn_position, aim_direction)
 	
 func apply_upgrade(upgrade: ShopUpgrade) -> void:
 	match upgrade.type:
 
 		ShopUpgrade.UpgradeType.MAX_HEALTH:
-			health_component.max_health += upgrade.amount
-			health_component.current_health += upgrade.amount
-
+			health_component.increase_max_health(upgrade.amount)
+	
 		ShopUpgrade.UpgradeType.MOVE_SPEED:
 			move_speed += upgrade.amount
 
 		ShopUpgrade.UpgradeType.DAMAGE:
-			# We'll hook this into projectile damage
-			# depending on where you're currently storing it.
-			pass
+			damage += upgrade.amount
 
 		ShopUpgrade.UpgradeType.FIRE_RATE:
 			fire_rate *= 1.0 - upgrade.amount

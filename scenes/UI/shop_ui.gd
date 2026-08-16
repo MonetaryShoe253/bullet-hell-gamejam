@@ -5,13 +5,14 @@ extends CanvasLayer
 
 var player: Player
 var offered_upgrades: Array[ShopUpgrade]
+var offers_generated: bool = false
 
-@onready var money_label: Label = $Panel/VBoxContainer/MoneyLabel
+@onready var money_label: Label = $CenterContainer/PanelContainer/MarginContainer/VBoxContainer/MoneyLabel
 
 @onready var buttons: Array[Button] = [
-	$Panel/VBoxContainer/Upgrades/Upgrade1,
-	$Panel/VBoxContainer/Upgrades/Upgrade2,
-	$Panel/VBoxContainer/Upgrades/Upgrade3
+	$CenterContainer/PanelContainer/MarginContainer/VBoxContainer/Upgrades/Upgrade1,
+	$CenterContainer/PanelContainer/MarginContainer/VBoxContainer/Upgrades/Upgrade2,
+	$CenterContainer/PanelContainer/MarginContainer/VBoxContainer/Upgrades/Upgrade3
 ]
 
 func _ready() -> void:
@@ -32,7 +33,17 @@ func _generate_offers() -> void:
 
 	for i in count:
 		offered_upgrades.append(pool[i])
-		
+
+
+func reset_shop() -> void:
+	offers_generated = false
+	offered_upgrades.clear()
+
+	for button in buttons:
+		button.disabled = false
+
+	hide()	
+	
 func _update_ui() -> void:
 	money_label.text = "Gold: " + str(GameState.money)
 
@@ -71,9 +82,11 @@ func _buy_upgrade(index: int) -> void:
 func open(target_player: Player) -> void:
 	player = target_player
 
-	_generate_offers()
-	_update_ui()
+	if not offers_generated:
+		_generate_offers()
+		offers_generated = true
 
+	_update_ui()
 	show()
 	
 func close() -> void:

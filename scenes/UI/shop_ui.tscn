@@ -12,29 +12,56 @@
 script = ExtResource("1_5tinp")
 available_upgrades = Array[ExtResource("2_yxlag")]([ExtResource("3_m41hj"), ExtResource("4_6l0ir"), ExtResource("5_4k3pv"), ExtResource("6_ge6mo"), ExtResource("7_m2mw0")])
 
-[node name="Panel" type="Panel" parent="." unique_id=1374781544]
-offset_right = 40.0
-offset_bottom = 40.0
+[node name="CenterContainer" type="CenterContainer" parent="." unique_id=1925415414]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
 
-[node name="VBoxContainer" type="VBoxContainer" parent="Panel" unique_id=75203507]
-layout_mode = 0
-offset_right = 40.0
-offset_bottom = 40.0
-
-[node name="Title" type="Label" parent="Panel/VBoxContainer" unique_id=288867206]
+[node name="PanelContainer" type="PanelContainer" parent="CenterContainer" unique_id=1364390019]
+custom_minimum_size = Vector2(1600, 900)
 layout_mode = 2
 
-[node name="MoneyLabel" type="Label" parent="Panel/VBoxContainer" unique_id=522031378]
+[node name="MarginContainer" type="MarginContainer" parent="CenterContainer/PanelContainer" unique_id=341550888]
 layout_mode = 2
+theme_override_constants/margin_left = 30
+theme_override_constants/margin_top = 30
+theme_override_constants/margin_right = 25
+theme_override_constants/margin_bottom = 25
 
-[node name="Upgrades" type="HBoxContainer" parent="Panel/VBoxContainer" unique_id=1528150976]
+[node name="VBoxContainer" type="VBoxContainer" parent="CenterContainer/PanelContainer/MarginContainer" unique_id=1274354626]
 layout_mode = 2
+theme_override_constants/separation = 50
 
-[node name="Upgrade1" type="Button" parent="Panel/VBoxContainer/Upgrades" unique_id=454848375]
+[node name="TitleLabel" type="Label" parent="CenterContainer/PanelContainer/MarginContainer/VBoxContainer" unique_id=758717490]
 layout_mode = 2
+theme_override_font_sizes/font_size = 32
+text = "CHICKEN SHOP"
+horizontal_alignment = 1
 
-[node name="Upgrade2" type="Button" parent="Panel/VBoxContainer/Upgrades" unique_id=1159458050]
+[node name="MoneyLabel" type="Label" parent="CenterContainer/PanelContainer/MarginContainer/VBoxContainer" unique_id=554150396]
 layout_mode = 2
+theme_override_font_sizes/font_size = 24
+text = "Gold: 125"
+horizontal_alignment = 1
 
-[node name="Upgrade3" type="Button" parent="Panel/VBoxContainer/Upgrades" unique_id=193498708]
+[node name="Upgrades" type="HBoxContainer" parent="CenterContainer/PanelContainer/MarginContainer/VBoxContainer" unique_id=924960573]
 layout_mode = 2
+theme_override_constants/separation = 20
+alignment = 1
+
+[node name="Upgrade1" type="Button" parent="CenterContainer/PanelContainer/MarginContainer/VBoxContainer/Upgrades" unique_id=1823608752]
+custom_minimum_size = Vector2(220, 220)
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="Upgrade2" type="Button" parent="CenterContainer/PanelContainer/MarginContainer/VBoxContainer/Upgrades" unique_id=1257161247]
+custom_minimum_size = Vector2(220, 220)
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="Upgrade3" type="Button" parent="CenterContainer/PanelContainer/MarginContainer/VBoxContainer/Upgrades" unique_id=846343015]
+custom_minimum_size = Vector2(220, 220)
+layout_mode = 2
+size_flags_horizontal = 3

@@ -15,7 +15,15 @@ var invulnerable: bool = false
 func _ready() -> void:
 	current_health = max_health
 
+func increase_max_health(amount: float) -> void:
+	if amount <= 0.0:
+		return
 
+	max_health += amount
+	current_health += amount
+
+	health_changed.emit(current_health, max_health)
+	
 func take_damage(amount: float) -> void:
 	if invulnerable:
 		return

@@ -117,13 +117,22 @@ func _unhandled_input(event: InputEvent) -> void: # DELETE LATER - HELPFUL FOR T
 			get_viewport().set_input_as_handled()
 
 func _spawn_player() -> void:
-	player = player_scene.instantiate()
-	add_child(player)
-
 	var spawn_position := tile_layer.map_to_local(_generator.player_spawn)
+
+	if player == null or not is_instance_valid(player):
+		# First dungeon - create the player.
+		player = player_scene.instantiate()
+		add_child(player)
+
+		print("Player created")
+	else:
+		# Next dungeon - keep existing player.
+		print("Reusing existing player")
+
+	# Move existing/new player to the new dungeon spawn.
 	player.position = spawn_position
 
-	print("Player spawned at: ", spawn_position)
+	print("Player positioned at: ", spawn_position)
 
 
 func _on_money_changed(total: int) -> void:
@@ -135,9 +144,6 @@ func _on_money_changed(total: int) -> void:
 ## stairs) before a new layout is generated - both for the "R" debug regenerate
 ## and for advancing to the next level.
 func _clear_level_entities() -> void:
-	if player and is_instance_valid(player):
-		player.queue_free()
-	player = null
 
 	for enemy in get_tree().get_nodes_in_group("enemy"):
 		if is_instance_valid(enemy) and enemy.get_parent() == self:
@@ -180,7 +186,9 @@ func generate_dungeon() -> void:
 
 	_setup_rooms(_generator)	
 	
-	_spawn_shop_trigger()
+	_spawn_shop_trigger()	
+	
+	shop_ui.reset_shop()
 
 	minimap.setup(_generator, _room_controllers, tile_layer, player)
 

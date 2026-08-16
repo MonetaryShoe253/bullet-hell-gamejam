@@ -1,7 +1,7 @@
 [gd_scene format=3 uid="uid://cgkmebodaryei"]
 
 [ext_resource type="Script" uid="uid://bxpm47jm72nwr" path="res://scenes/player/player.gd" id="1_8afob"]
-[ext_resource type="Texture2D" path="res://assets/Wing/player_idle.png" id="2_dovo2"]
+[ext_resource type="Texture2D" uid="uid://df8k8015iepvw" path="res://assets/Wing/player_idle.png" id="2_dovo2"]
 [ext_resource type="PackedScene" uid="uid://do4swhon6n2q2" path="res://scenes/components/health/health_component.tscn" id="3_gmlin"]
 [ext_resource type="PackedScene" uid="uid://hamwnbllhiuu" path="res://scenes/components/hurtbox/hurt_box.tscn" id="3_lvxji"]
 [ext_resource type="PackedScene" uid="uid://cfvi616pvm7t4" path="res://scenes/UI/player_health.tscn" id="5_p47bc"]
@@ -18,7 +18,7 @@ texture_filter = 1
 collision_layer = 2
 script = ExtResource("1_8afob")
 muzzle_offset = 15.0
-move_speed = 125.0
+move_speed = 500.0
 dash_speed = 600.0
 dash_duration = 0.1
 dash_cooldown = 1.5
