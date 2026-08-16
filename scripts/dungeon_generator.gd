@@ -29,20 +29,24 @@ enum RoomTheme { NONE, BURGER, TACO, PIZZA }
 # ~40x23 tiles at once. min_room_size is the floor of that range - about 3/4
 # of a screen - so ordinary rooms vary from "smaller than the view" up to
 # whatever a big partition can hold, rather than every room being arena-sized.
+# min_room_size and min_partition_size are both 80% of their original values
+# (was 30/60) - smaller rooms, and since the same map_size now fits more BSP
+# splits, more (and closer-together) rooms too, which is what actually keeps
+# tunnels short rather than anything in the corridor-routing itself.
 var map_size := Vector2i(260, 180)
-var min_partition_size := 60      # keep this >= min_room_size + padding*2 + a margin
-var min_room_size := 30           # bullet-hell arenas want generous space, not tiny rooms
+var min_partition_size := 48      # keep this >= min_room_size + padding*2 + a margin
+var min_room_size := 24           # bullet-hell arenas want generous space, not tiny rooms
 var room_padding := 5           # gap between a room and its partition edge
 var corridor_width := 5           # wide enough to dodge while transitioning rooms
 
 ## The start room is deliberately small and cozy rather than arena-sized -
 ## shrunk down from whatever _create_rooms() rolled for it once its identity
 ## is known (see _assign_roles()).
-var start_room_size := 12
+var start_room_size := 10
 
 ## The shop is a stall, not another arena - shrunk the same way, just a
 ## little roomier than the start so its chest/wares layout still fits.
-var shop_room_size := 18
+var shop_room_size := 14
 
 var rng := RandomNumberGenerator.new()
 var grid: Dictionary = {}         # Vector2i -> Cell.FLOOR
@@ -129,6 +133,7 @@ func generate(seed_value: int = -1) -> void:
 	stairs_cell = Vector2i.ZERO
 	seed_used = seed_value if seed_value >= 0 else randi()
 	rng.seed = seed_used
+	_boss_connected = false
 
 	var root: BSPNode = BSPNode.new(Rect2i(Vector2i.ZERO, map_size))
 	_split(root)
@@ -137,6 +142,7 @@ func generate(seed_value: int = -1) -> void:
 	# so the corridors that follow are routed to where its centre ends up.
 	_assign_roles()
 	_assign_themes()
+	_vary_room_shapes()
 	_connect_rooms(root)
 	# Rooms connect via the nearest-pair-per-split BSP join above, which
 	# already keeps any one corridor about as short as the tree allows -
@@ -150,18 +156,22 @@ func generate(seed_value: int = -1) -> void:
 	# openings and, chasing a fix for those, several seconds of wasted
 	# generation time per affected seed. Removed rather than kept as a
 	# half-working feature.
-	_carve_stairs_room()
-	# Cleanup has to run before the trim below: is_fully_connected() is a
-	# strict 4-directional flood fill, and the raw pre-cleanup grid can have
-	# regions that only touch diagonally (exactly what _carve_diagonal_pinches
-	# fixes), which reads as "disconnected" whether or not the trim actually
-	# changed anything. A full _clean_up() pass is the most expensive part of
-	# generation (it scans the whole grid several times over), so the second
-	# pass only runs when the trim actually touched the grid - the common
-	# case is no oversized spans at all, and re-scanning everything for
-	# nothing would roughly double generation time for no reason.
+	# Cleanup has to run before the stairs room (see its own comment) and
+	# before the trim below: is_fully_connected() is a strict 4-directional
+	# flood fill, and the raw pre-cleanup grid can have regions that only
+	# touch diagonally (exactly what _carve_diagonal_pinches fixes), which
+	# reads as "disconnected" whether or not anything downstream actually
+	# changed. A full _clean_up() pass is the most expensive part of
+	# generation (it scans the whole grid several times over), so the
+	# follow-up passes below only re-run it when they actually touched the
+	# grid - the common case is nothing to fix, and re-scanning everything
+	# for no reason would multiply generation time for nothing.
 	_clean_up()
+	if _carve_stairs_room():
+		_clean_up()
 	if _trim_wide_exits():
+		_clean_up()
+	if _enforce_boss_single_entrance():
 		_clean_up()
 	_place_obstacles()
 
@@ -431,17 +441,134 @@ func _assign_themes() -> void:
 			room_themes[room] = themes[rng.randi_range(0, themes.size() - 1)]
 
 
-## One or two cover spots per NORMAL room, so a room reads as more than a
-## bare rectangle to fight in. Runs last, after the grid is completely
-## finished (cleanup/trim can still reshape a room's edges up to that point),
-## picking cells the same "random spot, skip if too close to an already-
-## picked one" way _random_room_cell()-style helpers already use elsewhere -
-## just kept here instead since this generator has no Node/scene access to
-## place the actual obstacle nodes itself.
+enum RoomShape { RECTANGLE, L_SHAPE, INDENTED, DIAGONAL }
+
+## Random non-rectangular silhouettes for NORMAL rooms - "just a bare
+## rectangle to fight in" is the complaint this exists to answer, and
+## varying the shape (not just what's dressed inside it) is the most direct
+## way to do that. Only touches rooms with room to spare, and only after
+## _assign_roles() has already picked start/shop/boss, so those three -
+## whose art/prop placement assumes a plain rectangle - are never touched.
+##
+## Every cut here only ever erases floor, and _clean_up() (which runs after
+## all carving, corridors included) already exists specifically to fix the
+## kind of thin-wall/diagonal-pinch/enclosed-pocket artifacts an irregular
+## silhouette produces - the same class of defect a corridor clipping a
+## room's corner already creates today, so nothing new is being asked of it.
+## Cuts are also kept well clear of the room's centre (corners, or shallow
+## notches into the middle of a wall) since _connect_rooms()/
+## _carve_corridor() route corridors to a room's centre point, which has to
+## stay floor.
+func _vary_room_shapes() -> void:
+	for room: Rect2i in rooms:
+		if kind_of(room) != RoomKind.NORMAL:
+			continue
+		if room.size.x < min_room_size + 10 or room.size.y < min_room_size + 10:
+			continue  # too small to carve a shape out of without losing the room
+
+		match _roll_room_shape():
+			RoomShape.L_SHAPE:
+				_carve_l_corner(room)
+			RoomShape.INDENTED:
+				_carve_indents(room)
+			RoomShape.DIAGONAL:
+				_carve_diagonal(room)
+			RoomShape.RECTANGLE:
+				pass
+
+
+func _roll_room_shape() -> RoomShape:
+	var roll := rng.randf()
+	if roll < 0.4:
+		return RoomShape.RECTANGLE
+	elif roll < 0.65:
+		return RoomShape.L_SHAPE
+	elif roll < 0.85:
+		return RoomShape.INDENTED
+	else:
+		return RoomShape.DIAGONAL
+
+
+## Erases a random corner - roughly a third of the room in each dimension -
+## turning a rectangle into an L.
+func _carve_l_corner(room: Rect2i) -> void:
+	var cut_w: int = int(room.size.x * rng.randf_range(0.25, 0.4))
+	var cut_h: int = int(room.size.y * rng.randf_range(0.25, 0.4))
+	var corners: Array[Rect2i] = [
+		Rect2i(room.position, Vector2i(cut_w, cut_h)),
+		Rect2i(Vector2i(room.end.x - cut_w, room.position.y), Vector2i(cut_w, cut_h)),
+		Rect2i(Vector2i(room.position.x, room.end.y - cut_h), Vector2i(cut_w, cut_h)),
+		Rect2i(Vector2i(room.end.x - cut_w, room.end.y - cut_h), Vector2i(cut_w, cut_h)),
+	]
+	_erase_rect(corners[rng.randi_range(0, corners.size() - 1)])
+
+
+## Two opposite corners cut instead of one - reads as a stepped diagonal or
+## hourglass silhouette rather than a simple L.
+func _carve_diagonal(room: Rect2i) -> void:
+	var cut_w: int = int(room.size.x * rng.randf_range(0.2, 0.32))
+	var cut_h: int = int(room.size.y * rng.randf_range(0.2, 0.32))
+	if rng.randf() < 0.5:
+		_erase_rect(Rect2i(room.position, Vector2i(cut_w, cut_h)))
+		_erase_rect(Rect2i(Vector2i(room.end.x - cut_w, room.end.y - cut_h), Vector2i(cut_w, cut_h)))
+	else:
+		_erase_rect(Rect2i(Vector2i(room.end.x - cut_w, room.position.y), Vector2i(cut_w, cut_h)))
+		_erase_rect(Rect2i(Vector2i(room.position.x, room.end.y - cut_h), Vector2i(cut_w, cut_h)))
+
+
+## Shallow notches cut into the middle of one to three walls - "indented
+## walls", read literally.
+func _carve_indents(room: Rect2i) -> void:
+	var edges: Array[Vector2i] = _shuffled_edges()
+	var notch_count: int = rng.randi_range(1, 3)
+	for i in notch_count:
+		_carve_indent(room, edges[i])
+
+
+func _carve_indent(room: Rect2i, dir: Vector2i) -> void:
+	var depth: int = rng.randi_range(3, 5)
+	if dir.x == 0:
+		var width: int = mini(room.size.x / 3, 8)
+		var x: int = room.position.x + (room.size.x - width) / 2
+		var y: int = room.position.y if dir.y < 0 else room.end.y - depth
+		_erase_rect(Rect2i(x, y, width, depth))
+	else:
+		var height: int = mini(room.size.y / 3, 8)
+		var y: int = room.position.y + (room.size.y - height) / 2
+		var x: int = room.position.x if dir.x < 0 else room.end.x - depth
+		_erase_rect(Rect2i(x, y, depth, height))
+
+
+## Fisher-Yates using the generator's own seeded rng - Array.shuffle() uses
+## Godot's global RNG instead, which would break "same seed, same layout".
+func _shuffled_edges() -> Array[Vector2i]:
+	var edges: Array[Vector2i] = [Vector2i(0, -1), Vector2i(0, 1), Vector2i(-1, 0), Vector2i(1, 0)]
+	for i in range(edges.size() - 1, 0, -1):
+		var j: int = rng.randi_range(0, i)
+		var tmp: Vector2i = edges[i]
+		edges[i] = edges[j]
+		edges[j] = tmp
+	return edges
+
+
+func _erase_rect(r: Rect2i) -> void:
+	for x in range(r.position.x, r.end.x):
+		for y in range(r.position.y, r.end.y):
+			grid.erase(Vector2i(x, y))
+
+
+## Several cover spots per NORMAL room - scaled to room area so a big arena
+## gets meaningfully more pillars to fight around than a small one, not just
+## a fixed one-or-two regardless of size. Runs last, after the grid is
+## completely finished (cleanup/trim can still reshape a room's edges up to
+## that point), picking cells the same "random spot, skip if too close to an
+## already-picked one" way _random_room_cell()-style helpers already use
+## elsewhere - just kept here instead since this generator has no Node/scene
+## access to place the actual obstacle nodes itself.
 func _place_obstacles() -> void:
 	obstacle_cells.clear()
 	var margin := 4
-	var min_spacing := 8
+	var min_spacing := 6
 
 	for room: Rect2i in rooms:
 		if kind_of(room) != RoomKind.NORMAL:
@@ -449,7 +576,8 @@ func _place_obstacles() -> void:
 		if room.size.x <= margin * 2 or room.size.y <= margin * 2:
 			continue  # too small to spare floor for cover without choking the arena
 
-		var count: int = rng.randi_range(1, 2)
+		var area: int = room.size.x * room.size.y
+		var count: int = clampi(area / 250, 2, 6)
 		var placed: Array[Vector2i] = []
 		for i in count:
 			for attempt in 12:
@@ -509,10 +637,27 @@ func _distance_squared(a: Rect2i, b: Rect2i) -> int:
 	return delta.x * delta.x + delta.y * delta.y
 
 
+## True once boss_room has received its one corridor connection into the
+## rest of the dungeon - see _connect_rooms()'s own comment for why this
+## exists and how it's used.
+var _boss_connected := false
+
 ## Returns every room in this subtree, and joins the two subtrees on the way
 ## back up. Returning the whole list (rather than one representative room) lets
 ## each join pick the closest pair across the split, which keeps corridors short
 ## instead of always running back to the far corner of the map.
+##
+## boss_room is a special case: it's usually the biggest room on the map (it
+## was grown to fill its whole partition in _assign_roles()), so left
+## unchecked it's very often the closest candidate at *multiple* tree
+## levels, giving it several entrances - and worse, that can make it a hub
+## other rooms' only route to the rest of the dungeon happens to pass
+## through, which is exactly what the brief asks to avoid (an arena that
+## gates unrelated rooms behind itself). Once boss_room has been used in one
+## join, it's dropped from the list this function returns, so no later join
+## anywhere else in the tree can pick it again - the subtree it just joined
+## keeps representing itself in further merges through whatever *other* room
+## it was paired with, same as always.
 func _connect_rooms(node: BSPNode) -> Array[Rect2i]:
 	if node.is_leaf():
 		var leaf: Array[Rect2i] = []
@@ -537,10 +682,14 @@ func _connect_rooms(node: BSPNode) -> Array[Rect2i]:
 					best_b = b
 		_carve_corridor(_center(best_a), _center(best_b))
 		_add_adjacency(best_a, best_b)
+		if best_a == boss_room or best_b == boss_room:
+			_boss_connected = true
 
 	var all_rooms: Array[Rect2i] = []
 	all_rooms.append_array(left_rooms)
 	all_rooms.append_array(right_rooms)
+	if _boss_connected:
+		all_rooms.erase(boss_room)
 	return all_rooms
 
 
@@ -550,9 +699,20 @@ func _connect_rooms(node: BSPNode) -> Array[Rect2i]:
 ## level" landing once the boss is dead. Not every seed has map space north of
 ## the boss room for it; when it doesn't fit, stairs_room is left zero-sized
 ## and the caller falls back to putting the level-up trigger at the gate itself.
-func _carve_stairs_room() -> void:
+##
+## Called *after* the first _clean_up() pass now (not before) - the
+## _touches_floor() safety check below only means something if it's checking
+## against the grid's final shape. Checking against a not-yet-cleaned grid
+## used to let this land somewhere that looked clear at the time but that
+## cleanup then re-floored moments later (most often the room shape variation
+## cut a corner right where the check looked, and a pinched-wall/pocket fix
+## nearby put a couple of cells of it back) - a real, if rare, overlap that
+## only cropped up once room shapes stopped being guaranteed rectangles.
+## Returns true if a stairs room was actually carved, so the caller knows a
+## follow-up _clean_up() pass is worth its cost.
+func _carve_stairs_room() -> bool:
 	if boss_room.size == Vector2i.ZERO:
-		return
+		return false
 
 	var gate_x: int = boss_room.position.x + boss_room.size.x / 2 - 1
 	var top: int = boss_room.position.y
@@ -564,14 +724,15 @@ func _carve_stairs_room() -> void:
 			gate_x - stairs_w / 2 + 1, top - room_padding - 1 - stairs_h,
 			stairs_w, stairs_h)
 	if not _interior().encloses(candidate):
-		return
+		return false
 	if _touches_floor(candidate.grow(1)):
-		return  # would fuse with whatever's already there - drop it, same as not fitting
+		return false  # would fuse with whatever's already there - drop it, same as not fitting
 
 	stairs_room = candidate
 	_carve_rect(stairs_room)
 	stairs_cell = _center(stairs_room)
 	_carve_corridor(Vector2i(gate_x, top - 1), stairs_cell)
+	return true
 
 
 ## True if any cell of `rect` is already floor. Used before carving a new
@@ -609,6 +770,62 @@ func _touches_floor(rect: Rect2i) -> bool:
 ## on failure the keep-window is widened step by step (rather than simply
 ## giving up back at the untouched original) so the door still shrinks as
 ## far as connectivity allows instead of staying a whole wall wide.
+## The corridor system (see _connect_rooms()'s own comment) already limits
+## boss_room to one deliberate connection, but nothing stops it from ending
+## up flush against some *other* room by sheer chance - it's grown to fill
+## its whole partition in _assign_roles(), making it the single most likely
+## room on the map for that to happen to - which would read as a second
+## entrance no different from a real corridor door. This finds any such extra
+## opening (excluding the stairs corridor, which exits the opposite wall and
+## leads to a dead end, so it never gates anything) and seals it the same
+## safe way _try_trim() always does: never disconnecting the map, never
+## walling rock into a pocket. Returns true if anything actually got sealed.
+func _enforce_boss_single_entrance() -> bool:
+	if boss_room.size == Vector2i.ZERO:
+		return false
+
+	var north_y: int = boss_room.position.y - 1  # where the stairs corridor exits
+	var entrance_spans: Array = []
+	for span: Array in get_room_exits(boss_room):
+		var cell: Vector2i = span[0]
+		if cell.y != north_y:
+			entrance_spans.append(span)
+
+	if entrance_spans.size() <= 1:
+		return false
+
+	# Keep the widest span - almost certainly the real, deliberately-carved
+	# corridor, since an accidental flush-adjacency graze is rarely as wide
+	# as a purpose-built doorway - and seal the rest. Sealing can fail (see
+	# _try_trim()) when boss_room being huge - it fills its whole partition -
+	# means an unrelated corridor between two *other* rooms had nowhere to
+	# route except clipping its territory, making that "extra" opening
+	# genuinely load-bearing; when that happens the seal is safely skipped
+	# and the extra entrance is left in place rather than breaking the map.
+	entrance_spans.sort_custom(func(a, b): return a.size() > b.size())
+	var seal_depth: int = room_padding + corridor_width
+	var changed := false
+	for i in range(1, entrance_spans.size()):
+		var span: Array = entrance_spans[i]
+		var dir: Vector2i = _span_direction(boss_room, span[0])
+		if _try_trim(span, dir, seal_depth, 0, 0):  # keep_width 0 - seal the whole span
+			changed = true
+	return changed
+
+
+## Which of `room`'s four edges an exit-span cell belongs to, inferred from
+## its position (exit cells only ever exist one step outside the room's own
+## boundary, by construction of _edge_spans()).
+func _span_direction(room: Rect2i, cell: Vector2i) -> Vector2i:
+	if cell.y == room.position.y - 1:
+		return Vector2i(0, -1)
+	if cell.y == room.end.y:
+		return Vector2i(0, 1)
+	if cell.x == room.position.x - 1:
+		return Vector2i(-1, 0)
+	return Vector2i(1, 0)
+
+
 ## Returns true if any span actually got trimmed, so the caller knows whether
 ## a follow-up _clean_up() pass is worth its cost.
 func _trim_wide_exits() -> bool:

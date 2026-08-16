@@ -164,13 +164,6 @@ func _ready() -> void:
 	generate_dungeon()
 
 
-func _unhandled_input(event: InputEvent) -> void: # DELETE LATER - HELPFUL FOR TESTING
-	if event is InputEventKey and event.pressed and not event.echo:
-		if event.keycode == KEY_R:
-			use_random_seed = true
-			generate_dungeon()
-			get_viewport().set_input_as_handled()
-
 func _spawn_player() -> void:
 	var spawn_position := tile_layer.map_to_local(_generator.player_spawn)
 
@@ -196,8 +189,7 @@ func _on_money_changed(total: int) -> void:
 
 
 ## Tears down everything from the previous dungeon (player, enemies, gates,
-## stairs) before a new layout is generated - both for the "R" debug regenerate
-## and for advancing to the next level.
+## stairs, decorations) before a new layout is generated for the next level.
 func _clear_level_entities() -> void:
 
 	for enemy in get_tree().get_nodes_in_group("enemy"):
@@ -312,32 +304,49 @@ func _scatter_obstacles(gen: DungeonGenerator) -> void:
 
 
 ## Cosmetic clutter (no collision) scattered across ordinary fight rooms so
-## they read as distinct spaces instead of repeats of the same bare arena.
-## Start/shop/boss already get their own hand-placed dressing via
+## they read as distinct, fully-themed spaces instead of repeats of the same
+## bare arena. Start/shop/boss already get their own hand-placed dressing via
 ## _decorate_start()/_decorate_shop()/_decorate_boss(), so this only touches
 ## NORMAL rooms. Plain Sprite2D children rather than PropLayer tiles - these
-## art pieces don't live in Dungeon_Tileset.png's atlas, and a handful of
-## loose sprites per floor is cheap.
+## art pieces don't live in Dungeon_Tileset.png's atlas.
 func _scatter_decorations(gen: DungeonGenerator) -> void:
 	for room: Rect2i in gen.rooms:
 		if gen.kind_of(room) == DungeonGenerator.RoomKind.NORMAL:
 			_scatter_room(gen, room)
 
 
+## Lines the room's actual silhouette with decorations - reading straight off
+## the grid (via _classify_room_cells()) rather than assuming a plain
+## rectangle, so this works the same for an L-shaped or indented room as a
+## square one - then adds interior clutter scaled to floor area on top. The
+## pool is weighted heavily toward the room's own theme (3:1 against the
+## neutral pool) so a room reads as "the burger room" at a glance rather than
+## a random assortment.
 func _scatter_room(gen: DungeonGenerator, room: Rect2i) -> void:
-	var margin := 3  # keep clear of walls/doorways - these sprites are ~2 tiles wide
-	if room.size.x <= margin * 2 or room.size.y <= margin * 2:
-		return
+	if room.size.x < 6 or room.size.y < 6:
+		return  # too small for wall-lining to read as anything but clutter
 
-	var pool: Array = DECORATION_PATHS.duplicate()
 	var theme: DungeonGenerator.RoomTheme = gen.theme_of(room)
-	if THEME_DECORATIONS.has(theme):
-		pool.append_array(THEME_DECORATIONS[theme])
+	var pool: Array = []
+	for i in 3:
+		pool.append_array(THEME_DECORATIONS.get(theme, []))
+	pool.append_array(DECORATION_PATHS)
 
-	var count: int = _decoration_rng.randi_range(1, 3)
-	for cell: Vector2i in _claim_cells(gen, room, margin, count, 5):
-		var path: String = pool[_decoration_rng.randi_range(0, pool.size() - 1)]
-		_spawn_decoration(load(path), cell)
+	var cells: Dictionary = _classify_room_cells(gen, room)
+
+	# The sides of the room, densely - this is the main "10x more
+	# decorations" density lever. Spacing (not per-cell chance) is what
+	# actually controls the count here: a chance-only roll scales with
+	# perimeter length, which swings wildly between a small room and a huge
+	# arena, so a flat 80%-and-6-cells-apart reads as "lined" at any size
+	# instead of "fine on a small room, hundreds deep on a big one".
+	for cell: Vector2i in _claim_from_candidates(room, cells.wall, 0.8, 6):
+		_spawn_decoration(load(pool[_decoration_rng.randi_range(0, pool.size() - 1)]), cell)
+
+	# Interior clutter too, so a big arena doesn't stay empty in the middle
+	# once the walls are dressed - same spacing-led approach, just sparser.
+	for cell: Vector2i in _claim_from_candidates(room, cells.interior, 0.5, 9):
+		_spawn_decoration(load(pool[_decoration_rng.randi_range(0, pool.size() - 1)]), cell)
 
 
 ## One exploding barrel in most rooms - favoured heavily (BARREL_CHANCE) per
@@ -348,41 +357,70 @@ func _scatter_barrels(gen: DungeonGenerator) -> void:
 			continue
 		if _decoration_rng.randf() >= BARREL_CHANCE:
 			continue
-		var margin := 3
-		if room.size.x <= margin * 2 or room.size.y <= margin * 2:
-			continue
-		var cells: Array[Vector2i] = _claim_cells(gen, room, margin, 1, 5)
-		if not cells.is_empty():
-			_spawn_barrel(cells[0])
+		var cells: Dictionary = _classify_room_cells(gen, room)
+		var candidates: Array[Vector2i] = cells.interior if not cells.interior.is_empty() else cells.wall
+		var claimed: Array[Vector2i] = _claim_from_candidates(room, candidates, 1.0, 5)
+		if not claimed.is_empty():
+			_spawn_barrel(claimed[0])
 
 
-## Reserves up to `count` well-spaced floor cells in `room` for a scatter
-## pass, skipping anything an earlier pass this generation already claimed
-## (see _occupied_cells) so props never stack on the same tile.
-func _claim_cells(gen: DungeonGenerator, room: Rect2i, margin: int, count: int, min_spacing: int) -> Array[Vector2i]:
+## Every floor cell in `room`, split into cells touching a non-floor
+## neighbour ("wall", i.e. hugging the room's actual silhouette - an L-shape
+## or an indent both fall out of this correctly since it reads the grid, not
+## a bounding-rect assumption) versus the rest ("interior"), with anything
+## within 2 cells of a doorway excluded from both so props never block or
+## crowd an entrance.
+func _classify_room_cells(gen: DungeonGenerator, room: Rect2i) -> Dictionary:
+	var door_cells: Array[Vector2i] = []
+	for span: Array in gen.get_room_exits(room):
+		door_cells.append_array(span)
+
+	var wall_cells: Array[Vector2i] = []
+	var interior_cells: Array[Vector2i] = []
+	for x in range(room.position.x, room.end.x):
+		for y in range(room.position.y, room.end.y):
+			var cell := Vector2i(x, y)
+			if not gen.grid.has(cell):
+				continue
+			if _near_any(cell, door_cells, 2):
+				continue
+			var touches_wall := false
+			for offset: Vector2i in [Vector2i(1, 0), Vector2i(-1, 0), Vector2i(0, 1), Vector2i(0, -1)]:
+				if not gen.grid.has(cell + offset):
+					touches_wall = true
+					break
+			if touches_wall:
+				wall_cells.append(cell)
+			else:
+				interior_cells.append(cell)
+	return {"wall": wall_cells, "interior": interior_cells}
+
+
+func _near_any(cell: Vector2i, others: Array[Vector2i], radius: int) -> bool:
+	var radius_sq: int = radius * radius
+	for other: Vector2i in others:
+		if cell.distance_squared_to(other) <= radius_sq:
+			return true
+	return false
+
+
+## Rolls each of `candidates` independently at `take_chance`, skipping
+## anything within `min_spacing` of a cell an earlier pass this generation
+## already claimed (see _occupied_cells) so props never stack on the same
+## tile. Order-independent by design - candidates is typically already in
+## grid-scan order, not shuffled, since shuffling would need Godot's global
+## RNG and break the "same seed, same layout" guarantee the rest of the
+## generator relies on.
+func _claim_from_candidates(room: Rect2i, candidates: Array[Vector2i], take_chance: float, min_spacing: int) -> Array[Vector2i]:
 	var placed: Array[Vector2i] = []
 	placed.assign(_occupied_cells.get(room, []))
 	var claimed: Array[Vector2i] = []
 
-	for i in count:
-		var cell := Vector2i.ZERO
-		var found := false
-		for attempt in 12:
-			cell = Vector2i(
-					_decoration_rng.randi_range(room.position.x + margin, room.end.x - margin),
-					_decoration_rng.randi_range(room.position.y + margin, room.end.y - margin))
-			if not gen.grid.has(cell):
-				continue
-			var too_close := false
-			for other: Vector2i in placed:
-				if cell.distance_squared_to(other) < min_spacing * min_spacing:
-					too_close = true
-					break
-			if not too_close:
-				found = true
-				break
-		if not found:
-			break  # room's too tight for another - stop rather than keep retrying
+	for cell: Vector2i in candidates:
+		if _decoration_rng.randf() >= take_chance:
+			continue
+		if _near_any(cell, placed, min_spacing):
+			continue
 		placed.append(cell)
 		claimed.append(cell)
 
@@ -414,7 +452,14 @@ func _spawn_decoration(texture: Texture2D, cell: Vector2i) -> void:
 	sprite.texture_filter = 1
 	sprite.z_index = -1
 	sprite.position = tile_layer.map_to_local(cell)
-	add_child(sprite)
+	# force_readable_name=true: without it, add_child() resolves a name
+	# collision (guaranteed here - there are dozens of these per dungeon now)
+	# with an illegible "@Sprite2D@43"-style internal name instead of
+	# "Decoration2", and _clear_level_entities()'s begins_with() sweep misses
+	# it entirely - decorations silently piling up across level transitions
+	# instead of being cleared. Same reasoning applies to every add_child()
+	# below that names a node for that sweep to find.
+	add_child(sprite, true)
 
 
 ## Cover: a StaticBody2D on the tileset's own wall physics layer, so it blocks
@@ -428,7 +473,7 @@ func _spawn_obstacle(texture: Texture2D, cell: Vector2i) -> void:
 	body.collision_layer = 1
 	body.collision_mask = 0
 	body.position = tile_layer.map_to_local(cell)
-	gameplay_layer.add_child(body)
+	gameplay_layer.add_child(body, true)
 
 	var shape := CollisionShape2D.new()
 	var rect := RectangleShape2D.new()
@@ -450,7 +495,7 @@ func _spawn_barrel(cell: Vector2i) -> void:
 	var barrel := ExplodingBarrelScene.instantiate()
 	barrel.name = "Decoration"  # reuses _clear_level_entities()'s prefix sweep
 	barrel.position = tile_layer.map_to_local(cell)
-	gameplay_layer.add_child(barrel)
+	gameplay_layer.add_child(barrel, true)
 
 
 func _on_room_player_entered(rc: RoomController) -> void:

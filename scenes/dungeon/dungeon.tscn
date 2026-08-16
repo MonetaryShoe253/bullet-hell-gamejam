@@ -144,6 +144,7 @@ script = ExtResource("1_sub6p")
 player_scene = ExtResource("2_frwky")
 
 [node name="TileMapLayer" type="TileMapLayer" parent="." unique_id=1260377071]
+z_index = -2
 texture_filter = 1
 tile_set = SubResource("TileSet_sg11a")
 

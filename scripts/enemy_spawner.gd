@@ -61,6 +61,7 @@ const THEMED_TYPES: Dictionary = {
 		"fire_rate": 1.1,
 		"money_reward": 5,
 		"shot_pattern": Enemy.ShotPattern.SPREAD,
+		"movement_pattern": Enemy.MovementPattern.CHASE,
 	},
 	DungeonGenerator.RoomTheme.TACO: {
 		"scene": TacoScene,
@@ -70,6 +71,7 @@ const THEMED_TYPES: Dictionary = {
 		"fire_rate": 0.9,
 		"money_reward": 5,
 		"shot_pattern": Enemy.ShotPattern.BURST,
+		"movement_pattern": Enemy.MovementPattern.STRAFE,
 	},
 	DungeonGenerator.RoomTheme.PIZZA: {
 		"scene": PizzaScene,
@@ -79,6 +81,7 @@ const THEMED_TYPES: Dictionary = {
 		"fire_rate": 1.0,
 		"money_reward": 5,
 		"shot_pattern": Enemy.ShotPattern.SINGLE,
+		"movement_pattern": Enemy.MovementPattern.KITE,
 	},
 }
 
@@ -133,8 +136,8 @@ func _roll_wave_count() -> int:
 
 func _spawn_wave(gen: DungeonGenerator, room: Rect2i, room_controller: RoomController) -> void:
 	var theme: DungeonGenerator.RoomTheme = gen.theme_of(room)
-	var count: int = _rng.randi_range(4, 6) + int(GameState.level / 3)
-	count = mini(count, 9)
+	var count: int = _rng.randi_range(5, 8) + int(GameState.level / 2)
+	count = mini(count, 12)
 
 	var exclude: Array = gen.obstacle_cells.get(room, [])
 	for i in count:

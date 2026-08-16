@@ -33,6 +33,14 @@ const FACING_NAMES: Array[String] = [
 
 var _facing: String = "south"
 
+## The attack SpriteFrames animation is 7 frames at 12 fps (~0.58s) as
+## authored - matches this so the throw motion actually finishes around the
+## same time a shot at the *default* fire_rate goes off. shoot() scales
+## AnimatedSprite2D.speed_scale by base_duration/fire_rate so upgrading fire
+## rate (see apply_upgrade()) speeds the animation up to match, rather than
+## the throw visibly lagging behind shots that are already firing again.
+const ATTACK_ANIM_BASE_DURATION: float = 7.0 / 12.0
+
 
 var projectile_scene: PackedScene = preload("res://scenes/projectiles/playerbullet/playerbullet.tscn")
 var time_since_last_shot: float = 0.0
@@ -85,9 +93,10 @@ func _physics_process(delta: float) -> void:
 
 	move_and_slide()
 
-	# Facing follows the mouse aim (twin-stick style) rather than movement, so
-	# strafing doesn't spin the sprite away from where shots actually go.
-	_facing = _facing_for(get_global_mouse_position() - global_position)
+	# Facing follows movement, not the mouse aim - _facing_for() already keeps
+	# whatever direction we last had when velocity is ~zero, so standing
+	# still and shooting doesn't flicker the sprite back to some default.
+	_facing = _facing_for(velocity)
 	_update_animation()
 
 	# Dash cooldown
@@ -144,6 +153,7 @@ func shoot() -> void:
 	var spawn_position := global_position + aim_direction * muzzle_offset
 
 	proj.launch(spawn_position, aim_direction)
+	sprite.speed_scale = ATTACK_ANIM_BASE_DURATION / maxf(fire_rate, 0.05)
 	sprite.play("attack_%s" % _facing)
 
 
@@ -166,6 +176,7 @@ func _facing_for(vector: Vector2) -> String:
 func _update_animation() -> void:
 	if sprite.animation.begins_with("attack_") and sprite.is_playing():
 		return
+	sprite.speed_scale = 1.0  # attack's own speed_scale (see shoot()) only applies to attack
 
 	var state := "walk" if velocity.length_squared() > 25.0 else "idle"
 	var anim_name := "%s_%s" % [state, _facing]
