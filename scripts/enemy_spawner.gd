@@ -20,9 +20,10 @@ const SLIME_TYPES: Array[Dictionary] = [
 		"health": 18.0,
 		"damage": 4.0,
 		"move_speed": 90.0,
-		"fire_rate": 1.3,
+		"fire_rate": 0.8,
 		"money_reward": 4,
-		"shot_pattern": Enemy.ShotPattern.SINGLE
+		"shot_pattern": Enemy.ShotPattern.SINGLE,
+		"movement_pattern": Enemy.MovementPattern.CHASE
 	},
 	{
 		"scene": SlimeScene,
@@ -30,9 +31,10 @@ const SLIME_TYPES: Array[Dictionary] = [
 		"health": 12.0,
 		"damage": 3.0,
 		"move_speed": 150.0,
-		"fire_rate": 0.8,
+		"fire_rate": 0.5,
 		"money_reward": 5,
-		"shot_pattern": Enemy.ShotPattern.BURST
+		"shot_pattern": Enemy.ShotPattern.BURST,
+		"movement_pattern": Enemy.MovementPattern.STRAFE
 	},
 	{
 		"scene": SlimeScene,
@@ -40,9 +42,10 @@ const SLIME_TYPES: Array[Dictionary] = [
 		"health": 32.0,
 		"damage": 7.0,
 		"move_speed": 55.0,
-		"fire_rate": 1.8,
+		"fire_rate": 1.0,
 		"money_reward": 7,
-		"shot_pattern": Enemy.ShotPattern.SPREAD
+		"shot_pattern": Enemy.ShotPattern.SPREAD,
+		"movement_pattern": Enemy.MovementPattern.BOUNCE
 	},
 ]
 
@@ -85,7 +88,7 @@ const BOSS_STATS: Dictionary = {
 	"health": 220.0,
 	"damage": 12.0,
 	"move_speed": 70.0,
-	"fire_rate": 0.5,
+	"fire_rate": 0.2,
 	"money_reward": 60,
 	"scale": 2.4,
 	"shot_pattern": Enemy.ShotPattern.CIRCLE,

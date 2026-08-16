@@ -1,13 +1,13 @@
 class_name Enemy
 extends CharacterBody2D
 
-@export var fire_rate: float = 1.0  # seconds between shots
+@export var fire_rate: float = 1.0
 @export var move_speed: float = 250.0
 @export var preferred_distance: float = 150.0
 @export var distance_tolerance: float = 20.0
 @export var projectile_damage: float = 5.0
 @export var money_reward: int = 5
-@export var player: Node2D  # reference to the player, set this however you're tracking it
+@export var player: Node2D
 
 enum ShotPattern {
 	SINGLE,
@@ -17,27 +17,38 @@ enum ShotPattern {
 }
 @export var shot_pattern: ShotPattern = ShotPattern.SINGLE
 
+enum MovementPattern {
+	KITE,
+	CHASE,
+	BOUNCE,
+	STRAFE
+}
+@export var movement_pattern: MovementPattern = MovementPattern.KITE
+
+var strafe_direction: float = 1.0
+var strafe_timer: float = 0.0
+var bounce_phase: float = 0.0
+
 var projectile_scene := preload("res://scenes/projectiles/enemybullet/enemybullet.tscn")
 
 @export var spread_angle: float = 20.0
 @export var spread_projectiles: int = 3
-
 @export var circle_projectiles: int = 12
+
 @export var circle_rotation_speed: float = 7.0 # degrees per volley
 var circle_rotation: float = 0.0
+@export var circle_rotation_min: float = 0.0
+@export var circle_rotation_max: float = 120.0
 
 @export var burst_count: int = 3
 @export var burst_delay: float = 0.1
 
-## Both the drone (Sprite2D) and the slime variants (AnimatedSprite2D) name
-## their visual node "Sprite2D" so this script can stay agnostic of which.
 @onready var visual: CanvasItem = $Sprite2D
 @onready var health_component: HealthComponent = $Components/HealthComponent
 
 var _fire_timer: Timer
 var _flash_tween: Tween
 var _base_modulate: Color = Color.WHITE
-
 
 func _ready() -> void:
 	_base_modulate = visual.modulate
@@ -51,11 +62,6 @@ func _ready() -> void:
 	health_component.damaged.connect(_on_damaged)
 	health_component.died.connect(_on_died)
 
-
-## Applies the stats the spawner decided for this enemy (base stats scaled by
-## GameState's level curve). Call after add_child() - this relies on the
-## @onready refs above, and configure()'ing fire_rate needs _fire_timer to
-## already exist.
 func configure(stats: Dictionary) -> void:
 	if stats.has("health"):
 		health_component.max_health = stats.health
@@ -77,14 +83,24 @@ func configure(stats: Dictionary) -> void:
 		scale = Vector2.ONE * float(stats.scale)
 	if stats.has("shot_pattern"):
 		shot_pattern = stats.shot_pattern
-
+	if stats.has("movement_pattern"):
+		movement_pattern = stats.movement_pattern
 
 func _physics_process(_delta: float) -> void:
-	if can_see_player():
-		_mirror_player_movement()
-	else:
+	if not can_see_player():
 		velocity = Vector2.ZERO
 		move_and_slide()
+		return
+
+	match movement_pattern:
+		MovementPattern.KITE:
+			_kite()
+		MovementPattern.CHASE:
+			_chase()
+		MovementPattern.BOUNCE:
+			_bounce(_delta)
+		MovementPattern.STRAFE:
+			_strafe(_delta)
 
 func can_see_player() -> bool:
 	if player == null:
@@ -104,31 +120,21 @@ func fire_at_player() -> void:
 	if not can_see_player():
 		return
 
-	var direction := (
-		player.global_position - global_position
-	).normalized()
+	var direction := (player.global_position - global_position).normalized()
 
 	match shot_pattern:
 		ShotPattern.SINGLE:
 			fire_single(direction)
-
 		ShotPattern.SPREAD:
 			fire_spread(direction)
-
 		ShotPattern.BURST:
 			fire_burst(direction)
-
 		ShotPattern.CIRCLE:
 			fire_circle()
-			
-func _on_projectile_hit_player(player: Node2D) -> void:
-	pass
 
 func spawn_projectile(direction: Vector2) -> void:
 	var proj: EnemyProjectile = projectile_scene.instantiate()
-
 	get_tree().current_scene.add_child(proj)
-
 	proj.launch(global_position, direction)
 
 func fire_single(direction: Vector2) -> void:
@@ -146,9 +152,8 @@ func fire_spread(direction: Vector2) -> void:
 	for i in range(spread_projectiles):
 		var angle := start_angle + step * i
 		var bullet_direction := direction.rotated(angle)
-
 		spawn_projectile(bullet_direction)
-		
+
 func fire_circle() -> void:
 	for i in range(circle_projectiles):
 		var angle := TAU * i / circle_projectiles
@@ -157,25 +162,27 @@ func fire_circle() -> void:
 		var direction := Vector2.RIGHT.rotated(angle)
 		spawn_projectile(direction)
 
-	circle_rotation = fmod(
-		circle_rotation + circle_rotation_speed,
-		360.0
-	)
+	# Update rotation
+	circle_rotation += circle_rotation_speed
+
+	if circle_rotation >= circle_rotation_max:
+		circle_rotation = circle_rotation_max
+		circle_rotation_speed = -abs(circle_rotation_speed)
+
+	elif circle_rotation <= circle_rotation_min:
+		circle_rotation = circle_rotation_min
+		circle_rotation_speed = abs(circle_rotation_speed)
 
 func fire_burst(_direction: Vector2) -> void:
 	for i in range(burst_count):
 		if player == null:
 			return
 
-		var direction := (
-			player.global_position - global_position
-		).normalized()
-
+		var direction := (player.global_position - global_position).normalized()
 		spawn_projectile(direction)
-
 		await get_tree().create_timer(burst_delay).timeout
-		
-func _mirror_player_movement() -> void:
+
+func _kite() -> void:
 	if player == null:
 		return
 
@@ -192,11 +199,62 @@ func _mirror_player_movement() -> void:
 
 	move_and_slide()
 
+func _chase() -> void:
+	if player == null:
+		return
+
+	var direction := (player.global_position - global_position).normalized()
+	velocity = direction * move_speed
+	move_and_slide()
+
+func _strafe(_delta: float) -> void:
+	if player == null:
+		return
+
+	var to_player := player.global_position - global_position
+	var distance := to_player.length()
+	var toward := to_player.normalized()
+	var side := Vector2(-toward.y, toward.x)
+
+	strafe_timer -= _delta
+	if strafe_timer <= 0.0:
+		strafe_timer = 0.9
+		strafe_direction *= -1.0
+
+	var drift := Vector2.ZERO
+
+	if distance > preferred_distance + 20.0:
+		drift += toward * move_speed
+	elif distance < preferred_distance - 20.0:
+		drift -= toward * move_speed
+
+	drift += side * strafe_direction * move_speed * 0.8
+
+	velocity = drift
+	move_and_slide()
+
+func _bounce(_delta: float) -> void:
+	if player == null:
+		return
+
+	var to_player := player.global_position - global_position
+	var direction := to_player.normalized()
+	var side := Vector2(-direction.y, direction.x)
+
+	bounce_phase += _delta * 4.0
+
+	var wave := sin(bounce_phase)
+	var offset := side * wave * 80.0
+
+	var target_pos := player.global_position + offset
+	var desired_dir := (target_pos - global_position).normalized()
+
+	velocity = desired_dir * move_speed * 1.15
+	move_and_slide()
 
 func _on_damaged(amount: float) -> void:
 	Fx.damage_number(global_position + Vector2(0, -24), amount)
 	_flash_red()
-
 
 func _flash_red() -> void:
 	if _flash_tween:
@@ -204,7 +262,6 @@ func _flash_red() -> void:
 	_flash_tween = create_tween()
 	_flash_tween.tween_property(visual, "modulate", Color(1.0, 0.25, 0.25, 1.0), 0.05)
 	_flash_tween.tween_property(visual, "modulate", _base_modulate, 0.15)
-
 
 func _on_died() -> void:
 	Fx.money_popup(global_position + Vector2(0, -24), money_reward)
