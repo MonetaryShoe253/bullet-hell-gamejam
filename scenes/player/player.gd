@@ -20,6 +20,17 @@ var dash_direction: Vector2
 var dash_cooldown_remaining: float = 0.0
 
 @onready var hurt_box: HurtboxComponent = $Components/HurtBox
+@onready var sprite: AnimatedSprite2D = $Sprite2D
+
+## Index order matches an angle sector walk (45 deg each) starting at east and
+## going clockwise - Y is down in Godot 2D, so a positive angle sweeps toward
+## south, matching the sprite sheet's own direction names.
+const FACING_NAMES: Array[String] = [
+	"east", "south_east", "south", "south_west",
+	"west", "north_west", "north", "north_east",
+]
+
+var _facing: String = "south"
 
 
 var projectile_scene: PackedScene = preload("res://scenes/projectiles/playerbullet/playerbullet.tscn")
@@ -73,6 +84,10 @@ func _physics_process(delta: float) -> void:
 
 	move_and_slide()
 
+	# Facing follows the mouse aim (twin-stick style) rather than movement, so
+	# strafing doesn't spin the sprite away from where shots actually go.
+	_facing = _facing_for(get_global_mouse_position() - global_position)
+	_update_animation()
 
 	# Dash cooldown
 	if dash_cooldown_remaining > 0.0:
@@ -120,3 +135,30 @@ func shoot() -> void:
 	var aim_direction := (get_global_mouse_position() - global_position).normalized()
 	var spawn_position := global_position + aim_direction * muzzle_offset
 	proj.launch(spawn_position, aim_direction)
+	sprite.play("attack_%s" % _facing)
+
+
+## Snaps a direction vector to one of the 8 facings the sprite sheet has
+## frames for. Falls back to whatever we were already facing for a
+## near-zero vector (mouse sitting right on top of the player) instead of
+## flickering to a meaningless direction.
+func _facing_for(vector: Vector2) -> String:
+	if vector.length_squared() < 1.0:
+		return _facing
+	var index: int = int(round(vector.angle() / (PI / 4.0))) % 8
+	if index < 0:
+		index += 8
+	return FACING_NAMES[index]
+
+
+## Attack is a one-shot animation (loop = false in the SpriteFrames
+## resource) - while it's still playing, leave it alone rather than
+## stomping it back to idle/walk every frame.
+func _update_animation() -> void:
+	if sprite.animation.begins_with("attack_") and sprite.is_playing():
+		return
+
+	var state := "walk" if velocity.length_squared() > 25.0 else "idle"
+	var anim_name := "%s_%s" % [state, _facing]
+	if sprite.animation != anim_name:
+		sprite.play(anim_name)

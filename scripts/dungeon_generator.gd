@@ -79,6 +79,15 @@ const _NEIGHBOURS: Array[Vector2i] = [
 	Vector2i(1, 1), Vector2i(1, -1), Vector2i(-1, 1), Vector2i(-1, -1),
 ]
 
+## Orthogonal-only subset of _NEIGHBOURS, hoisted out of the flood-fill hot
+## loops below (is_fully_connected(), _carve_enclosed_pockets()) - both call
+## this often enough at runtime now (is_fully_connected() runs inside
+## _trim_wide_exits(), once per candidate trim) that re-allocating a literal
+## array on every visited cell was showing up as real generation time.
+const _ORTHOGONAL: Array[Vector2i] = [
+	Vector2i(1, 0), Vector2i(-1, 0), Vector2i(0, 1), Vector2i(0, -1),
+]
+
 
 class BSPNode:
 	var rect: Rect2i
@@ -114,7 +123,18 @@ func generate(seed_value: int = -1) -> void:
 	_assign_roles()
 	_connect_rooms(root)
 	_carve_stairs_room()
+	# Cleanup has to run before the trim below: is_fully_connected() is a
+	# strict 4-directional flood fill, and the raw pre-cleanup grid can have
+	# regions that only touch diagonally (exactly what _carve_diagonal_pinches
+	# fixes), which reads as "disconnected" whether or not the trim actually
+	# changed anything. A full _clean_up() pass is the most expensive part of
+	# generation (it scans the whole grid several times over), so the second
+	# pass only runs when the trim actually touched the grid - the common
+	# case is no oversized spans at all, and re-scanning everything for
+	# nothing would roughly double generation time for no reason.
 	_clean_up()
+	if _trim_wide_exits():
+		_clean_up()
 
 
 ## What job a room has, looked up by its rect. Room rects come from disjoint BSP
@@ -204,9 +224,10 @@ func get_bounds() -> Rect2i:
 	return Rect2i(min_c, max_c - min_c + Vector2i.ONE)
 
 
-## Flood fill check - every floor cell reachable from every other. Connectivity
-## is guaranteed by construction, so this is here for tests and for catching
-## regressions in the carving passes rather than for use at runtime.
+## Flood fill check - every floor cell reachable from every other. Guaranteed
+## by construction for the finished grid (which is what the tests check), but
+## also called mid-generation now, by _trim_wide_exits() while the grid is
+## still a work in progress - see that function's own comment.
 func is_fully_connected() -> bool:
 	if grid.is_empty():
 		return true
@@ -216,7 +237,7 @@ func is_fully_connected() -> bool:
 	var queue: Array[Vector2i] = [start]
 	while not queue.is_empty():
 		var cell: Vector2i = queue.pop_back()
-		for offset: Vector2i in [Vector2i(1, 0), Vector2i(-1, 0), Vector2i(0, 1), Vector2i(0, -1)]:
+		for offset: Vector2i in _ORTHOGONAL:
 			var n: Vector2i = cell + offset
 			if grid.has(n) and not seen.has(n):
 				seen[n] = true
@@ -459,11 +480,115 @@ func _carve_stairs_room() -> void:
 			stairs_w, stairs_h)
 	if not _interior().encloses(candidate):
 		return
+	if _touches_floor(candidate.grow(1)):
+		return  # would fuse with whatever's already there - drop it, same as not fitting
 
 	stairs_room = candidate
 	_carve_rect(stairs_room)
 	stairs_cell = _center(stairs_room)
 	_carve_corridor(Vector2i(gate_x, top - 1), stairs_cell)
+
+
+## True if any cell of `rect` is already floor. Used before carving a new
+## dedicated room so it never fuses with whatever's already on the map.
+func _touches_floor(rect: Rect2i) -> bool:
+	for x in range(rect.position.x, rect.end.x):
+		for y in range(rect.position.y, rect.end.y):
+			if grid.has(Vector2i(x, y)):
+				return true
+	return false
+
+
+## Corridors are meant to cross a room's wall as one modest opening
+## (corridor_width, ~5 cells). Two BSP siblings can end up close enough that
+## a corridor's straight run skims flush along a room it isn't even the
+## intended connection for - the whole stretch where they run side by side
+## reads as floor outside that room's edge, so get_room_exits() hands back
+## one giant span instead of a doorway ("a whole corner or side" rather than
+## a hallway). This walls the excess back up, keeping only a centered
+## doorway-sized opening per span.
+##
+## The seal has to be more than one cell deep: _clean_up() (which runs right
+## after this) treats a one-cell-thick wall between two floor regions as a
+## drawability defect and reopens it, which would silently undo a shallow
+## seal. Digging seal_depth cells into the *far* side (away from `room`,
+## never back into it) makes a wall thick enough to survive that pass and
+## read as a real one.
+##
+## Most of the time the real, guaranteed connectivity comes from the narrow
+## spanning-tree corridors _connect_rooms() already carved between every
+## pair of rooms, so trimming an oversized span down to one doorway is safe.
+## But on some seeds two rooms this size and this close *are* each other's
+## only route to the rest of the map - trimming all the way down would wall
+## them off from it. is_fully_connected() is checked after each attempt, and
+## on failure the keep-window is widened step by step (rather than simply
+## giving up back at the untouched original) so the door still shrinks as
+## far as connectivity allows instead of staying a whole wall wide.
+## Returns true if any span actually got trimmed, so the caller knows whether
+## a follow-up _clean_up() pass is worth its cost.
+func _trim_wide_exits() -> bool:
+	var max_span: int = corridor_width + 2
+	var seal_depth: int = room_padding + corridor_width
+	var target_rooms: Array[Rect2i] = rooms.duplicate()
+	if stairs_room.size != Vector2i.ZERO:
+		target_rooms.append(stairs_room)
+
+	var edge_dirs: Array[Vector2i] = [Vector2i(0, -1), Vector2i(0, 1), Vector2i(-1, 0), Vector2i(1, 0)]
+
+	var changed := false
+	for room: Rect2i in target_rooms:
+		for dir: Vector2i in edge_dirs:
+			for span: Array in _edge_spans(room, dir):
+				if span.size() <= max_span:
+					continue
+				if _trim_span(span, dir, seal_depth):
+					changed = true
+	return changed
+
+
+## Tries progressively wider keep-windows (starting at corridor_width) until
+## one keeps the map connected, sealing everything outside the kept window
+## `seal_depth` cells into `dir` each time. Cheap seeds settle on the first
+## try.
+##
+## A centered window alone isn't enough: this span can be a corridor running
+## parallel to the room for a long stretch before it actually turns the
+## corner into it, in which case the one spot that truly connects sits near
+## one END of the span, not the middle - a centered doorway would seal off
+## the real junction and (correctly) fail the connectivity check every time.
+## So each width tries the window centered, flush to the start, and flush to
+## the end, and keeps whichever succeeds first.
+func _trim_span(span: Array, dir: Vector2i, seal_depth: int) -> bool:
+	var keep_width: int = corridor_width
+	while keep_width < span.size():
+		var starts: Array[int] = [0, span.size() - keep_width, (span.size() - keep_width) / 2]
+		for keep_start in starts:
+			if _try_trim(span, dir, seal_depth, keep_start, keep_width):
+				return true
+		keep_width += corridor_width
+	return false
+
+
+## Seals everything in `span` outside [keep_start, keep_start + keep_width)
+## `seal_depth` cells into `dir`, keeps the change if the map is still fully
+## connected afterwards, and reverts (returning false) otherwise.
+func _try_trim(span: Array, dir: Vector2i, seal_depth: int, keep_start: int, keep_width: int) -> bool:
+	var removed: Array[Vector2i] = []
+	for i in span.size():
+		if i < keep_start or i >= keep_start + keep_width:
+			var cell: Vector2i = span[i]
+			for d in range(seal_depth):
+				var seal_cell: Vector2i = cell + dir * d
+				if grid.has(seal_cell):
+					grid.erase(seal_cell)
+					removed.append(seal_cell)
+
+	if is_fully_connected():
+		return true
+
+	for cell: Vector2i in removed:
+		grid[cell] = Cell.FLOOR
+	return false
 
 
 func _center(r: Rect2i) -> Vector2i:
@@ -572,7 +697,7 @@ func _carve_enclosed_pockets() -> int:
 
 	while not queue.is_empty():
 		var cell: Vector2i = queue.pop_back()
-		for offset: Vector2i in [Vector2i(1, 0), Vector2i(-1, 0), Vector2i(0, 1), Vector2i(0, -1)]:
+		for offset: Vector2i in _ORTHOGONAL:
 			var n: Vector2i = cell + offset
 			if area.has_point(n) and not grid.has(n) and not reached.has(n):
 				reached[n] = true

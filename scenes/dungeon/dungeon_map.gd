@@ -47,6 +47,22 @@ var player: Node2D
 
 const DemonPortalScene := preload("res://scenes/dungeon/demon_portal.tscn")
 
+## Cosmetic clutter scattered across ordinary fight rooms - no collision, just
+## flavor so rooms stop reading as repeats of the same bare arena.
+const DECORATION_PATHS: Array[String] = [
+	"res://assets/Wing/decorations/stacked_chairs.png",
+	"res://assets/Wing/decorations/condiment_station.png",
+	"res://assets/Wing/decorations/jukebox.png",
+	"res://assets/Wing/decorations/potted_plant.png",
+	"res://assets/Wing/decorations/oil_barrel.png",
+	"res://assets/Wing/decorations/trash_can.png",
+	"res://assets/Wing/decorations/wing_crate.png",
+	"res://assets/Wing/vending_machine.png",
+]
+const ShopkeeperTexture := preload("res://assets/Wing/shopkeeper.png")
+
+var _decoration_rng := RandomNumberGenerator.new()
+
 
 # --- atlas coordinates (column, row) in the 16px grid ---
 
@@ -151,9 +167,9 @@ func _clear_level_entities() -> void:
 	_stairs_trigger = null
 
 	# Godot uniquifies sibling names ("DemonPortal", "DemonPortal2", ...) since
-	# there are two of them, so match by prefix rather than tracking an array.
+	# there can be several, so match by prefix rather than tracking an array.
 	for child in get_children():
-		if child.name.begins_with("DemonPortal"):
+		if child.name.begins_with("DemonPortal") or child.name.begins_with("Decoration"):
 			child.queue_free()
 
 	boss_health_bar.visible = false
@@ -172,6 +188,8 @@ func generate_dungeon() -> void:
 	_spawn_player()
 	_spawner = EnemySpawner.new(self, tile_layer, player)
 	_setup_rooms(_generator)
+	_scatter_decorations(_generator)
+	_spawn_shopkeeper(_generator)
 	minimap.setup(_generator, _room_controllers, tile_layer, player)
 
 
@@ -194,6 +212,76 @@ func _setup_rooms(gen: DungeonGenerator) -> void:
 		rc.player_entered.connect(_on_room_player_entered)
 		rc.all_enemies_cleared.connect(_on_room_cleared)
 		_room_controllers.append(rc)
+
+
+## Cosmetic clutter (no collision) scattered across ordinary fight rooms so
+## they read as distinct spaces instead of repeats of the same bare arena.
+## Start/shop/boss already get their own hand-placed dressing via
+## _decorate_start()/_decorate_shop()/_decorate_boss(), so this only touches
+## NORMAL rooms. Plain Sprite2D children rather than PropLayer tiles - these
+## art pieces don't live in Dungeon_Tileset.png's atlas, and a handful of
+## loose sprites per floor is cheap.
+func _scatter_decorations(gen: DungeonGenerator) -> void:
+	_decoration_rng.seed = gen.seed_used
+	for room: Rect2i in gen.rooms:
+		if gen.kind_of(room) == DungeonGenerator.RoomKind.NORMAL:
+			_scatter_room(gen, room)
+
+
+func _scatter_room(gen: DungeonGenerator, room: Rect2i) -> void:
+	var margin := 3  # keep clear of walls/doorways - these sprites are ~2 tiles wide
+	if room.size.x <= margin * 2 or room.size.y <= margin * 2:
+		return
+
+	var count: int = _decoration_rng.randi_range(1, 3)
+	var min_spacing := 5
+	var placed: Array[Vector2i] = []
+
+	for i in count:
+		var cell := Vector2i.ZERO
+		var found := false
+		for attempt in 10:
+			cell = Vector2i(
+					_decoration_rng.randi_range(room.position.x + margin, room.end.x - margin),
+					_decoration_rng.randi_range(room.position.y + margin, room.end.y - margin))
+			if not gen.grid.has(cell):
+				continue
+			var too_close := false
+			for other: Vector2i in placed:
+				if cell.distance_squared_to(other) < min_spacing * min_spacing:
+					too_close = true
+					break
+			if not too_close:
+				found = true
+				break
+		if not found:
+			break  # room's too tight for another - stop rather than keep retrying
+
+		var path: String = DECORATION_PATHS[_decoration_rng.randi_range(0, DECORATION_PATHS.size() - 1)]
+		_spawn_decoration(load(path), cell)
+		placed.append(cell)
+
+
+## A shopkeeper standing at the shop's counter, just behind the wares
+## _decorate_shop() already lays out on the floor there.
+func _spawn_shopkeeper(gen: DungeonGenerator) -> void:
+	var room: Rect2i = gen.shop_room
+	if room.size == Vector2i.ZERO:
+		return
+
+	var middle: Vector2i = room.position + room.size / 2
+	var cell: Vector2i = middle + Vector2i(0, -2)
+	if room.has_point(cell) and gen.grid.has(cell):
+		_spawn_decoration(ShopkeeperTexture, cell)
+
+
+func _spawn_decoration(texture: Texture2D, cell: Vector2i) -> void:
+	var sprite := Sprite2D.new()
+	sprite.name = "Decoration"
+	sprite.texture = texture
+	sprite.texture_filter = 1
+	sprite.position = tile_layer.map_to_local(cell)
+	add_child(sprite)
 
 
 func _on_room_player_entered(rc: RoomController) -> void:
