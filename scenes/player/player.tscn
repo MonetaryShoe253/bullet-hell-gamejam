@@ -1,7 +1,7 @@
 [gd_scene format=3 uid="uid://cgkmebodaryei"]
 
 [ext_resource type="Script" uid="uid://bxpm47jm72nwr" path="res://scenes/player/player.gd" id="1_8afob"]
-[ext_resource type="Texture2D" uid="uid://df8k8015iepvw" path="res://assets/Wing/player_idle.png" id="2_dovo2"]
+[ext_resource type="SpriteFrames" path="res://assets/Wing/player_anim/player_sprite_frames.tres" id="2_dovo2"]
 [ext_resource type="PackedScene" uid="uid://do4swhon6n2q2" path="res://scenes/components/health/health_component.tscn" id="3_gmlin"]
 [ext_resource type="PackedScene" uid="uid://hamwnbllhiuu" path="res://scenes/components/hurtbox/hurt_box.tscn" id="3_lvxji"]
 [ext_resource type="PackedScene" uid="uid://cfvi616pvm7t4" path="res://scenes/UI/player_health.tscn" id="5_p47bc"]
@@ -18,10 +18,12 @@ texture_filter = 1
 collision_layer = 2
 script = ExtResource("1_8afob")
 
-[node name="Sprite2D" type="Sprite2D" parent="." unique_id=2147301644]
+[node name="Sprite2D" type="AnimatedSprite2D" parent="." unique_id=2147301644]
 texture_filter = 1
-scale = Vector2(0.35, 0.35)
-texture = ExtResource("2_dovo2")
+scale = Vector2(0.25, 0.25)
+sprite_frames = ExtResource("2_dovo2")
+animation = &"idle_south"
+autoplay = "idle_south"
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=1072646543]
 shape = SubResource("RectangleShape2D_gmlin")
