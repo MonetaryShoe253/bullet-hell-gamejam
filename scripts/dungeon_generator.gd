@@ -34,6 +34,10 @@ var corridor_width := 5           # wide enough to dodge while transitioning roo
 ## is known (see _assign_roles()).
 var start_room_size := 12
 
+## The shop is a stall, not another arena - shrunk the same way, just a
+## little roomier than the start so its chest/wares layout still fits.
+var shop_room_size := 18
+
 var rng := RandomNumberGenerator.new()
 var grid: Dictionary = {}         # Vector2i -> Cell.FLOOR
 var rooms: Array[Rect2i] = []
@@ -55,6 +59,12 @@ var stairs_cell := Vector2i.ZERO
 ## is drawn on. Filled in by _carve_stairs_room() so the renderer and the room
 ## gate/trigger logic don't each have to recompute where "the gate" is.
 var boss_gate_cells: Array[Vector2i] = []
+
+## Rect2i -> Array[Rect2i], which rooms a corridor directly connects. Built
+## alongside the corridors themselves in _connect_rooms()/_carve_stairs_room().
+## Used by the minimap to know which unexplored rooms are worth showing as
+## "next room, contents unknown" versus leaving fully hidden.
+var room_adjacency: Dictionary = {}
 
 ## The leaf partition each entry of `rooms` came from, same order. Needed to
 ## grow the boss room out to fill its partition once the roles are handed out.
@@ -347,7 +357,12 @@ func _assign_roles() -> void:
 		if distance > best_distance:
 			best_distance = distance
 			shop_index = i
-	shop_room = rooms[shop_index]
+	# Shrunk the same way the start room is - a shop is a stall, not an arena.
+	var rolled_shop: Rect2i = rooms[shop_index]
+	shop_room = _shrink_room(rolled_shop, shop_room_size)
+	_erase_outside(rolled_shop, shop_room)
+	rooms[shop_index] = shop_room
+	_room_nodes[shop_index].room = shop_room
 
 
 ## The largest room the partition behind `rooms[index]` could possibly hold.
@@ -373,6 +388,15 @@ func _erase_outside(old_room: Rect2i, new_room: Rect2i) -> void:
 			var cell := Vector2i(x, y)
 			if not new_room.has_point(cell):
 				grid.erase(cell)
+
+
+func _add_adjacency(a: Rect2i, b: Rect2i) -> void:
+	if not room_adjacency.has(a):
+		room_adjacency[a] = []
+	if not room_adjacency.has(b):
+		room_adjacency[b] = []
+	room_adjacency[a].append(b)
+	room_adjacency[b].append(a)
 
 
 func _distance_squared(a: Rect2i, b: Rect2i) -> int:
@@ -407,6 +431,7 @@ func _connect_rooms(node: BSPNode) -> Array[Rect2i]:
 					best_a = a
 					best_b = b
 		_carve_corridor(_center(best_a), _center(best_b))
+		_add_adjacency(best_a, best_b)
 
 	var all_rooms: Array[Rect2i] = []
 	all_rooms.append_array(left_rooms)

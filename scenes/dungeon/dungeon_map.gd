@@ -28,6 +28,7 @@ extends Node2D
 @onready var money_label: Label = $HUD/MoneyLabel
 @onready var boss_health_bar: CanvasLayer = $BossHealthBar
 @onready var shop_ui: ShopUI = $ShopUI
+@onready var minimap: Control = $HUD/Minimap
 
 @export var tile_source_id := 0   # the TileSetAtlasSource id for the tileset (0 if it's the only source)
 @export var map_size := Vector2i(260, 180)
@@ -127,7 +128,7 @@ func _spawn_player() -> void:
 
 func _on_money_changed(total: int) -> void:
 	if money_label:
-		money_label.text = "Money: %d" % total
+		money_label.text = "Cluck Coins: %d" % total
 
 
 ## Tears down everything from the previous dungeon (player, enemies, gates,
@@ -176,22 +177,29 @@ func generate_dungeon() -> void:
 
 	_spawn_player()
 	_spawner = EnemySpawner.new(self, tile_layer, player)
+
 	_setup_rooms(_generator)	
 	
 	_spawn_shop_trigger()
 
+	minimap.setup(_generator, _room_controllers, tile_layer, player)
+
+
 
 ## One RoomController per fight room. Start and shop never gate, so they don't
-## get one at all - the player can always walk straight through them.
+## get one at all - the start room is always considered explored, and the
+## shop's controller is ungated (see room_controller.gd), there purely so
+## walking in flips `cleared` for the minimap.
 func _setup_rooms(gen: DungeonGenerator) -> void:
 	for room: Rect2i in gen.rooms:
 		var kind: DungeonGenerator.RoomKind = gen.kind_of(room)
-		if kind != DungeonGenerator.RoomKind.NORMAL and kind != DungeonGenerator.RoomKind.BOSS:
+		if kind == DungeonGenerator.RoomKind.START:
 			continue
 
 		var rc := RoomController.new()
 		rc.room_rect = room
 		rc.kind = kind
+		rc.gated = kind != DungeonGenerator.RoomKind.SHOP
 		add_child(rc)
 		rc.setup(tile_layer, gen.get_room_exits(room))
 		rc.player_entered.connect(_on_room_player_entered)
@@ -201,6 +209,10 @@ func _setup_rooms(gen: DungeonGenerator) -> void:
 
 func _on_room_player_entered(rc: RoomController) -> void:
 	if rc.cleared:
+		return
+
+	if not rc.gated:
+		rc.cleared = true  # shop: nothing to fight, just mark it explored
 		return
 
 	if not rc.spawned:

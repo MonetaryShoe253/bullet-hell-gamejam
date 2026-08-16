@@ -1,0 +1,11 @@
+{
+  "timestamp": "2026-08-16T13:33:58.864Z",
+  "projectRoot": "G:\\gamejam\\bullethell-gamejam",
+  "structure": {
+    "hasPackageJson": false,
+    "hasTsConfig": false,
+    "hasClaudeConfig": true,
+    "hasClaudeFlow": true
+  },
+  "scannedAt": 1786887238864
+}

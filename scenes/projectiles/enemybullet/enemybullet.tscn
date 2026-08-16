@@ -1,10 +1,10 @@
 [gd_scene format=3 uid="uid://cxyxspte2w1mg"]
 
 [ext_resource type="Script" uid="uid://cp6c3je12muh4" path="res://scenes/projectiles/enemybullet/enemybullet.gd" id="1_cxore"]
-[ext_resource type="Texture2D" uid="uid://blqk21eblm8ni" path="res://assets/Bullets/sprites/bullet4.png" id="2_dibrq"]
+[ext_resource type="Texture2D" path="res://assets/Wing/enemy_bullet.png" id="2_dibrq"]
 
 [node name="EnemyBullet" type="Area2D" unique_id=884955343]
-scale = Vector2(0.5, 0.5)
+scale = Vector2(0.4, 0.4)
 collision_layer = 16
 collision_mask = 3
 script = ExtResource("1_cxore")

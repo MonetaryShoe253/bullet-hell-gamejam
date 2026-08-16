@@ -1,11 +1,13 @@
 class_name RoomController
 extends Node2D
-## Gameplay side of one gated room: a trigger that notices the player walking
-## in, and a set of colliders at the room's doorways that can be switched on
-## to seal it. Built entirely at runtime (see setup()) since its geometry only
-## exists once DungeonGenerator has actually run. Only created for NORMAL and
-## BOSS rooms - dungeon_map.gd never makes one for the start or shop room, so
-## those are simply never gated.
+## Gameplay side of one room's trigger: notices the player walking in, and -
+## for gated rooms - a set of colliders at the doorways that can be switched
+## on to seal it. Built entirely at runtime (see setup()) since its geometry
+## only exists once DungeonGenerator has actually run. Created for NORMAL,
+## BOSS and SHOP rooms; dungeon_map.gd never makes one for the start room,
+## which is always considered explored. Only NORMAL/BOSS ever lock - the shop
+## controller (gated = false) exists purely so entering it can flip `cleared`
+## for the minimap, with no gate bodies and no enemies to wait for.
 ##
 ## dungeon_map.gd owns what happens on these signals (spawning enemies,
 ## painting the gate art); this script only owns the physics and bookkeeping.
@@ -15,6 +17,7 @@ signal all_enemies_cleared(controller: RoomController)
 
 var room_rect: Rect2i
 var kind: DungeonGenerator.RoomKind
+var gated: bool = true
 var spawned: bool = false
 var cleared: bool = false
 var locked: bool = false
@@ -28,8 +31,9 @@ var _trigger: Area2D
 func setup(tile_layer: TileMapLayer, exit_spans: Array) -> void:
 	exits = exit_spans
 	_build_trigger(tile_layer)
-	for span: Array in exit_spans:
-		_build_gate(tile_layer, span)
+	if gated:
+		for span: Array in exit_spans:
+			_build_gate(tile_layer, span)
 
 
 func register_enemy(enemy: Enemy) -> void:

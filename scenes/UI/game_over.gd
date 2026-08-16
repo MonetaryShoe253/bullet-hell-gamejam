@@ -10,7 +10,7 @@ extends CanvasLayer
 
 func _ready() -> void:
 	process_mode = Node.PROCESS_MODE_ALWAYS
-	money_label.text = "Money collected: %d" % GameState.money
+	money_label.text = "Cluck Coins collected: %d" % GameState.money
 	level_label.text = "Level reached: %d" % GameState.level
 	restart_button.pressed.connect(_on_restart_pressed)
 	restart_button.grab_focus()
