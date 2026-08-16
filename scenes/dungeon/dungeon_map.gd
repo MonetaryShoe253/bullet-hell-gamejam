@@ -25,8 +25,8 @@ extends Node2D
 
 @onready var tile_layer: TileMapLayer = $TileMapLayer
 @onready var prop_layer: TileMapLayer = $PropLayer
-@onready var seed_label: Label = $HUD/SeedLabel
 @onready var money_label: Label = $HUD/MoneyLabel
+@onready var boss_health_bar: CanvasLayer = $BossHealthBar
 
 @export var tile_source_id := 0   # the TileSetAtlasSource id for the tileset (0 if it's the only source)
 @export var map_size := Vector2i(260, 180)
@@ -37,7 +37,6 @@ extends Node2D
 ## the camera can see past the dungeon; it is not part of the playable area.
 @export var void_margin := 16
 @export var fit_camera_to_map := true
-@export var show_hud := true
 ## Draws the ladder / wares / gate that mark out the start, shop and boss rooms.
 @export var show_room_props := true
 
@@ -150,6 +149,14 @@ func _clear_level_entities() -> void:
 		_stairs_trigger.queue_free()
 	_stairs_trigger = null
 
+	# Godot uniquifies sibling names ("DemonPortal", "DemonPortal2", ...) since
+	# there are two of them, so match by prefix rather than tracking an array.
+	for child in get_children():
+		if child.name.begins_with("DemonPortal"):
+			child.queue_free()
+
+	boss_health_bar.visible = false
+
 
 func generate_dungeon() -> void:
 	_clear_level_entities()
@@ -164,11 +171,6 @@ func generate_dungeon() -> void:
 	_spawn_player()
 	_spawner = EnemySpawner.new(self, tile_layer, player)
 	_setup_rooms(_generator)
-
-	seed_label.visible = show_hud
-	seed_label.text = "seed %d   ·   %d rooms   ·   boss arena %d×%d   ·   [R] regenerate" % [
-			_generator.seed_used, _generator.rooms.size(),
-			_generator.boss_room.size.x, _generator.boss_room.size.y]
 
 
 ## One RoomController per fight room. Start and shop never gate, so they don't
@@ -196,7 +198,7 @@ func _on_room_player_entered(rc: RoomController) -> void:
 	if not rc.spawned:
 		rc.spawned = true
 		if rc.kind == DungeonGenerator.RoomKind.BOSS:
-			_spawner.spawn_boss(rc.room_rect, rc)
+			_spawner.spawn_boss(rc.room_rect, rc, boss_health_bar.show_for)
 		else:
 			_spawner.spawn_room(_generator, rc.room_rect, rc)
 
@@ -354,9 +356,11 @@ func _decorate_boss(gen: DungeonGenerator) -> void:
 		_set_prop(gen, room, room.position + corners[i], PROP_BONES[i])
 
 
-## A demon portal at the boss room's *entrance* (never its stairs-side exit),
-## so a player approaching from the rest of the dungeon can tell what's behind
-## that door before they walk in. There is exactly one of these per dungeon.
+## A demon portal flanking each side of the boss room's *entrance* (never its
+## stairs-side exit), so a player approaching from the rest of the dungeon can
+## tell what's behind that door before they walk in. Sitting beside the door
+## rather than on top of it keeps them clear of the gate art, which already
+## overlays that same span once the room locks.
 func _place_boss_portal(gen: DungeonGenerator) -> void:
 	var room: Rect2i = gen.boss_room
 	if room.size == Vector2i.ZERO:
@@ -372,10 +376,28 @@ func _place_boss_portal(gen: DungeonGenerator) -> void:
 	if entrance_span.is_empty():
 		return
 
+	# Flank the span's midpoint rather than its two ends: most exits are a
+	# narrow corridor doorway where that's the same thing, but where a big
+	## room sits flush against the boss arena for a long stretch, the "ends"
+	# would be tiles apart - the midpoint keeps the pair tight regardless.
+	var first: Vector2i = entrance_span[0]
+	var last: Vector2i = entrance_span[entrance_span.size() - 1]
 	var mid: Vector2i = entrance_span[entrance_span.size() / 2]
+	var along: Vector2i = Vector2i(0, 1) if first.x == last.x else Vector2i(1, 0)
+	var spacing := 3
+
+	_spawn_portal(mid - along * spacing)
+	_spawn_portal(mid + along * spacing)
+
+
+func _spawn_portal(cell: Vector2i) -> void:
 	var portal := DemonPortalScene.instantiate()
-	add_child(portal)
-	portal.position = tile_layer.map_to_local(mid)
+	portal.name = "DemonPortal"
+	# force_readable_name: without it, add_child() resolves the name collision
+	# between the two portals with an illegible internal name instead of
+	# "DemonPortal2", and _clear_level_entities()'s begins_with() match misses it.
+	add_child(portal, true)
+	portal.position = tile_layer.map_to_local(cell)
 
 
 ## Places a floor prop, but only on a cell that is both inside the room it

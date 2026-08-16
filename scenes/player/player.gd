@@ -49,7 +49,9 @@ func _on_health_changed(current_health: float, max_health: float) -> void:
 
 func _on_died() -> void:
 	var game_over := GameOverScene.instantiate()
-	get_tree().root.add_child(game_over)
+	# Parented under current_scene (not root) so it's actually destroyed when
+	# Start Over reloads the scene - a root-level child survives a scene reload.
+	get_tree().current_scene.add_child(game_over)
 	get_tree().paused = true
 
 

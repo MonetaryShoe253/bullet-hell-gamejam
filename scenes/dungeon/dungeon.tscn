@@ -3,6 +3,7 @@
 [ext_resource type="Script" uid="uid://bk4xj87f0qe8a" path="res://scenes/dungeon/dungeon_map.gd" id="1_sub6p"]
 [ext_resource type="Texture2D" uid="uid://j766rkp3ucj" path="res://assets/2D Pixel Dungeon Asset Pack/character and tileset/Dungeon_Tileset.png" id="2_4f38h"]
 [ext_resource type="PackedScene" uid="uid://cgkmebodaryei" path="res://scenes/player/player.tscn" id="2_frwky"]
+[ext_resource type="PackedScene" path="res://scenes/UI/boss_health_bar.tscn" id="4_boss_hp"]
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_frwky"]
 texture = ExtResource("2_4f38h")
@@ -150,12 +151,6 @@ tile_set = SubResource("TileSet_sg11a")
 
 [node name="HUD" type="CanvasLayer" parent="." unique_id=1108299953]
 
-[node name="SeedLabel" type="Label" parent="HUD" unique_id=538708620]
-offset_left = 8.0
-offset_top = 6.0
-offset_right = 408.0
-offset_bottom = 29.0
-
 [node name="MoneyLabel" type="Label" parent="HUD"]
 offset_left = 8.0
 offset_top = 84.0
@@ -166,3 +161,5 @@ theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
 theme_override_constants/outline_size = 3
 theme_override_font_sizes/font_size = 22
 text = "Money: 0"
+
+[node name="BossHealthBar" parent="." instance=ExtResource("4_boss_hp")]

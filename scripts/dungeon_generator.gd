@@ -19,15 +19,20 @@ enum Cell { FLOOR }
 enum RoomKind { NORMAL, START, SHOP, BOSS }
 
 # --- Tuning knobs (set these before calling generate()) ---
-# Room floor is sized so the smallest possible room (min_room_size squared)
-# still covers a 1920x1080 viewport at the player camera's 3x zoom - a 16px
-# tile means ~40x23 tiles are on screen at once, so 44 gives every room, not
-# just the boss arena, a margin beyond that in both axes.
+# A 16px tile at the player camera's 3x zoom on a 1920x1080 viewport shows
+# ~40x23 tiles at once. min_room_size is the floor of that range - about 3/4
+# of a screen - so ordinary rooms vary from "smaller than the view" up to
+# whatever a big partition can hold, rather than every room being arena-sized.
 var map_size := Vector2i(260, 180)
 var min_partition_size := 52      # keep this >= min_room_size + padding*2 + a margin
-var min_room_size := 44           # bullet-hell arenas want generous space, not tiny rooms
+var min_room_size := 30           # bullet-hell arenas want generous space, not tiny rooms
 var room_padding := 2             # gap between a room and its partition edge
 var corridor_width := 5           # wide enough to dodge while transitioning rooms
+
+## The start room is deliberately small and cozy rather than arena-sized -
+## shrunk down from whatever _create_rooms() rolled for it once its identity
+## is known (see _assign_roles()).
+var start_room_size := 12
 
 var rng := RandomNumberGenerator.new()
 var grid: Dictionary = {}         # Vector2i -> Cell.FLOOR
@@ -316,7 +321,13 @@ func _assign_roles() -> void:
 		if distance > best_distance:
 			best_distance = distance
 			start_index = i
-	start_room = rooms[start_index]
+	# Shrink it down from whatever size it happened to roll - the start room
+	# reads as a small landing, not another fight arena.
+	var rolled_start: Rect2i = rooms[start_index]
+	start_room = _shrink_room(rolled_start, start_room_size)
+	_erase_outside(rolled_start, start_room)
+	rooms[start_index] = start_room
+	_room_nodes[start_index].room = start_room
 	player_spawn = _center(start_room)
 
 	if rooms.size() < 3:
@@ -342,6 +353,26 @@ func _assign_roles() -> void:
 ## The largest room the partition behind `rooms[index]` could possibly hold.
 func _arena_for(index: int) -> Rect2i:
 	return _room_nodes[index].rect.grow(-room_padding)
+
+
+func _shrink_room(room: Rect2i, size: int) -> Rect2i:
+	var w: int = mini(size, room.size.x)
+	var h: int = mini(size, room.size.y)
+	var x: int = room.position.x + (room.size.x - w) / 2
+	var y: int = room.position.y + (room.size.y - h) / 2
+	return Rect2i(x, y, w, h)
+
+
+## Un-carves whatever `old_room` covered that `new_room` doesn't. Safe to call
+## before _connect_rooms()/_clean_up() run - both only ever add floor, so
+## erasing here is the only place in generation floor can shrink, and nothing
+## downstream depends on this cell having been floor a moment ago.
+func _erase_outside(old_room: Rect2i, new_room: Rect2i) -> void:
+	for x in range(old_room.position.x, old_room.end.x):
+		for y in range(old_room.position.y, old_room.end.y):
+			var cell := Vector2i(x, y)
+			if not new_room.has_point(cell):
+				grid.erase(cell)
 
 
 func _distance_squared(a: Rect2i, b: Rect2i) -> int:

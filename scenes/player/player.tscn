@@ -21,7 +21,7 @@ muzzle_offset = 15.0
 move_speed = 125.0
 dash_speed = 600.0
 dash_duration = 0.1
-dash_cooldown = 3.0
+dash_cooldown = 1.5
 
 [node name="Sprite2D" type="Sprite2D" parent="." unique_id=2147301644]
 texture_filter = 1

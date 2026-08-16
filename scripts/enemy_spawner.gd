@@ -47,10 +47,13 @@ func spawn_room(gen: DungeonGenerator, room: Rect2i, room_controller: RoomContro
 		_spawn(variant, cell, room_controller)
 
 
-## The boss room gets one big, tough slime instead of a crowd.
-func spawn_boss(room: Rect2i, room_controller: RoomController) -> void:
+## The boss room gets one big, tough slime instead of a crowd. on_spawned, if
+## given, is called with the actual Enemy once it exists (spawning is
+## deferred - see _spawn()) so callers like the boss health bar can hook up
+## to it without knowing about that delay themselves.
+func spawn_boss(room: Rect2i, room_controller: RoomController, on_spawned: Callable = Callable()) -> void:
 	var cell: Vector2i = room.position + room.size / 2
-	_spawn(BOSS_STATS, cell, room_controller)
+	_spawn(BOSS_STATS, cell, room_controller, on_spawned)
 
 
 func _random_room_cell(gen: DungeonGenerator, room: Rect2i) -> Vector2i:
@@ -74,7 +77,8 @@ func _random_room_cell(gen: DungeonGenerator, room: Rect2i) -> Vector2i:
 ## "can't change this state while flushing queries" guard. Deferring the
 ## add_child (and everything that depends on its @onready refs) to the next
 ## idle frame sidesteps that entirely.
-func _spawn(base_stats: Dictionary, cell: Vector2i, room_controller: RoomController) -> void:
+func _spawn(base_stats: Dictionary, cell: Vector2i, room_controller: RoomController,
+		on_spawned: Callable = Callable()) -> void:
 	var enemy: Enemy = SlimeScene.instantiate()
 	enemy.player = _player
 	enemy.position = _tile_layer.map_to_local(cell)
@@ -85,6 +89,8 @@ func _spawn(base_stats: Dictionary, cell: Vector2i, room_controller: RoomControl
 		enemy.configure(stats)
 		if room_controller:
 			room_controller.register_enemy(enemy)
+		if on_spawned.is_valid():
+			on_spawned.call(enemy)
 	).call_deferred()
 
 
