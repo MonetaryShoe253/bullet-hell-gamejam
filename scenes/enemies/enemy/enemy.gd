@@ -34,6 +34,10 @@ var projectile_scene := preload("res://scenes/projectiles/enemybullet/enemybulle
 @export var spread_angle: float = 20.0
 @export var spread_projectiles: int = 3
 @export var circle_projectiles: int = 12
+
+@export var circle_rotation_speed: float = 7.0 # degrees per volley
+var circle_rotation: float = 0.0
+
 @export var burst_count: int = 3
 @export var burst_delay: float = 0.1
 
@@ -151,8 +155,15 @@ func fire_spread(direction: Vector2) -> void:
 func fire_circle() -> void:
 	for i in range(circle_projectiles):
 		var angle := TAU * i / circle_projectiles
+		angle += deg_to_rad(circle_rotation)
+
 		var direction := Vector2.RIGHT.rotated(angle)
 		spawn_projectile(direction)
+
+	circle_rotation = fmod(
+		circle_rotation + circle_rotation_speed,
+		360.0
+	)
 
 func fire_burst(_direction: Vector2) -> void:
 	for i in range(burst_count):

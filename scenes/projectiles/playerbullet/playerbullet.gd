@@ -5,14 +5,23 @@ signal hit_enemy(enemy)
 
 @export var speed: float = 400.0
 @export var damage: float = 5.0
+@export var lifetime: float = 0.5
+
+var lifetime_remaining: float
+
 var direction: Vector2 = Vector2.RIGHT
 
 func _ready() -> void:
-	body_entered.connect(_on_body_entered)
+	body_entered.connect(_on_body_entered)	
+	lifetime_remaining = lifetime
 
 func _physics_process(delta: float) -> void:
+	lifetime_remaining -= delta
+	if lifetime_remaining <= 0.0:
+		queue_free()
+		return	
 	position += direction * speed * delta
-
+	
 func launch(start_position: Vector2, target_direction: Vector2) -> void:
 	global_position = start_position
 	direction = target_direction.normalized()

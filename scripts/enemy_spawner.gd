@@ -46,7 +46,7 @@ const BOSS_STATS: Dictionary = {
 	"health": 220.0,
 	"damage": 12.0,
 	"move_speed": 70.0,
-	"fire_rate": 0.5,
+	"fire_rate": 0.2,
 	"money_reward": 60,
 	"scale": 2.4,
 	"shot_pattern": Enemy.ShotPattern.CIRCLE,
