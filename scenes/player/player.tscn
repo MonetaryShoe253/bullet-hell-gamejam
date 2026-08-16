@@ -8,15 +8,17 @@
 [ext_resource type="PackedScene" uid="uid://m7dvd11aqb4x" path="res://scenes/UI/energy_bar.tscn" id="6_75vfm"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_gmlin"]
-size = Vector2(12, 14)
+size = Vector2(5.3333335, 13.333334)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_nehcj"]
-size = Vector2(10, 12)
+size = Vector2(6, 17)
 
 [node name="Player" type="CharacterBody2D" unique_id=1277505981 groups=["player"]]
 texture_filter = 1
+scale = Vector2(1.5, 1.5)
 collision_layer = 2
 script = ExtResource("1_8afob")
+move_speed = 150.0
 
 [node name="Sprite2D" type="AnimatedSprite2D" parent="." unique_id=2147301644]
 texture_filter = 1
@@ -26,6 +28,7 @@ animation = &"idle_south"
 autoplay = "idle_south"
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=1072646543]
+position = Vector2(1.1920929e-07, 0)
 shape = SubResource("RectangleShape2D_gmlin")
 
 [node name="WeaponController" type="Node2D" parent="." unique_id=331834832]
@@ -37,6 +40,7 @@ collision_mask = 17
 health_component = NodePath("../HealthComponent")
 
 [node name="CollisionShape2D" parent="Components/HurtBox" index="0" unique_id=1854667238]
+position = Vector2(0, -0.5)
 shape = SubResource("RectangleShape2D_nehcj")
 
 [node name="HealthComponent" parent="Components" unique_id=1395210045 instance=ExtResource("3_gmlin")]

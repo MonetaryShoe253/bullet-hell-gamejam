@@ -1,22 +1,22 @@
 [gd_scene format=3 uid="uid://cxyxspte2w1mg"]
 
 [ext_resource type="Script" uid="uid://cp6c3je12muh4" path="res://scenes/projectiles/enemybullet/enemybullet.gd" id="1_cxore"]
-[ext_resource type="Texture2D" path="res://assets/Wing/enemy_bullet.png" id="2_dibrq"]
+[ext_resource type="Texture2D" uid="uid://ctdsksqw1cyo4" path="res://assets/Wing/enemy_bullet.png" id="2_dibrq"]
 
 [node name="EnemyBullet" type="Area2D" unique_id=884955343]
 scale = Vector2(0.4, 0.4)
 collision_layer = 16
 collision_mask = 3
 script = ExtResource("1_cxore")
-speed = 100.0
+speed = 85.0
 
 [node name="Sprite2D" type="Sprite2D" parent="." unique_id=1581674488]
 texture_filter = 1
 rotation = 1.5707964
 texture = ExtResource("2_dibrq")
 
-[node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="." unique_id=1945350566]
-visible = false
-polygon = PackedVector2Array(-8, -5, -6, -5, -6, -4, 11, -4, 11, -3, 14, -3, 14, -2, 15, -2, 15, 2, 14, 2, 14, 3, 11, 3, 11, 4, -6, 4, -6, 5, -8, 5, -8, 2, -10, 2, -10, 1, -13, 1, -13, 0, -15, 0, -15, -1, -12, -1, -12, -2, -8, -2)
+[node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="." unique_id=522927053]
+scale = Vector2(0.99999994, 0.99999994)
+polygon = PackedVector2Array(-15.000002, -7.500001, -2.5000002, -7.500001, 0, -5.0000005, 0, -2.5000002, 10.000001, 5.0000005, 15.000002, 10.000001, 7.500001, 7.500001, -2.5000002, 2.5000002, -7.500001, 0, -10.000001, -5.0000005, -15.000002, -5.0000005)
 
 [node name="VisibleOnScreenNotifier2D" type="VisibleOnScreenNotifier2D" parent="." unique_id=1892516894]
