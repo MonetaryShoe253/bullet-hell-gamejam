@@ -1,0 +1,40 @@
+[gd_scene format=3 uid="uid://cktjjn0cmkhvv"]
+
+[ext_resource type="Script" uid="uid://ndmtkayqc8vc" path="res://scenes/UI/shop_ui.gd" id="1_5tinp"]
+[ext_resource type="Script" uid="uid://b3wq8knx2k7vo" path="res://scripts/shop_upgrade.gd" id="2_yxlag"]
+[ext_resource type="Resource" uid="uid://ltregfafr6x6" path="res://resources/shop_upgrades/extra_damage.tres" id="3_m41hj"]
+[ext_resource type="Resource" uid="uid://dpuavvcjbalc" path="res://resources/shop_upgrades/extra_health.tres" id="4_6l0ir"]
+[ext_resource type="Resource" uid="uid://dcnn14ue6ajfm" path="res://resources/shop_upgrades/faster_dash.tres" id="5_4k3pv"]
+[ext_resource type="Resource" uid="uid://cxqpy7yl2a6xa" path="res://resources/shop_upgrades/faster_firing.tres" id="6_ge6mo"]
+[ext_resource type="Resource" uid="uid://cvdvemftvl3gm" path="res://resources/shop_upgrades/faster_movement.tres" id="7_m2mw0"]
+
+[node name="ShopUI" type="CanvasLayer" unique_id=1633812390]
+script = ExtResource("1_5tinp")
+available_upgrades = Array[ExtResource("2_yxlag")]([ExtResource("3_m41hj"), ExtResource("4_6l0ir"), ExtResource("5_4k3pv"), ExtResource("6_ge6mo"), ExtResource("7_m2mw0")])
+
+[node name="Panel" type="Panel" parent="." unique_id=1374781544]
+offset_right = 40.0
+offset_bottom = 40.0
+
+[node name="VBoxContainer" type="VBoxContainer" parent="Panel" unique_id=75203507]
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 40.0
+
+[node name="Title" type="Label" parent="Panel/VBoxContainer" unique_id=288867206]
+layout_mode = 2
+
+[node name="MoneyLabel" type="Label" parent="Panel/VBoxContainer" unique_id=522031378]
+layout_mode = 2
+
+[node name="Upgrades" type="HBoxContainer" parent="Panel/VBoxContainer" unique_id=1528150976]
+layout_mode = 2
+
+[node name="Upgrade1" type="Button" parent="Panel/VBoxContainer/Upgrades" unique_id=454848375]
+layout_mode = 2
+
+[node name="Upgrade2" type="Button" parent="Panel/VBoxContainer/Upgrades" unique_id=1159458050]
+layout_mode = 2
+
+[node name="Upgrade3" type="Button" parent="Panel/VBoxContainer/Upgrades" unique_id=193498708]
+layout_mode = 2

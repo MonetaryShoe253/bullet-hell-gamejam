@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="ShopUpgrade" format=3 uid="uid://dpuavvcjbalc"]
+
+[ext_resource type="Script" uid="uid://b3wq8knx2k7vo" path="res://scripts/shop_upgrade.gd" id="1_nwejb"]
+
+[resource]
+script = ExtResource("1_nwejb")
+upgrade_name = "Extra Crispy Heart"
+description = "+25 maximum health"
+price = 30
+amount = 25.0
+metadata/_custom_type_script = "uid://b3wq8knx2k7vo"

@@ -27,6 +27,7 @@ extends Node2D
 @onready var prop_layer: TileMapLayer = $PropLayer
 @onready var money_label: Label = $HUD/MoneyLabel
 @onready var boss_health_bar: CanvasLayer = $BossHealthBar
+@onready var shop_ui: ShopUI = $ShopUI
 
 @export var tile_source_id := 0   # the TileSetAtlasSource id for the tileset (0 if it's the only source)
 @export var map_size := Vector2i(260, 180)
@@ -98,6 +99,7 @@ var _generator: DungeonGenerator
 var _spawner: EnemySpawner
 var _room_controllers: Array[RoomController] = []
 var _stairs_trigger: Area2D
+var _shop_trigger: Area2D
 
 
 func _ready() -> void:
@@ -148,6 +150,10 @@ func _clear_level_entities() -> void:
 	if _stairs_trigger and is_instance_valid(_stairs_trigger):
 		_stairs_trigger.queue_free()
 	_stairs_trigger = null
+	
+	if _shop_trigger and is_instance_valid(_shop_trigger):
+		_shop_trigger.queue_free()
+	_shop_trigger = null
 
 	# Godot uniquifies sibling names ("DemonPortal", "DemonPortal2", ...) since
 	# there are two of them, so match by prefix rather than tracking an array.
@@ -170,7 +176,9 @@ func generate_dungeon() -> void:
 
 	_spawn_player()
 	_spawner = EnemySpawner.new(self, tile_layer, player)
-	_setup_rooms(_generator)
+	_setup_rooms(_generator)	
+	
+	_spawn_shop_trigger()
 
 
 ## One RoomController per fight room. Start and shop never gate, so they don't
@@ -253,7 +261,57 @@ func _spawn_stairs_trigger() -> void:
 
 	prop_layer.set_cell(cell, tile_source_id, PROP_LADDER)
 
+func _spawn_shop_trigger() -> void:
+	var room: Rect2i = _generator.shop_room
 
+	if room.size == Vector2i.ZERO:
+		return
+
+	_shop_trigger = Area2D.new()
+	_shop_trigger.name = "ShopTrigger"
+
+	# The trigger itself doesn't physically collide with anything.
+	_shop_trigger.collision_layer = 0
+
+	# Your Player is physics layer 2.
+	_shop_trigger.collision_mask = 2
+
+	add_child(_shop_trigger)
+
+	var collision_shape := CollisionShape2D.new()
+	var rectangle := RectangleShape2D.new()
+
+	# Convert the shop room from tiles into pixels.
+	var tile_size := tile_layer.tile_set.tile_size
+
+	rectangle.size = Vector2(
+		room.size.x * tile_size.x,
+		room.size.y * tile_size.y
+	)
+
+	collision_shape.shape = rectangle
+	_shop_trigger.add_child(collision_shape)
+
+	# Put the Area2D in the centre of the generated shop room.
+	var center_cell: Vector2i = room.position + room.size / 2
+	_shop_trigger.position = tile_layer.map_to_local(center_cell)
+
+	_shop_trigger.body_entered.connect(_on_shop_entered)
+	_shop_trigger.body_exited.connect(_on_shop_exited)
+
+func _on_shop_entered(body: Node2D) -> void:
+	if not body.is_in_group("player"):
+		return
+
+	shop_ui.open(body)
+
+
+func _on_shop_exited(body: Node2D) -> void:
+	if not body.is_in_group("player"):
+		return
+
+	shop_ui.close()
+	
 func _on_stairs_entered(body: Node) -> void:
 	if not body.is_in_group("player"):
 		return

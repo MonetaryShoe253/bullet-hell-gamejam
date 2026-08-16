@@ -120,3 +120,29 @@ func shoot() -> void:
 	var aim_direction := (get_global_mouse_position() - global_position).normalized()
 	var spawn_position := global_position + aim_direction * muzzle_offset
 	proj.launch(spawn_position, aim_direction)
+	
+func apply_upgrade(upgrade: ShopUpgrade) -> void:
+	match upgrade.type:
+
+		ShopUpgrade.UpgradeType.MAX_HEALTH:
+			health_component.max_health += upgrade.amount
+			health_component.current_health += upgrade.amount
+
+		ShopUpgrade.UpgradeType.MOVE_SPEED:
+			move_speed += upgrade.amount
+
+		ShopUpgrade.UpgradeType.DAMAGE:
+			# We'll hook this into projectile damage
+			# depending on where you're currently storing it.
+			pass
+
+		ShopUpgrade.UpgradeType.FIRE_RATE:
+			fire_rate *= 1.0 - upgrade.amount
+
+		ShopUpgrade.UpgradeType.DASH_COOLDOWN:
+			dash_cooldown = max(
+				0.1,
+				dash_cooldown - upgrade.amount
+			)
+
+	print("Bought upgrade: ", upgrade.upgrade_name)
