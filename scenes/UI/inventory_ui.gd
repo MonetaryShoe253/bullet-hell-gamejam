@@ -118,62 +118,13 @@ func _refresh_details() -> void:
 
 	item_name.text = selected_item.item_name
 	item_description.text = selected_item.description
-	item_stats.text = _build_stats_text(selected_item)
+	item_stats.text = selected_item.get_stats_text()
 
 	if _is_equipped(selected_item):
 		equip_button.text = "UNEQUIP"
 	else:
 		equip_button.text = "EQUIP"
-	
-func _format_stat(value: float) -> String:
-	var formatted := "%.2f" % abs(value)
-
-	# Remove unnecessary trailing zeros
-	formatted = formatted.rstrip("0").rstrip(".")
-
-	if value > 0:
-		return "+" + formatted
-	elif value < 0:
-		return "-" + formatted
-
-	return "0"
-	
-func _build_stats_text(item: Item) -> String:
-	var lines: Array[String] = []
-
-	if item.max_health != 0:
-		lines.append(
-			_format_stat(item.max_health) + " Max Health"
-		)
-
-	if item.damage != 0:
-		lines.append(
-			_format_stat(item.damage) + " Damage"
-		)
-
-	if item.move_speed != 0:
-		lines.append(
-			_format_stat(item.move_speed) + " Move Speed"
-		)
-
-	if item.projectile_range != 0:
-		lines.append(
-			_format_stat(item.projectile_range) + " Range"
-		)
-
-	if item.fire_rate_multiplier != 0:
-		lines.append(
-			_format_stat(item.fire_rate_multiplier) + " Fire Rate"
-		)
-
-	if item.dash_cooldown != 0:
-		lines.append(
-			_format_stat(item.dash_cooldown) + " Dash Cooldown"
-		)
-
-	return "\n".join(lines)
-	
-	
+		
 	
 func _on_equip_pressed() -> void:
 	if selected_item == null:

@@ -7,10 +7,16 @@
 [ext_resource type="Resource" uid="uid://dcnn14ue6ajfm" path="res://resources/shop_upgrades/faster_dash.tres" id="5_4k3pv"]
 [ext_resource type="Resource" uid="uid://cxqpy7yl2a6xa" path="res://resources/shop_upgrades/faster_firing.tres" id="6_ge6mo"]
 [ext_resource type="Resource" uid="uid://cvdvemftvl3gm" path="res://resources/shop_upgrades/faster_movement.tres" id="7_m2mw0"]
+[ext_resource type="Script" uid="uid://ceuvhyf720s15" path="res://scripts/item.gd" id="8_m2mw0"]
+[ext_resource type="Resource" uid="uid://c7t2dw5j0l84t" path="res://resources/items/bucket_helmet.tres" id="9_087to"]
+[ext_resource type="Resource" uid="uid://bjsjfcsmhyl0w" path="res://resources/items/chicken_boots.tres" id="10_57epl"]
+[ext_resource type="Resource" uid="uid://ddvuww5vs8d4r" path="res://resources/items/crispy_armour.tres" id="11_rqu28"]
+[ext_resource type="Resource" uid="uid://dei13ma05ppro" path="res://resources/items/hot_wings.tres" id="12_bxeai"]
 
 [node name="ShopUI" type="CanvasLayer" unique_id=1633812390]
 script = ExtResource("1_5tinp")
-available_upgrades = Array[ExtResource("2_yxlag")]([ExtResource("3_m41hj"), ExtResource("4_6l0ir"), ExtResource("5_4k3pv"), ExtResource("6_ge6mo"), ExtResource("7_m2mw0")])
+upgrade_pool = Array[ExtResource("2_yxlag")]([ExtResource("3_m41hj"), ExtResource("4_6l0ir"), ExtResource("5_4k3pv"), ExtResource("6_ge6mo"), ExtResource("7_m2mw0")])
+item_pool = Array[ExtResource("8_m2mw0")]([ExtResource("9_087to"), ExtResource("10_57epl"), ExtResource("11_rqu28"), ExtResource("12_bxeai")])
 
 [node name="CenterContainer" type="CenterContainer" parent="." unique_id=1925415414]
 anchors_preset = 15

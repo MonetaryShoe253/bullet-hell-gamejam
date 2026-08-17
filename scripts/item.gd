@@ -21,3 +21,38 @@ enum ItemType {
 @export var fire_rate_multiplier: float = 1.0
 @export var dash_cooldown: float = 0.0
 @export var projectile_range: float = 0.0
+func get_stats_text() -> String:
+	var lines: Array[String] = []
+
+	if max_health != 0:
+		lines.append(_format_stat(max_health) + " Max Health")
+
+	if damage != 0:
+		lines.append(_format_stat(damage) + " Damage")
+
+	if move_speed != 0:
+		lines.append(_format_stat(move_speed) + " Move Speed")
+
+	if projectile_range != 0:
+		lines.append(_format_stat(projectile_range) + " Range")
+
+	if fire_rate_multiplier != 0:
+		lines.append(_format_stat(fire_rate_multiplier) + " Fire Rate")
+
+	if dash_cooldown != 0:
+		lines.append(_format_stat(dash_cooldown) + " Dash Cooldown")
+
+	return "\n".join(lines)
+
+
+func _format_stat(value: float) -> String:
+	var formatted := "%.2f" % abs(value)
+
+	formatted = formatted.rstrip("0").rstrip(".")
+
+	if value > 0:
+		return "+" + formatted
+	elif value < 0:
+		return "-" + formatted
+
+	return "0"
