@@ -7,9 +7,12 @@ extends Area2D
 
 var direction: Vector2 = Vector2.RIGHT
 var half_angle: float = deg_to_rad(15.0)
-var damage: float = 10.0
+var base_damage: float = 10.0
 var max_range: float = 300.0
 var duration: float = 1.0
+
+## Damage multiplier by distance band, closest third of max_range first.
+var damage_multipliers: Array[float] = [3.0, 2.0, 1.5]
 
 var _elapsed: float = 0.0
 var _hit_enemies: Array[Node2D] = []
@@ -31,16 +34,18 @@ func launch(
 	start_position: Vector2,
 	aim_direction: Vector2,
 	angle_degrees: float,
-	wave_damage: float,
+	wave_base_damage: float,
 	wave_range: float,
-	wave_duration: float
+	wave_duration: float,
+	wave_damage_multipliers: Array[float] = [3.0, 2.0, 1.5]
 ) -> void:
 	global_position = start_position
 	direction = aim_direction.normalized()
 	half_angle = deg_to_rad(angle_degrees) / 2.0
-	damage = wave_damage
+	base_damage = wave_base_damage
 	max_range = wave_range
 	duration = wave_duration
+	damage_multipliers = wave_damage_multipliers
 
 func _physics_process(delta: float) -> void:
 	_elapsed += delta
@@ -64,14 +69,28 @@ func _damage_new_overlaps() -> void:
 			continue
 
 		_hit_enemies.append(body)
+		var distance := (body.global_position - global_position).length()
 		var hurt_box = body.get_node("Components/HurtBox")
-		hurt_box.take_damage(damage)
+		hurt_box.take_damage(base_damage * _multiplier_for_distance(distance))
 
 func _within_cone(body: Node2D) -> bool:
 	var to_body := body.global_position - global_position
 	if to_body.length_squared() < 1.0:
 		return true
 	return absf(direction.angle_to(to_body.normalized())) <= half_angle
+
+## Splits max_range into equal thirds - closest, mid, farthest - and picks
+## the matching entry from damage_multipliers (padding/clamping if it isn't
+## exactly 3 long, so a misconfigured resource degrades rather than crashes).
+func _multiplier_for_distance(distance: float) -> float:
+	if damage_multipliers.is_empty():
+		return 1.0
+
+	var band_count := damage_multipliers.size()
+	var band := int(clampf(distance / max_range, 0.0, 0.999) * band_count)
+	band = clampi(band, 0, band_count - 1)
+
+	return damage_multipliers[band]
 
 ## Draws only the leading edge of the wave - a thin ribbon between
 ## current_radius and (current_radius - wavefront_thickness), with a sine
