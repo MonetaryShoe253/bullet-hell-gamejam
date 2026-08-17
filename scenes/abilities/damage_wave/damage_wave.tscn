@@ -1,0 +1,17 @@
+[gd_scene format=3 uid="uid://ccrikqg764q0y"]
+
+[ext_resource type="Script" uid="uid://cxmnc44ktc3xh" path="res://scenes/abilities/damage_wave/damage_wave.gd" id="1_i2lyf"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_xmy6w"]
+
+[node name="DamageWave" type="Area2D" unique_id=247483852]
+collision_layer = 8
+collision_mask = 4
+script = ExtResource("1_i2lyf")
+wavefront_thickness = 4.0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=735288057]
+shape = SubResource("CircleShape2D_xmy6w")
+
+[node name="Polygon2D" type="Polygon2D" parent="." unique_id=1416070391]
+color = Color(0.11372549, 1, 1, 1)

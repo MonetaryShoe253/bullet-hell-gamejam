@@ -8,12 +8,29 @@
 [ext_resource type="PackedScene" uid="uid://cfvi616pvm7t4" path="res://scenes/UI/player_health.tscn" id="5_p47bc"]
 [ext_resource type="PackedScene" uid="uid://m7dvd11aqb4x" path="res://scenes/UI/energy_bar.tscn" id="6_75vfm"]
 [ext_resource type="PackedScene" uid="uid://wen7cw6175o8" path="res://scenes/components/stats/stats_component.tscn" id="6_qek5x"]
+[ext_resource type="Script" uid="uid://d7b6xlys2gmy" path="res://scenes/components/abilities/abilities_component.gd" id="7_fm80t"]
+[ext_resource type="Script" uid="uid://c24n76nrnb3o1" path="res://scripts/abilities/abilities.gd" id="8_gx1jg"]
+[ext_resource type="PackedScene" uid="uid://d0tu6eohh56ju" path="res://scenes/projectiles/playerbullet/playerbullet.tscn" id="9_ugbui"]
+[ext_resource type="Script" uid="uid://b2v6yyh1ciw5p" path="res://scripts/abilities/bullet_storm_ability.gd" id="10_fcs02"]
+[ext_resource type="Script" uid="uid://cghv0jgqsjnpb" path="res://scripts/abilities/damage_wave_ability.gd" id="11_fcs02"]
+[ext_resource type="PackedScene" uid="uid://ccrikqg764q0y" path="res://scenes/abilities/damage_wave/damage_wave.tscn" id="12_myrg7"]
+[ext_resource type="PackedScene" uid="uid://cxel0xtrtcdel" path="res://scenes/UI/ability_bar.tscn" id="13_gx1jg"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_gmlin"]
 size = Vector2(5.3333335, 13.333334)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_nehcj"]
 size = Vector2(6, 17)
+
+[sub_resource type="Resource" id="Resource_fm8fw"]
+script = ExtResource("10_fcs02")
+metadata/_custom_type_script = "uid://b2v6yyh1ciw5p"
+
+[sub_resource type="Resource" id="Resource_kvlxm"]
+script = ExtResource("11_fcs02")
+ability_name = "Damage Wave"
+cooldown = 3.0
+metadata/_custom_type_script = "uid://cghv0jgqsjnpb"
 
 [node name="Player" type="CharacterBody2D" unique_id=1277505981 groups=["player"]]
 texture_filter = 1
@@ -51,6 +68,10 @@ max_health = 25.0
 
 [node name="StatsComponent" parent="Components" unique_id=990394817 instance=ExtResource("6_qek5x")]
 
+[node name="AbilityComponent" type="Node" parent="Components" unique_id=1262351499]
+script = ExtResource("7_fm80t")
+slots = Array[ExtResource("8_gx1jg")]([SubResource("Resource_fm8fw"), SubResource("Resource_kvlxm")])
+
 [node name="AnimationPlayer" type="AnimationPlayer" parent="." unique_id=1940173901]
 
 [node name="Camera2D" type="Camera2D" parent="." unique_id=1105706883]
@@ -61,5 +82,7 @@ position_smoothing_speed = 10.0
 [node name="HealthBar" parent="." unique_id=956263465 instance=ExtResource("5_p47bc")]
 
 [node name="EnergyBar" parent="." unique_id=1631118562 instance=ExtResource("6_75vfm")]
+
+[node name="AbilityBars" parent="." unique_id=1365779104 instance=ExtResource("13_gx1jg")]
 
 [editable path="Components/HurtBox"]

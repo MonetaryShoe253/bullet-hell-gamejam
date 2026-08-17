@@ -17,6 +17,7 @@ var dash_cooldown_remaining: float = 0.0
 @onready var sprite: AnimatedSprite2D = $Sprite2D
 @onready var inventory: InventoryComponent = $Components/InventoryComponent
 @onready var stats: StatsComponent = $Components/StatsComponent
+@onready var ability_component: AbilityComponent = $Components/AbilityComponent
 
 ## Index order matches an angle sector walk (45 deg each) starting at east and
 ## going clockwise - Y is down in Godot 2D, so a positive angle sweeps toward
@@ -45,6 +46,9 @@ const GameOverScene := preload("res://scenes/UI/game_over.tscn")
 @onready var health_component: HealthComponent = $Components/HealthComponent
 @onready var health_bar: ProgressBar = $HealthBar/HealthBar
 @onready var dash_cooldown_bar: ProgressBar = $EnergyBar/EnergyBar
+@onready var ability_bars: AbilityBars = $AbilityBars
+
+
 func _ready() -> void:
 	health_bar.max_value = health_component.max_health
 	health_bar.value = health_component.current_health
@@ -58,6 +62,9 @@ func _ready() -> void:
 	dash_cooldown_bar.min_value = 0.0
 	dash_cooldown_bar.max_value = 1.0
 	dash_cooldown_bar.value = 1.0	
+	
+	ability_bars.setup(ability_component)
+
 
 func _on_health_changed(current_health: float, max_health: float) -> void:
 	health_bar.max_value = max_health
@@ -137,6 +144,8 @@ func _physics_process(delta: float) -> void:
 	dash_cooldown_bar.value = 1.0 - (
 		dash_cooldown_remaining / stats.get_dash_cooldown()
 	)
+
+	ability_component.handle_input(self)
 
 
 	# Shooting

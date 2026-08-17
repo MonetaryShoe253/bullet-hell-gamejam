@@ -61,7 +61,12 @@ func _damage_nearby(origin: Vector2) -> void:
 
 func _clear_projectiles(origin: Vector2) -> void:
 	for node in get_tree().current_scene.get_children():
-		if not (is_instance_of(node, PlayerProjectile) or is_instance_of(node, EnemyProjectile)):
+		var is_projectile := (
+			is_instance_of(node, PlayerProjectile)
+			or is_instance_of(node, EnemyProjectile)
+			or is_instance_of(node, DamageWave)
+		)
+		if not is_projectile:
 			continue
 		if not (node is Node2D):
 			continue

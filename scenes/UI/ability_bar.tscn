@@ -1,0 +1,39 @@
+[gd_scene format=3 uid="uid://cxel0xtrtcdel"]
+
+[ext_resource type="Script" uid="uid://cdma5k38vep1h" path="res://scenes/UI/ability_bars.gd" id="1_8bcdu"]
+
+[node name="AbilityBar" type="CanvasLayer" unique_id=66822349]
+script = ExtResource("1_8bcdu")
+
+[node name="VBox" type="VBoxContainer" parent="." unique_id=1770955780]
+anchors_preset = 3
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -9.0
+offset_top = -58.0
+grow_horizontal = 0
+grow_vertical = 0
+
+[node name="Slot1" type="HBoxContainer" parent="VBox" unique_id=147484395]
+layout_mode = 2
+
+[node name="Slot1Label" type="Label" parent="VBox/Slot1" unique_id=60197472]
+custom_minimum_size = Vector2(140, 0)
+layout_mode = 2
+horizontal_alignment = 2
+
+[node name="Slot1Bar" type="ProgressBar" parent="VBox/Slot1" unique_id=1646449862]
+layout_mode = 2
+
+[node name="Slot2" type="HBoxContainer" parent="VBox" unique_id=181647547]
+layout_mode = 2
+
+[node name="Slot2Label" type="Label" parent="VBox/Slot2" unique_id=1226275722]
+custom_minimum_size = Vector2(140, 0)
+layout_mode = 2
+horizontal_alignment = 2
+
+[node name="Slot2Bar" type="ProgressBar" parent="VBox/Slot2" unique_id=1820075056]
+layout_mode = 2
