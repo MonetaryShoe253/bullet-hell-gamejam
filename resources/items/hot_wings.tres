@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="Item" format=3 uid="uid://dei13ma05ppro"]
+
+[ext_resource type="Script" uid="uid://ceuvhyf720s15" path="res://scripts/item.gd" id="1_jw8rs"]
+
+[resource]
+script = ExtResource("1_jw8rs")
+item_name = "Hot Wings"
+description = "Too spicy to stand still."
+price = 125
+max_health = 5.0
+damage = 5.0
+move_speed = 25.0
+metadata/_custom_type_script = "uid://ceuvhyf720s15"

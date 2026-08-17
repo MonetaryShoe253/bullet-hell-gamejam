@@ -3,17 +3,10 @@ extends CharacterBody2D
 
 @export var muzzle_offset: float = 30.0  # distance from player center to spawn point
 
-@export_category("Attack")
-@export var damage: float = 5.0
-@export var fire_rate: float = 0.3
-
-@export_category("Speed")
-@export var move_speed: float = 250.0
 
 @export_category("Dash")
 @export var dash_speed: float = 800.0
 @export var dash_duration: float = 0.15
-@export var dash_cooldown: float = 0.75
 
 var is_dashing: bool = false
 var can_dash: bool = true
@@ -22,6 +15,8 @@ var dash_cooldown_remaining: float = 0.0
 
 @onready var hurt_box: HurtboxComponent = $Components/HurtBox
 @onready var sprite: AnimatedSprite2D = $Sprite2D
+@onready var inventory: InventoryComponent = $Components/InventoryComponent
+@onready var stats: StatsComponent = $Components/StatsComponent
 
 ## Index order matches an angle sector walk (45 deg each) starting at east and
 ## going clockwise - Y is down in Godot 2D, so a positive angle sweeps toward
@@ -45,6 +40,14 @@ const ATTACK_ANIM_BASE_DURATION: float = 7.0 / 12.0
 var projectile_scene: PackedScene = preload("res://scenes/projectiles/playerbullet/playerbullet.tscn")
 var time_since_last_shot: float = 0.0
 
+var test_armour: Item = preload(
+	"res://resources/items/bucket_helmet.tres"
+)
+
+var test_armour_2: Item = preload(
+	"res://resources/items/crispy_armour.tres"
+)
+
 const GameOverScene := preload("res://scenes/UI/game_over.tscn")
 
 @onready var health_component: HealthComponent = $Components/HealthComponent
@@ -56,15 +59,51 @@ func _ready() -> void:
 
 	health_component.health_changed.connect(_on_health_changed)
 	health_component.died.connect(_on_died)
+	
+	stats.stats_changed.connect(_on_stats_changed)
+	inventory.equipment_changed.connect(_on_equipment_changed)
 
 	dash_cooldown_bar.min_value = 0.0
 	dash_cooldown_bar.max_value = 1.0
 	dash_cooldown_bar.value = 1.0
-
+	
+	inventory.add_item(test_armour)
+	inventory.add_item(test_armour_2)
+	
 
 func _on_health_changed(current_health: float, max_health: float) -> void:
 	health_bar.max_value = max_health
 	health_bar.value = current_health
+	
+func _on_equipment_changed() -> void:
+	stats.set_equipment(
+		inventory.equipped_armour,
+		inventory.equipped_weapon,
+		inventory.equipped_accessory
+	)
+	
+func _on_stats_changed() -> void:
+	var old_max_health := health_component.max_health
+	var new_max_health := stats.get_max_health()
+
+	var health_difference := new_max_health - old_max_health
+
+	health_component.max_health = new_max_health
+
+	# If max HP increased, give the player that extra HP too.
+	if health_difference > 0:
+		health_component.current_health += health_difference
+
+	# Make sure current HP can never exceed max.
+	health_component.current_health = min(
+		health_component.current_health,
+		health_component.max_health
+	)
+
+	health_component.health_changed.emit(
+		health_component.current_health,
+		health_component.max_health
+	)
 
 
 func _on_died() -> void:
@@ -86,7 +125,7 @@ func _physics_process(delta: float) -> void:
 			"move_down"
 		)
 
-		velocity = direction * move_speed
+		velocity = direction * stats.get_move_speed()
 
 		if Input.is_action_just_pressed("dash"):
 			start_dash()
@@ -108,14 +147,15 @@ func _physics_process(delta: float) -> void:
 			can_dash = true
 
 	dash_cooldown_bar.value = 1.0 - (
-		dash_cooldown_remaining / dash_cooldown
+		dash_cooldown_remaining / stats.get_dash_cooldown()
 	)
 
 
 	# Shooting
 	time_since_last_shot += delta
 
-	if Input.is_action_pressed("shoot") and time_since_last_shot >= fire_rate:
+	if (Input.is_action_pressed("shoot") 
+	and time_since_last_shot >= stats.get_fire_rate()):
 		shoot()
 		time_since_last_shot = 0.0
 
@@ -137,12 +177,12 @@ func start_dash() -> void:
 	is_dashing = false
 	health_component.invulnerable = false
 
-	dash_cooldown_remaining = dash_cooldown
+	dash_cooldown_remaining = stats.get_dash_cooldown()
 	
 func shoot() -> void:
 	var proj: PlayerProjectile = projectile_scene.instantiate()
 
-	proj.damage = damage
+	proj.damage = stats.get_damage()
 
 	get_tree().current_scene.add_child(proj)
 
@@ -153,7 +193,7 @@ func shoot() -> void:
 	var spawn_position := global_position + aim_direction * muzzle_offset
 
 	proj.launch(spawn_position, aim_direction)
-	sprite.speed_scale = ATTACK_ANIM_BASE_DURATION / maxf(fire_rate, 0.05)
+	sprite.speed_scale = ATTACK_ANIM_BASE_DURATION / maxf(stats.get_fire_rate(), 0.05)
 	sprite.play("attack_%s" % _facing)
 
 
@@ -184,24 +224,4 @@ func _update_animation() -> void:
 		sprite.play(anim_name)
 	
 func apply_upgrade(upgrade: ShopUpgrade) -> void:
-	match upgrade.type:
-
-		ShopUpgrade.UpgradeType.MAX_HEALTH:
-			health_component.increase_max_health(upgrade.amount)
-	
-		ShopUpgrade.UpgradeType.MOVE_SPEED:
-			move_speed += upgrade.amount
-
-		ShopUpgrade.UpgradeType.DAMAGE:
-			damage += upgrade.amount
-
-		ShopUpgrade.UpgradeType.FIRE_RATE:
-			fire_rate *= 1.0 - upgrade.amount
-
-		ShopUpgrade.UpgradeType.DASH_COOLDOWN:
-			dash_cooldown = max(
-				0.1,
-				dash_cooldown - upgrade.amount
-			)
-
-	print("Bought upgrade: ", upgrade.upgrade_name)
+	stats.apply_shop_upgrade(upgrade)

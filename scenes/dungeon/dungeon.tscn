@@ -6,6 +6,7 @@
 [ext_resource type="PackedScene" path="res://scenes/UI/boss_health_bar.tscn" id="4_boss_hp"]
 [ext_resource type="Script" uid="uid://clmn8utdyvei6" path="res://scenes/UI/minimap.gd" id="5_minimap"]
 [ext_resource type="PackedScene" uid="uid://cktjjn0cmkhvv" path="res://scenes/UI/shop_ui.tscn" id="5_vhky6"]
+[ext_resource type="PackedScene" uid="uid://1dl1typf2xi7" path="res://scenes/UI/inventory_ui.tscn" id="7_bsb75"]
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_frwky"]
 texture = ExtResource("2_4f38h")
@@ -152,7 +153,7 @@ tile_set = SubResource("TileSet_sg11a")
 texture_filter = 1
 tile_set = SubResource("TileSet_sg11a")
 
-[node name="GameplayLayer" type="Node2D" parent="." unique_id=2839104623]
+[node name="GameplayLayer" type="Node2D" parent="." unique_id=-1455862673]
 y_sort_enabled = true
 
 [node name="HUD" type="CanvasLayer" parent="." unique_id=1108299953]
@@ -183,3 +184,6 @@ script = ExtResource("5_minimap")
 [node name="BossHealthBar" parent="." unique_id=845301674 instance=ExtResource("4_boss_hp")]
 
 [node name="ShopUI" parent="." unique_id=1633812390 instance=ExtResource("5_vhky6")]
+
+[node name="InventoryUI" parent="." unique_id=767680652 instance=ExtResource("7_bsb75")]
+unique_name_in_owner = true

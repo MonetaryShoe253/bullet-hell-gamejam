@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="Item" format=3 uid="uid://bjsjfcsmhyl0w"]
+
+[ext_resource type="Script" uid="uid://ceuvhyf720s15" path="res://scripts/item.gd" id="1_ae2qn"]
+
+[resource]
+script = ExtResource("1_ae2qn")
+item_name = "Chicken Boots"
+description = "For when running away isn't chicken enough"
+price = 65
+max_health = 10.0
+move_speed = 20.0
+metadata/_custom_type_script = "uid://ceuvhyf720s15"

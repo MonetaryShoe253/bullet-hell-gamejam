@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="Item" format=3 uid="uid://ddvuww5vs8d4r"]
+
+[ext_resource type="Script" uid="uid://ceuvhyf720s15" path="res://scripts/item.gd" id="1_g2wow"]
+
+[resource]
+script = ExtResource("1_g2wow")
+item_name = "Crispy Armour"
+description = "Crispy on the outside. Also crispy on the inside"
+price = 80
+max_health = 35.0
+move_speed = -5.0
+dash_cooldown = 1.0
+metadata/_custom_type_script = "uid://ceuvhyf720s15"

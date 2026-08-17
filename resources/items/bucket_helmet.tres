@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="Item" format=3 uid="uid://c7t2dw5j0l84t"]
+
+[ext_resource type="Script" uid="uid://ceuvhyf720s15" path="res://scripts/item.gd" id="1_femye"]
+
+[resource]
+script = ExtResource("1_femye")
+item_name = "Bucket Helmet"
+description = "A bucket. On your head."
+max_health = 20.0
+move_speed = -10.0
+metadata/_custom_type_script = "uid://ceuvhyf720s15"
