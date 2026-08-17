@@ -37,6 +37,7 @@ extends Node2D
 @onready var shop_ui: ShopUI = $ShopUI
 @onready var minimap: Control = $HUD/Minimap
 @onready var inventory_ui: InventoryUI = %InventoryUI
+@onready var death_reward_ui: DeathRewardUI = $DeathRewardUI
 
 @export var tile_source_id := 0   # the TileSetAtlasSource id for the tileset (0 if it's the only source)
 @export var map_size := Vector2i(260, 180)
@@ -187,8 +188,7 @@ func _spawn_player() -> void:
 
 func _on_money_changed(total: int) -> void:
 	if money_label:
-		money_label.text = "Cluck Coins: %d" % total
-
+		money_label.text = "Cluck Coins: %d" % total	
 
 ## Tears down everything from the previous dungeon (player, enemies, gates,
 ## stairs, decorations) before a new layout is generated for the next level.

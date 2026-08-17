@@ -4,6 +4,8 @@
 
 [resource]
 script = ExtResource("1_k6odd")
+unlock_id = &"chicken_run"
+unlock_tier = 2
 upgrade_name = "Chicken Run"
 description = "Reduces dash cooldown"
 price = 35

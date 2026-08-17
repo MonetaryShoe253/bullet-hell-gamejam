@@ -4,6 +4,8 @@
 
 [resource]
 script = ExtResource("1_g2wow")
+unlock_id = &"crispy_armour"
+unlock_tier = 3
 item_name = "Crispy Armour"
 description = "Crispy on the outside. Also crispy on the inside"
 price = 80

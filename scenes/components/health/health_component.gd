@@ -54,9 +54,9 @@ func heal(amount: float) -> void:
 		health_changed.emit(current_health, max_health)
 
 func die() -> void:
-	print("Entity died!")
+	if not is_dead():
+		return
 	died.emit()
-	get_owner().queue_free()
 
 
 func is_dead() -> bool:

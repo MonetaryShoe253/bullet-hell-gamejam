@@ -35,10 +35,12 @@ func _generate_offers() -> void:
 	var available: Array[Resource] = []
 
 	for upgrade in upgrade_pool:
-		available.append(upgrade)
+		if MetaProgression.is_unlocked(upgrade):
+			available.append(upgrade)
 
 	for item in item_pool:
-		available.append(item)
+		if MetaProgression.is_unlocked(item):
+			available.append(item)
 
 	available.shuffle()
 

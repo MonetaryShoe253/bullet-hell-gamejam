@@ -4,6 +4,7 @@
 
 [resource]
 script = ExtResource("1_femye")
+unlock_id = &"bucket_helmet"
 item_name = "Bucket Helmet"
 description = "A bucket. On your head."
 max_health = 20.0

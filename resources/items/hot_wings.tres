@@ -4,6 +4,8 @@
 
 [resource]
 script = ExtResource("1_jw8rs")
+unlock_id = &"hot_wings"
+unlock_tier = 4
 item_name = "Hot Wings"
 description = "Too spicy to stand still."
 price = 125

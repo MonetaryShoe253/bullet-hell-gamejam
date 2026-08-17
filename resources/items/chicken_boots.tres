@@ -4,6 +4,8 @@
 
 [resource]
 script = ExtResource("1_ae2qn")
+unlock_id = &"chicken_boots"
+unlock_tier = 2
 item_name = "Chicken Boots"
 description = "For when running away isn't chicken enough"
 price = 65

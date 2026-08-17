@@ -4,9 +4,11 @@
 
 [resource]
 script = ExtResource("1_lxrmo")
+unlock_id = &"spicy_seasoning"
+unlock_tier = 5
 upgrade_name = "Spicy Seasoning"
 description = "+5 projectile damage"
-price = 35
+price = 100
 type = 2
 amount = 5.0
 metadata/_custom_type_script = "uid://b3wq8knx2k7vo"
