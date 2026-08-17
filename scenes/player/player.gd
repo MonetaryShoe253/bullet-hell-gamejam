@@ -40,14 +40,6 @@ const ATTACK_ANIM_BASE_DURATION: float = 7.0 / 12.0
 var projectile_scene: PackedScene = preload("res://scenes/projectiles/playerbullet/playerbullet.tscn")
 var time_since_last_shot: float = 0.0
 
-var test_armour: Item = preload(
-	"res://resources/items/bucket_helmet.tres"
-)
-
-var test_armour_2: Item = preload(
-	"res://resources/items/crispy_armour.tres"
-)
-
 const GameOverScene := preload("res://scenes/UI/game_over.tscn")
 
 @onready var health_component: HealthComponent = $Components/HealthComponent
@@ -65,11 +57,7 @@ func _ready() -> void:
 
 	dash_cooldown_bar.min_value = 0.0
 	dash_cooldown_bar.max_value = 1.0
-	dash_cooldown_bar.value = 1.0
-	
-	inventory.add_item(test_armour)
-	inventory.add_item(test_armour_2)
-	
+	dash_cooldown_bar.value = 1.0	
 
 func _on_health_changed(current_health: float, max_health: float) -> void:
 	health_bar.max_value = max_health
