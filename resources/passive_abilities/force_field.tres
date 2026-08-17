@@ -1,0 +1,9 @@
+[gd_resource type="Resource" script_class="ForceFieldAbility" format=3]
+
+[ext_resource type="Script" path="res://scripts/abilities/force_field_ability.gd" id="1_ffld"]
+
+[resource]
+script = ExtResource("1_ffld")
+ability_name = "Force Field"
+description = "An aura around you that damages any enemy that touches it, and keeps burning them for as long as they stay in it."
+price = 90

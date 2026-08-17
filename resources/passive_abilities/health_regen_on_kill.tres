@@ -1,0 +1,10 @@
+[gd_resource type="Resource" script_class="HealthRegenOnKillAbility" format=3]
+
+[ext_resource type="Script" path="res://scripts/abilities/health_regen_on_kill_ability.gd" id="1_hregen"]
+
+[resource]
+script = ExtResource("1_hregen")
+ability_name = "Health Regen"
+description = "Heal a small amount of health whenever you kill an enemy."
+price = 70
+heal_amount = 1.0

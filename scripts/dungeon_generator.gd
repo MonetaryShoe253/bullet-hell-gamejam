@@ -85,6 +85,18 @@ var room_themes: Dictionary = {}
 ## into StaticBody2D nodes (see dungeon_map.gd's _scatter_obstacles()).
 var obstacle_cells: Dictionary = {}
 
+## Rect2i -> Array[Vector2i], each room's actual floor cells - captured right
+## after _vary_room_shapes() but *before* _connect_rooms() carves corridors,
+## specifically so a corridor that later clips through a room's rectangular
+## bounding box (corridors are straight lines between room centres with no
+## awareness of any third room sitting in between - see _carve_corridor())
+## is never mistaken for part of that room. room_rect alone can't be trusted
+## for this: it stays the room's full bounding box even after shape variation
+## carves an L-shape/indent/diagonal out of it, and even a still-rectangular
+## room's rect can end up overlapping a corridor that merely grazes it.
+## RoomController's entry trigger is built from these cells, not room_rect.
+var room_cells: Dictionary = {}
+
 ## The leaf partition each entry of `rooms` came from, same order. Needed to
 ## grow the boss room out to fill its partition once the roles are handed out.
 var _room_nodes: Array[BSPNode] = []
@@ -131,6 +143,7 @@ func generate(seed_value: int = -1) -> void:
 	player_spawn = Vector2i.ZERO
 	stairs_room = Rect2i()
 	stairs_cell = Vector2i.ZERO
+	room_cells.clear()
 	seed_used = seed_value if seed_value >= 0 else randi()
 	rng.seed = seed_used
 	_boss_connected = false
@@ -143,6 +156,7 @@ func generate(seed_value: int = -1) -> void:
 	_assign_roles()
 	_assign_themes()
 	_vary_room_shapes()
+	_capture_room_cells()
 	_connect_rooms(root)
 	# Rooms connect via the nearest-pair-per-split BSP join above, which
 	# already keeps any one corridor about as short as the tree allows -
@@ -439,6 +453,20 @@ func _assign_themes() -> void:
 	for room: Rect2i in rooms:
 		if kind_of(room) == RoomKind.NORMAL:
 			room_themes[room] = themes[rng.randi_range(0, themes.size() - 1)]
+
+
+## See room_cells' own comment - this must run after shape variation but
+## before any corridor is carved.
+func _capture_room_cells() -> void:
+	room_cells.clear()
+	for room: Rect2i in rooms:
+		var cells: Array[Vector2i] = []
+		for x in range(room.position.x, room.end.x):
+			for y in range(room.position.y, room.end.y):
+				var cell := Vector2i(x, y)
+				if grid.has(cell):
+					cells.append(cell)
+		room_cells[room] = cells
 
 
 enum RoomShape { RECTANGLE, L_SHAPE, INDENTED, DIAGONAL }

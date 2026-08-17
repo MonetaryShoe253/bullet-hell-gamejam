@@ -1,0 +1,20 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scenes/abilities/force_field/force_field.gd" id="1_ffld"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_ffld"]
+radius = 60.0
+
+[node name="ForceField" type="Area2D"]
+collision_layer = 8
+collision_mask = 4
+script = ExtResource("1_ffld")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("CircleShape2D_ffld")
+
+[node name="OuterRing" type="Polygon2D" parent="."]
+color = Color(0.2, 0.6, 1, 0.9)
+
+[node name="InnerRing" type="Polygon2D" parent="."]
+color = Color(0.6, 0.85, 1, 0.8)

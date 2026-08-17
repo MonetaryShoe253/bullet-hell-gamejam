@@ -266,5 +266,6 @@ func _flash_red() -> void:
 func _on_died() -> void:
 	Fx.money_popup(global_position + Vector2(0, -24), money_reward)
 	GameState.add_money(money_reward)
+	GameState.enemy_killed.emit()
 	
 	queue_free()

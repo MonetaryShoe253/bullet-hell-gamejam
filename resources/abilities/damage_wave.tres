@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="DamageWaveAbility" format=3]
+
+[ext_resource type="Script" uid="uid://cghv0jgqsjnpb" path="res://scripts/abilities/damage_wave_ability.gd" id="1_dwave"]
+
+[resource]
+script = ExtResource("1_dwave")
+ability_name = "Damage Wave"
+description = "A short, wide burst of damage right in front of you - the closer enemies are, the harder it hits."
+price = 100
+cooldown = 3.0
+metadata/_custom_type_script = "uid://cghv0jgqsjnpb"

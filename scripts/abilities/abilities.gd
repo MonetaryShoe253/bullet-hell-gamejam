@@ -5,6 +5,7 @@ extends Resource
 @export var ability_name: String = ""
 @export_multiline var description: String = ""
 @export var icon: Texture2D
+@export var price: int = 50
 @export var cooldown: float = 1.0
 
 ## Override in subclasses. caster is the Node2D (Player) that triggered this.

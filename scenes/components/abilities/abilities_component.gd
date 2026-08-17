@@ -25,6 +25,36 @@ func handle_input(caster: Node2D) -> void:
 		if i < slots.size() and Input.is_action_just_pressed(input_actions[i]):
 			try_activate(i, caster)
 
+## Puts ability into the first empty slot. Returns false if every slot is
+## already filled, so the caller can fall back to storing it unequipped.
+func equip_in_first_empty_slot(ability: Ability) -> bool:
+	for i in slots.size():
+		if slots[i] == null:
+			slots[i] = ability
+			_cooldowns[i] = 0.0
+			return true
+	return false
+
+## Places ability into slot `index`, returning whatever was displaced (or
+## null if it was empty). Used by the ability menu's equip flow, where the
+## target slot is explicit rather than "first empty" - see
+## equip_in_first_empty_slot() for that simpler case.
+func equip_at(index: int, ability: Ability) -> Ability:
+	if index < 0 or index >= slots.size():
+		return null
+	var displaced: Ability = slots[index]
+	slots[index] = ability
+	_cooldowns[index] = 0.0
+	return displaced
+
+## Empties slot `index`, returning whatever was in it (or null).
+func unequip_at(index: int) -> Ability:
+	if index < 0 or index >= slots.size():
+		return null
+	var ability: Ability = slots[index]
+	slots[index] = null
+	return ability
+
 func try_activate(index: int, caster: Node2D) -> bool:
 	if index < 0 or index >= slots.size():
 		return false

@@ -5,6 +5,7 @@ extends Node
 
 signal money_changed(total: int)
 signal level_changed(new_level: int)
+signal enemy_killed
 
 var money: int = 0
 var level: int = 1

@@ -36,9 +36,9 @@ var _gate_bodies: Array[StaticBody2D] = []
 var _trigger: Area2D
 
 
-func setup(tile_layer: TileMapLayer, exit_spans: Array) -> void:
+func setup(tile_layer: TileMapLayer, exit_spans: Array, floor_cells: Array[Vector2i]) -> void:
 	exits = exit_spans
-	_build_trigger(tile_layer)
+	_build_trigger(tile_layer, floor_cells)
 	if gated:
 		for span: Array in exit_spans:
 			_build_gate(tile_layer, span)
@@ -63,11 +63,14 @@ func unlock() -> void:
 			shape.set_deferred("disabled", true)
 
 
-func _build_trigger(tile_layer: TileMapLayer) -> void:
+## Built from the room's actual floor cells (row-run-length-encoded into
+## rectangular strips), never from room_rect's bounding box - a corridor
+## that clips through a room's rectangular *extent* without actually being
+## part of its floor (an irregular L-shaped/indented room, or just a
+## corridor between two other rooms passing close by) must never register
+## as the player entering this room. See DungeonGenerator.room_cells.
+func _build_trigger(tile_layer: TileMapLayer, floor_cells: Array[Vector2i]) -> void:
 	var tile_size := Vector2(tile_layer.tile_set.tile_size)
-	var world_rect := Rect2(
-			tile_layer.map_to_local(room_rect.position) - tile_size / 2.0,
-			Vector2(room_rect.size) * tile_size)
 
 	_trigger = Area2D.new()
 	_trigger.collision_layer = 0
@@ -75,14 +78,54 @@ func _build_trigger(tile_layer: TileMapLayer) -> void:
 	_trigger.monitorable = false
 	add_child(_trigger)
 
-	var shape := CollisionShape2D.new()
-	var rect_shape := RectangleShape2D.new()
-	rect_shape.size = world_rect.size
-	shape.shape = rect_shape
-	shape.position = world_rect.position + world_rect.size / 2.0
-	_trigger.add_child(shape)
+	var strips: Array[Rect2i] = _row_runs(floor_cells)
+	if strips.is_empty():
+		# Defensive fallback - shouldn't happen for a real room, but an empty
+		# trigger would silently never gate at all, which is worse than
+		# falling back to the old bounding-box behaviour just this once.
+		strips = [room_rect]
+
+	for strip: Rect2i in strips:
+		var world_rect := Rect2(
+				tile_layer.map_to_local(strip.position) - tile_size / 2.0,
+				Vector2(strip.size) * tile_size)
+
+		var shape := CollisionShape2D.new()
+		var rect_shape := RectangleShape2D.new()
+		rect_shape.size = world_rect.size
+		shape.shape = rect_shape
+		shape.position = world_rect.position + world_rect.size / 2.0
+		_trigger.add_child(shape)
 
 	_trigger.body_entered.connect(_on_trigger_body_entered)
+
+
+## Merges cells into the fewest 1-cell-tall horizontal strips that cover the
+## same area - row by row, contiguous x runs combined into one Rect2i each.
+## Keeps the trigger's shape count to roughly "room height" instead of "room
+## area" worth of CollisionShape2D children.
+func _row_runs(cells: Array[Vector2i]) -> Array[Rect2i]:
+	var by_row: Dictionary = {}
+	for cell: Vector2i in cells:
+		var xs: Array = by_row.get(cell.y, [])
+		xs.append(cell.x)
+		by_row[cell.y] = xs
+
+	var strips: Array[Rect2i] = []
+	for y: int in by_row:
+		var xs: Array = by_row[y]
+		xs.sort()
+		var run_start: int = xs[0]
+		var prev: int = xs[0]
+		for i in range(1, xs.size()):
+			var x: int = xs[i]
+			if x != prev + 1:
+				strips.append(Rect2i(run_start, y, prev - run_start + 1, 1))
+				run_start = x
+			prev = x
+		strips.append(Rect2i(run_start, y, prev - run_start + 1, 1))
+
+	return strips
 
 
 func _build_gate(tile_layer: TileMapLayer, span: Array) -> void:

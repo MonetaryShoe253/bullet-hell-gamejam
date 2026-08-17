@@ -3,6 +3,8 @@ extends CanvasLayer
 
 @export var upgrade_pool: Array[ShopUpgrade]
 @export var item_pool: Array[Item] = []
+@export var ability_pool: Array[Ability] = []
+@export var passive_pool: Array[PassiveAbility] = []
 
 var player: Player
 var offered_offers: Array[Resource] = []
@@ -11,6 +13,7 @@ var offers_generated: bool = false
 var purchased_offers: Array[bool] = []
 
 @onready var money_label: Label = $CenterContainer/PanelContainer/MarginContainer/VBoxContainer/MoneyLabel
+@onready var exhausted_label: Label = %ExhaustedLabel
 
 @onready var buttons: Array[Button] = [
 	$CenterContainer/PanelContainer/MarginContainer/VBoxContainer/Upgrades/Upgrade1,
@@ -39,8 +42,20 @@ func _generate_offers() -> void:
 			available.append(upgrade)
 
 	for item in item_pool:
-		if MetaProgression.is_unlocked(item):
+		if MetaProgression.is_unlocked(item) and not _player_owns_item(item):
 			available.append(item)
+
+	# Abilities skip the MetaProgression unlock gate entirely - purchasable
+	# for gold from run one, no permanent unlock required. They do need to
+	# be excluded once owned though, since nothing else stops the same one
+	# being reoffered (and rebought) after a reset_shop() on the next level.
+	for ability in ability_pool:
+		if not _player_owns_ability(ability):
+			available.append(ability)
+
+	for passive in passive_pool:
+		if not _player_owns_passive(passive):
+			available.append(passive)
 
 	available.shuffle()
 
@@ -60,6 +75,33 @@ func _generate_offers() -> void:
 	offers_generated = true
 
 
+## Equipping an item doesn't remove it from InventoryComponent.items (see
+## InventoryComponent.equip()), so this one check already covers both a
+## worn armour piece and one just sitting in the backpack.
+func _player_owns_item(item: Item) -> bool:
+	if player == null:
+		return false
+	return item in player.inventory.items
+
+
+func _player_owns_ability(ability: Ability) -> bool:
+	if player == null:
+		return false
+	return (
+		ability in player.ability_component.slots
+		or ability in player.inventory.abilities
+	)
+
+
+func _player_owns_passive(passive: PassiveAbility) -> bool:
+	if player == null:
+		return false
+	return (
+		passive in player.passive_ability_component.slots
+		or passive in player.inventory.passive_abilities
+	)
+
+
 func reset_shop() -> void:
 	offers_generated = false
 	offered_offers.clear()
@@ -72,6 +114,8 @@ func reset_shop() -> void:
 	
 func _update_ui() -> void:
 	money_label.text = "Gold: " + str(GameState.money)
+
+	exhausted_label.visible = offered_offers.is_empty()
 
 	for i in range(buttons.size()):
 		var button := buttons[i]
@@ -99,6 +143,18 @@ func _update_ui() -> void:
 					+ "\n\nSOLD"
 				)
 
+			elif offer is Ability:
+				button.text = (
+					(offer as Ability).ability_name
+					+ "\n\nSOLD"
+				)
+
+			elif offer is PassiveAbility:
+				button.text = (
+					(offer as PassiveAbility).ability_name
+					+ "\n\nSOLD"
+				)
+
 			continue
 
 		button.disabled = false
@@ -113,6 +169,18 @@ func _update_ui() -> void:
 			_setup_item_button(
 				button,
 				offer as Item
+			)
+
+		elif offer is Ability:
+			_setup_ability_button(
+				button,
+				offer as Ability
+			)
+
+		elif offer is PassiveAbility:
+			_setup_passive_ability_button(
+				button,
+				offer as PassiveAbility
 			)
 
 func _setup_upgrade_button(
@@ -144,7 +212,37 @@ func _setup_item_button(
 	)
 
 	button.icon = item.icon
-				
+
+func _setup_ability_button(
+	button: Button,
+	ability: Ability
+) -> void:
+	button.text = (
+		ability.ability_name
+		+ "\n\n"
+		+ ability.description
+		+ "\n\n"
+		+ str(ability.price)
+		+ " GOLD"
+	)
+
+	button.icon = ability.icon
+
+func _setup_passive_ability_button(
+	button: Button,
+	passive: PassiveAbility
+) -> void:
+	button.text = (
+		passive.ability_name
+		+ "\n\n"
+		+ passive.description
+		+ "\n\n"
+		+ str(passive.price)
+		+ " GOLD"
+	)
+
+	button.icon = passive.icon
+
 func _buy_offer(index: int) -> void:
 	if index < 0 or index >= offered_offers.size():
 		return
@@ -162,7 +260,19 @@ func _buy_offer(index: int) -> void:
 			offer as Item,
 			index
 		)
-	
+
+	elif offer is Ability:
+		_buy_ability(
+			offer as Ability,
+			index
+		)
+
+	elif offer is PassiveAbility:
+		_buy_passive_ability(
+			offer as PassiveAbility,
+			index
+		)
+
 func open(target_player: Player) -> void:
 	player = target_player
 
@@ -205,6 +315,41 @@ func _buy_item(
 	purchased_offers[index] = true
 
 	_update_ui()
-		
+
+## Auto-equips into the first empty AbilityComponent slot if there is one;
+## otherwise the ability is still bought, just held unequipped in the
+## inventory until equipped manually later.
+func _buy_ability(
+	ability: Ability,
+	index: int
+) -> void:
+	if not GameState.spend_money(ability.price):
+		print("Not enough gold!")
+		return
+
+	if player.ability_component.equip_in_first_empty_slot(ability):
+		player.ability_bars.refresh(player.ability_component)
+	else:
+		player.inventory.add_ability(ability)
+
+	purchased_offers[index] = true
+
+	_update_ui()
+
+func _buy_passive_ability(
+	passive: PassiveAbility,
+	index: int
+) -> void:
+	if not GameState.spend_money(passive.price):
+		print("Not enough gold!")
+		return
+
+	if not player.passive_ability_component.equip_in_first_empty_slot(passive):
+		player.inventory.add_passive_ability(passive)
+
+	purchased_offers[index] = true
+
+	_update_ui()
+
 func close() -> void:
 	hide()

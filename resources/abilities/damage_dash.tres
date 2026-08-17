@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="DamageDashAbility" format=3]
+
+[ext_resource type="Script" uid="uid://c528heqxdywiv" path="res://scripts/abilities/damage_dash_ability.gd" id="1_ddash"]
+
+[resource]
+script = ExtResource("1_ddash")
+ability_name = "Damage Dash"
+description = "Dash through enemies, damaging them along the way and staying invincible a little longer than usual."
+price = 110
+cooldown = 2.0
+metadata/_custom_type_script = "uid://c528heqxdywiv"

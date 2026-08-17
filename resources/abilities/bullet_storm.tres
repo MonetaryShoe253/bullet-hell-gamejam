@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="BulletStormAbility" format=3]
+
+[ext_resource type="Script" uid="uid://b2v6yyh1ciw5p" path="res://scripts/abilities/bullet_storm_ability.gd" id="1_bstrm"]
+
+[resource]
+script = ExtResource("1_bstrm")
+ability_name = "Bullet Storm"
+description = "Unleash a ring of bullets in every direction."
+price = 90
+cooldown = 4.0
+metadata/_custom_type_script = "uid://b2v6yyh1ciw5p"

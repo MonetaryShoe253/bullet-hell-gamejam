@@ -4,6 +4,8 @@ extends Node
 signal item_added(item: Item)
 signal item_removed(item: Item)
 signal equipment_changed()
+signal ability_added(ability: Ability)
+signal passive_ability_added(passive: PassiveAbility)
 
 @export var max_inventory_size: int = 12
 
@@ -12,6 +14,19 @@ var items: Array[Item] = []
 var equipped_armour: Item
 var equipped_weapon: Item
 var equipped_accessory: Item
+
+## Abilities bought with no free AbilityComponent/PassiveAbilityComponent
+## slot land here, owned but inactive, until manually equipped elsewhere.
+var abilities: Array[Ability] = []
+var passive_abilities: Array[PassiveAbility] = []
+
+func add_ability(ability: Ability) -> void:
+	abilities.append(ability)
+	ability_added.emit(ability)
+
+func add_passive_ability(passive: PassiveAbility) -> void:
+	passive_abilities.append(passive)
+	passive_ability_added.emit(passive)
 
 func add_item(item: Item) -> bool:
 	if items.size() >= max_inventory_size:

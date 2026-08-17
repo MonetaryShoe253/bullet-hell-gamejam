@@ -12,11 +12,20 @@
 [ext_resource type="Resource" uid="uid://bjsjfcsmhyl0w" path="res://resources/items/chicken_boots.tres" id="10_57epl"]
 [ext_resource type="Resource" uid="uid://ddvuww5vs8d4r" path="res://resources/items/crispy_armour.tres" id="11_rqu28"]
 [ext_resource type="Resource" uid="uid://dei13ma05ppro" path="res://resources/items/hot_wings.tres" id="12_bxeai"]
+[ext_resource type="Script" uid="uid://c24n76nrnb3o1" path="res://scripts/abilities/abilities.gd" id="13_ab1l1"]
+[ext_resource type="Resource" path="res://resources/abilities/bullet_storm.tres" id="14_bstrm"]
+[ext_resource type="Resource" path="res://resources/abilities/damage_wave.tres" id="15_dwave"]
+[ext_resource type="Resource" path="res://resources/abilities/damage_dash.tres" id="16_ddash"]
+[ext_resource type="Script" path="res://scripts/abilities/passive_ability.gd" id="17_pasv1"]
+[ext_resource type="Resource" path="res://resources/passive_abilities/health_regen_on_kill.tres" id="18_hregen"]
+[ext_resource type="Resource" path="res://resources/passive_abilities/force_field.tres" id="19_ffld"]
 
 [node name="ShopUI" type="CanvasLayer" unique_id=1633812390]
 script = ExtResource("1_5tinp")
 upgrade_pool = Array[ExtResource("2_yxlag")]([ExtResource("3_m41hj"), ExtResource("4_6l0ir"), ExtResource("5_4k3pv"), ExtResource("6_ge6mo"), ExtResource("7_m2mw0")])
 item_pool = Array[ExtResource("8_m2mw0")]([ExtResource("9_087to"), ExtResource("10_57epl"), ExtResource("11_rqu28"), ExtResource("12_bxeai")])
+ability_pool = Array[ExtResource("13_ab1l1")]([ExtResource("14_bstrm"), ExtResource("15_dwave"), ExtResource("16_ddash")])
+passive_pool = Array[ExtResource("17_pasv1")]([ExtResource("18_hregen"), ExtResource("19_ffld")])
 
 [node name="CenterContainer" type="CenterContainer" parent="." unique_id=1925415414]
 anchors_preset = 15
@@ -71,3 +80,12 @@ size_flags_horizontal = 3
 custom_minimum_size = Vector2(220, 220)
 layout_mode = 2
 size_flags_horizontal = 3
+
+[node name="ExhaustedLabel" type="Label" parent="CenterContainer/PanelContainer/MarginContainer/VBoxContainer" unique_id=846343016]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+theme_override_font_sizes/font_size = 22
+text = "Shop pool exhausted - keep completing runs to unlock new shop gear!"
+horizontal_alignment = 1
+autowrap_mode = 3

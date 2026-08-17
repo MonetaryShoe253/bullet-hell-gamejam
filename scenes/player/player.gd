@@ -13,10 +13,22 @@ var can_dash: bool = true
 var dash_direction: Vector2
 var dash_cooldown_remaining: float = 0.0
 
+## Separate movement state for the Damage Dash ability - deliberately not
+## sharing is_dashing/can_dash/dash_cooldown_remaining with the regular dash
+## above, since the ability has its own cooldown on AbilityComponent.
+var is_ability_dashing: bool = false
+var ability_dash_direction: Vector2
+
+var _ability_dash_speed: float = 0.0
+var _ability_dash_damage: float = 0.0
+var _ability_dash_hit_radius: float = 0.0
+var _ability_dash_hit_enemies: Array[Node2D] = []
+
 @onready var hurt_box: HurtboxComponent = $Components/HurtBox
 @onready var sprite: AnimatedSprite2D = $Sprite2D
 @onready var inventory: InventoryComponent = $Components/InventoryComponent
 @onready var stats: StatsComponent = $Components/StatsComponent
+@onready var passive_ability_component: PassiveAbilityComponent = $Components/PassiveAbilityComponent
 @onready var ability_component: AbilityComponent = $Components/AbilityComponent
 
 ## Index order matches an angle sector walk (45 deg each) starting at east and
@@ -130,6 +142,9 @@ func _on_death_reward_finished() -> void:
 func _physics_process(delta: float) -> void:
 	if is_dashing:
 		velocity = dash_direction * dash_speed
+	elif is_ability_dashing:
+		velocity = ability_dash_direction * _ability_dash_speed
+		_damage_ability_dash_path()
 	else:
 		var direction := Input.get_vector(
 			"move_left",
@@ -193,7 +208,64 @@ func start_dash() -> void:
 	health_component.invulnerable = false
 
 	dash_cooldown_remaining = stats.get_dash_cooldown()
-	
+
+
+## Self-contained dash used by the Damage Dash ability: moves like a normal
+## dash and grants the same invulnerability, but tracked independently of
+## is_dashing/can_dash so it never touches the regular dash's cooldown -
+## AbilityComponent's own per-slot cooldown is what paces this one.
+## post_invincibility_duration keeps invulnerable on for a bit after the
+## movement itself ends, without extending is_ability_dashing (so movement
+## and input return to normal immediately, only the i-frames linger).
+func perform_ability_dash(
+	damage: float,
+	speed: float,
+	duration: float,
+	hit_radius: float,
+	post_invincibility_duration: float = 0.0
+) -> void:
+	if is_dashing or is_ability_dashing:
+		return
+
+	is_ability_dashing = true
+	ability_dash_direction = (
+		get_global_mouse_position() - global_position
+	).normalized()
+
+	_ability_dash_speed = speed
+	_ability_dash_damage = damage
+	_ability_dash_hit_radius = hit_radius
+	_ability_dash_hit_enemies.clear()
+
+	health_component.invulnerable = true
+
+	await get_tree().create_timer(duration).timeout
+
+	is_ability_dashing = false
+
+	if post_invincibility_duration > 0.0:
+		await get_tree().create_timer(post_invincibility_duration).timeout
+
+	health_component.invulnerable = false
+
+
+## Enemies are on a collision mask the player's own CharacterBody2D doesn't
+## test against (the player passes through them during move_and_slide), so
+## this is a manual proximity sweep each physics frame rather than reading
+## collisions off the dash's own movement. hit_radius is deliberately a bit
+## larger than the player's own hurtbox extents so the swept path has some
+## width to it, not just a pixel-thin line along the direction of travel.
+func _damage_ability_dash_path() -> void:
+	for enemy in get_tree().get_nodes_in_group("enemy"):
+		if enemy in _ability_dash_hit_enemies or not (enemy is Node2D):
+			continue
+		if global_position.distance_to(enemy.global_position) > _ability_dash_hit_radius:
+			continue
+
+		_ability_dash_hit_enemies.append(enemy)
+		var hurt_box = enemy.get_node("Components/HurtBox")
+		hurt_box.take_damage(_ability_dash_damage)
+
 func shoot() -> void:
 	var proj: PlayerProjectile = projectile_scene.instantiate()
 
