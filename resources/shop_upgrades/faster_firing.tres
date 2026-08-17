@@ -4,6 +4,8 @@
 
 [resource]
 script = ExtResource("1_1f88v")
+unlock_id = &"rapid_fryer"
+unlock_tier = 3
 upgrade_name = "Rapid Fryer"
 description = "Fire 15% faster"
 price = 40

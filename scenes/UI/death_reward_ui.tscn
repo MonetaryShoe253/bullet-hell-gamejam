@@ -1,0 +1,79 @@
+[gd_scene format=3 uid="uid://daq0vn44ulaa2"]
+
+[ext_resource type="Script" uid="uid://djtix828e1u6k" path="res://scenes/UI/death_reward_ui.gd" id="1_yt8be"]
+
+[node name="DeathRewardUI" type="CanvasLayer" unique_id=288556813]
+process_mode = 3
+script = ExtResource("1_yt8be")
+
+[node name="Background" type="ColorRect" parent="." unique_id=2095847858]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.18431373, 0, 0, 0.39215687)
+
+[node name="CenterContainer" type="CenterContainer" parent="Background" unique_id=219713764]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="PanelContainer" type="PanelContainer" parent="Background/CenterContainer" unique_id=538734250]
+custom_minimum_size = Vector2(1000, 500)
+layout_mode = 2
+
+[node name="MarginContainer" type="MarginContainer" parent="Background/CenterContainer/PanelContainer" unique_id=1591114853]
+layout_mode = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="Background/CenterContainer/PanelContainer/MarginContainer" unique_id=1814738258]
+layout_mode = 2
+
+[node name="Title" type="Label" parent="Background/CenterContainer/PanelContainer/MarginContainer/VBoxContainer" unique_id=1715127798]
+layout_mode = 2
+theme_override_font_sizes/font_size = 40
+text = "RUN REWARDS"
+
+[node name="RunResult" type="Label" parent="Background/CenterContainer/PanelContainer/MarginContainer/VBoxContainer" unique_id=630984870]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Reached Floor 5"
+
+[node name="RewardTier" type="Label" parent="Background/CenterContainer/PanelContainer/MarginContainer/VBoxContainer" unique_id=1620912126]
+unique_name_in_owner = true
+layout_mode = 2
+text = "T3 Reward"
+
+[node name="Instructions" type="Label" parent="Background/CenterContainer/PanelContainer/MarginContainer/VBoxContainer" unique_id=1926219896]
+layout_mode = 2
+text = "Choose a reward - the selected unlock will appear in future runs"
+
+[node name="RewardContainer" type="HBoxContainer" parent="Background/CenterContainer/PanelContainer/MarginContainer/VBoxContainer" unique_id=1009858131]
+layout_mode = 2
+
+[node name="Reward1" type="Button" parent="Background/CenterContainer/PanelContainer/MarginContainer/VBoxContainer/RewardContainer" unique_id=208678077]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(280, 300)
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="Reward2" type="Button" parent="Background/CenterContainer/PanelContainer/MarginContainer/VBoxContainer/RewardContainer" unique_id=1646397515]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(280, 300)
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="Reward3" type="Button" parent="Background/CenterContainer/PanelContainer/MarginContainer/VBoxContainer/RewardContainer" unique_id=1949193326]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(280, 300)
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="ConfirmButton" type="Button" parent="Background/CenterContainer/PanelContainer/MarginContainer/VBoxContainer" unique_id=1657120686]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+text = "CONFIRM"

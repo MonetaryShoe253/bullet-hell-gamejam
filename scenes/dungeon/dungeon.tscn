@@ -7,6 +7,7 @@
 [ext_resource type="Script" uid="uid://clmn8utdyvei6" path="res://scenes/UI/minimap.gd" id="5_minimap"]
 [ext_resource type="PackedScene" uid="uid://cktjjn0cmkhvv" path="res://scenes/UI/shop_ui.tscn" id="5_vhky6"]
 [ext_resource type="PackedScene" uid="uid://1dl1typf2xi7" path="res://scenes/UI/inventory_ui.tscn" id="7_bsb75"]
+[ext_resource type="PackedScene" uid="uid://daq0vn44ulaa2" path="res://scenes/UI/death_reward_ui.tscn" id="8_h6dl1"]
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_frwky"]
 texture = ExtResource("2_4f38h")
@@ -187,3 +188,5 @@ script = ExtResource("5_minimap")
 
 [node name="InventoryUI" parent="." unique_id=767680652 instance=ExtResource("7_bsb75")]
 unique_name_in_owner = true
+
+[node name="DeathRewardUI" parent="." unique_id=288556813 instance=ExtResource("8_h6dl1")]

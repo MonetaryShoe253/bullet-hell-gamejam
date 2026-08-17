@@ -4,6 +4,8 @@
 
 [resource]
 script = ExtResource("1_pjagk")
+unlock_id = &"greased_chicken"
+unlock_tier = 4
 upgrade_name = "Greased Chicken"
 description = "+30 movement speed"
 price = 25

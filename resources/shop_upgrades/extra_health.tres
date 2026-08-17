@@ -4,6 +4,8 @@
 
 [resource]
 script = ExtResource("1_nwejb")
+unlock_id = &"extra_crispy_heart"
+unlocked_by_default = true
 upgrade_name = "Extra Crispy Heart"
 description = "+25 maximum health"
 price = 30

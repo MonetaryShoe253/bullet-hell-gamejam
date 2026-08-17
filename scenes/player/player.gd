@@ -41,7 +41,9 @@ const ATTACK_ANIM_BASE_DURATION: float = 7.0 / 12.0
 var projectile_scene: PackedScene = preload("res://scenes/projectiles/playerbullet/playerbullet.tscn")
 var time_since_last_shot: float = 0.0
 
-const GameOverScene := preload("res://scenes/UI/game_over.tscn")
+const DeathRewardScene := preload("res://scenes/ui/death_reward_ui.tscn")
+
+const GameOverScene := preload("res://scenes/ui/game_over.tscn")
 
 @onready var health_component: HealthComponent = $Components/HealthComponent
 @onready var health_bar: ProgressBar = $HealthBar/HealthBar
@@ -102,12 +104,28 @@ func _on_stats_changed() -> void:
 
 
 func _on_died() -> void:
-	var game_over := GameOverScene.instantiate()
-	# Parented under current_scene (not root) so it's actually destroyed when
-	# Start Over reloads the scene - a root-level child survives a scene reload.
-	get_tree().current_scene.add_child(game_over)
-	get_tree().paused = true
+	
+	print("PLAYER DIED")
+	var level_reached := GameState.level
 
+	var reward_ui: DeathRewardUI = DeathRewardScene.instantiate()
+
+	get_tree().current_scene.add_child(reward_ui)
+
+	reward_ui.finished.connect(
+		_on_death_reward_finished
+	)
+	
+	print("FINISHED SIGNAL CONNECTED")
+
+	reward_ui.open(level_reached)
+	
+func _on_death_reward_finished() -> void:
+	var game_over := GameOverScene.instantiate()
+
+	get_tree().current_scene.add_child(game_over)
+
+	get_tree().paused = true
 
 func _physics_process(delta: float) -> void:
 	if is_dashing:
