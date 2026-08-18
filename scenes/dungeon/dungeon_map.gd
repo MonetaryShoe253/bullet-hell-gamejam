@@ -271,6 +271,7 @@ func _spawn_stairs_trigger() -> void:
 	_stairs_trigger.body_entered.connect(_on_stairs_entered)
 
 	prop_layer.set_cell(cell, tile_source_id, PROP_LADDER)
+	minimap.show_exit(cell)
 
 func _spawn_shop_trigger() -> void:
 	var room: Rect2i = _generator.shop_room
