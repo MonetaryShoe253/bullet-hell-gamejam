@@ -5,31 +5,31 @@ extends RefCounted
 ## RoomGenerator, so this class no longer spawns standalone pillar obstacles.
 
 const DECORATION_PATHS: Array[String] = [
-	"res://assets/Wing/decorations/stacked_chairs.png",
-	"res://assets/Wing/decorations/condiment_station.png",
-	"res://assets/Wing/decorations/jukebox.png",
-	"res://assets/Wing/decorations/potted_plant.png",
-	"res://assets/Wing/decorations/trash_can.png",
-	"res://assets/Wing/decorations/wing_crate.png",
-	"res://assets/Wing/vending_machine.png",
+	"res://assets/Dungeon/decorations/stacked_chairs.png",
+	"res://assets/Dungeon/decorations/condiment_station.png",
+	"res://assets/Dungeon/decorations/jukebox.png",
+	"res://assets/Dungeon/decorations/potted_plant.png",
+	"res://assets/Dungeon/decorations/trash_can.png",
+	"res://assets/Dungeon/decorations/wing_crate.png",
+	"res://assets/Dungeon/vending_machine.png",
 ]
 
 const THEME_DECORATIONS: Dictionary = {
 	DungeonGenerator.RoomTheme.BURGER: [
-		"res://assets/Wing/decorations/burger_grill.png",
-		"res://assets/Wing/decorations/burger_stack.png",
+		"res://assets/Dungeon/decorations/burger_grill.png",
+		"res://assets/Dungeon/decorations/burger_stack.png",
 	],
 	DungeonGenerator.RoomTheme.TACO: [
-		"res://assets/Wing/decorations/taco_salsa.png",
-		"res://assets/Wing/decorations/taco_tortillas.png",
+		"res://assets/Dungeon/decorations/taco_salsa.png",
+		"res://assets/Dungeon/decorations/taco_tortillas.png",
 	],
 	DungeonGenerator.RoomTheme.PIZZA: [
-		"res://assets/Wing/decorations/pizza_oven.png",
-		"res://assets/Wing/decorations/pizza_boxes.png",
+		"res://assets/Dungeon/decorations/pizza_oven.png",
+		"res://assets/Dungeon/decorations/pizza_boxes.png",
 	],
 }
 
-const ShopkeeperTexture := preload("res://assets/Wing/shopkeeper.png")
+const ShopkeeperTexture := preload("res://assets/Dungeon/shopkeeper.png")
 const ExplodingBarrelScene := preload("res://scenes/dungeon/exploding_barrel/exploding_barrel.tscn")
 const BARREL_CHANCE := 0.6
 

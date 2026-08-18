@@ -160,6 +160,8 @@ func generate_dungeon() -> void:
 		player.global_position = Vector2(-100000, -100000)
 		
 	_clear_level_entities()
+	# Allow everything we just queue_free()'d to actually disappear.
+	await get_tree().process_frame
 
 	_generator = DungeonGenerator.new()
 	_generator.map_size = map_size
@@ -172,6 +174,10 @@ func generate_dungeon() -> void:
 
 	_spawn_player()
 	_spawner = EnemySpawner.new(gameplay_layer, tile_layer, player)
+	
+	# Give the physics server a chance to register the player's
+	# new position.
+	await get_tree().physics_frame
 
 	_setup_rooms(_generator)
 	_decorator.scatter(_generator)

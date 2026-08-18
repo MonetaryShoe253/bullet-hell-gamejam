@@ -144,7 +144,8 @@ const BOSSES: Array[Dictionary] = [
 	},
 	{
 	"id": &"slime_boss",
-	"scene": SlimeScene,
+	"scene": SlimeScene,	
+	"projectile_scene": SlimeProjectile,
 	"color": Color(0.75, 0.3, 0.95, 1),
 	"health": 280.0,
 	"damage": 12.0,

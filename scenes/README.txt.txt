@@ -1,3 +1,1 @@
-README.txt
-
-test edit
+default scene: res://scenes/dungeon/dungeon.tscn
