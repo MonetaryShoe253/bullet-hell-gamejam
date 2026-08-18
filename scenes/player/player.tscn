@@ -10,21 +10,16 @@
 [ext_resource type="PackedScene" uid="uid://wen7cw6175o8" path="res://scenes/components/stats/stats_component.tscn" id="6_qek5x"]
 [ext_resource type="Script" uid="uid://d7b6xlys2gmy" path="res://scenes/components/abilities/abilities_component.gd" id="7_fm80t"]
 [ext_resource type="Script" uid="uid://c24n76nrnb3o1" path="res://scripts/abilities/abilities.gd" id="8_gx1jg"]
-[ext_resource type="PackedScene" path="res://scenes/abilities/force_field/force_field.tscn" id="11_fcs02"]
-[ext_resource type="Script" uid="uid://clni4m2orvlf5" path="res://scripts/abilities/force_field_ability.gd" id="12_myrg7"]
 [ext_resource type="PackedScene" uid="uid://cxel0xtrtcdel" path="res://scenes/UI/ability_bar.tscn" id="13_gx1jg"]
 [ext_resource type="Script" uid="uid://duetqoik5vdep" path="res://scenes/components/abilities/passive_ability_component.gd" id="14_pasvc"]
 [ext_resource type="Script" uid="uid://b4oy2lqi0n2ie" path="res://scripts/abilities/passive_ability.gd" id="15_pasv2"]
+[ext_resource type="Resource" path="res://resources/passive_abilities/force_field.tres" id="16_ffldr"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_gmlin"]
 size = Vector2(5.3333335, 13.333334)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_nehcj"]
 size = Vector2(6, 17)
-
-[sub_resource type="Resource" id="Resource_fcs02"]
-script = ExtResource("12_myrg7")
-ability_name = "Force Field"
 
 [node name="Player" type="CharacterBody2D" unique_id=1277505981 groups=["player"]]
 texture_filter = 1
@@ -68,7 +63,7 @@ slots = Array[ExtResource("8_gx1jg")]([null, null])
 
 [node name="PassiveAbilityComponent" type="Node" parent="Components" unique_id=1262351500]
 script = ExtResource("14_pasvc")
-slots = Array[ExtResource("15_pasv2")]([SubResource("Resource_fcs02"), null])
+slots = Array[ExtResource("15_pasv2")]([ExtResource("16_ffldr"), null])
 
 [node name="AnimationPlayer" type="AnimationPlayer" parent="." unique_id=1940173901]
 

@@ -10,7 +10,6 @@ var _rng := RandomNumberGenerator.new()
 var _wave_index_by_room: Dictionary = {}
 var _budget_by_room: Dictionary = {}
 
-
 func _init(parent: Node, tile_layer: TileMapLayer, player: Node2D) -> void:
 	_parent = parent
 	_tile_layer = tile_layer

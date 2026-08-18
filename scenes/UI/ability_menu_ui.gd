@@ -1,17 +1,24 @@
 class_name AbilityMenuUI
 extends CanvasLayer
 
-enum Source { NONE, OWNED_ABILITY, OWNED_PASSIVE, ACTIVE_SLOT, PASSIVE_SLOT }
+## ACTIVE/PASSIVE can never swap with each other - a PassiveAbility can't go
+## in an AbilityComponent slot or vice versa.
+enum Kind { ACTIVE, PASSIVE }
+
+## Where a selected resource currently lives - a fixed-index component slot,
+## or the unordered "owned but unequipped" backpack list.
+enum Place { SLOT, BACKPACK }
 
 var player: Player
 var ability_component: AbilityComponent
 var passive_component: PassiveAbilityComponent
 var inventory: InventoryComponent
 
-var _selection_source: Source = Source.NONE
-var _selection_index: int = -1
-var _selected_ability: Ability = null
-var _selected_passive: PassiveAbility = null
+var _has_selection: bool = false
+var _sel_kind: Kind = Kind.ACTIVE
+var _sel_place: Place = Place.SLOT
+var _sel_index: int = -1  # meaningful only when _sel_place == SLOT
+var _sel_resource: Resource = null  # the Ability/PassiveAbility currently picked up
 
 @onready var active_slot_buttons: Array[Button] = [%ActiveSlot1, %ActiveSlot2]
 @onready var passive_slot_buttons: Array[Button] = [%PassiveSlot1, %PassiveSlot2]
@@ -26,15 +33,15 @@ var _selected_passive: PassiveAbility = null
 
 func _ready() -> void:
 	close_button.pressed.connect(close)
-	action_button.pressed.connect(_on_action_pressed)
+	action_button.pressed.connect(_on_unequip_pressed)
 
 	for i in active_slot_buttons.size():
 		var index := i
-		active_slot_buttons[i].pressed.connect(func(): _on_active_slot_pressed(index))
+		active_slot_buttons[i].pressed.connect(func(): _on_slot_pressed(Kind.ACTIVE, index))
 
 	for i in passive_slot_buttons.size():
 		var index := i
-		passive_slot_buttons[i].pressed.connect(func(): _on_passive_slot_pressed(index))
+		passive_slot_buttons[i].pressed.connect(func(): _on_slot_pressed(Kind.PASSIVE, index))
 
 	hide()
 
@@ -84,16 +91,20 @@ func _refresh_slots() -> void:
 		var ability: Ability = (
 			ability_component.slots[i] if i < ability_component.slots.size() else null
 		)
+		var selected := _has_selection and _sel_kind == Kind.ACTIVE and _sel_place == Place.SLOT and _sel_index == i
 		active_slot_buttons[i].text = (
-			"ACTIVE %d\n%s" % [i + 1, ability.ability_name if ability else "Empty"]
+			("» " if selected else "")
+			+ "ACTIVE %d\n%s" % [i + 1, ability.ability_name if ability else "Empty"]
 		)
 
 	for i in passive_slot_buttons.size():
 		var passive: PassiveAbility = (
 			passive_component.slots[i] if i < passive_component.slots.size() else null
 		)
+		var selected := _has_selection and _sel_kind == Kind.PASSIVE and _sel_place == Place.SLOT and _sel_index == i
 		passive_slot_buttons[i].text = (
-			"PASSIVE %d\n%s" % [i + 1, passive.ability_name if passive else "Empty"]
+			("» " if selected else "")
+			+ "PASSIVE %d\n%s" % [i + 1, passive.ability_name if passive else "Empty"]
 		)
 
 
@@ -102,146 +113,175 @@ func _refresh_owned_grid() -> void:
 		child.queue_free()
 
 	for ability in inventory.abilities:
+		var selected := _has_selection and _sel_place == Place.BACKPACK and _sel_resource == ability
 		var button := Button.new()
 		button.custom_minimum_size = Vector2(150, 70)
-		button.text = ability.ability_name
-		button.pressed.connect(func(): _on_owned_ability_pressed(ability))
+		button.text = ("» " if selected else "") + ability.ability_name
+		button.pressed.connect(func(): _on_owned_pressed(Kind.ACTIVE, ability))
 		owned_grid.add_child(button)
 
 	for passive in inventory.passive_abilities:
+		var selected := _has_selection and _sel_place == Place.BACKPACK and _sel_resource == passive
 		var button := Button.new()
 		button.custom_minimum_size = Vector2(150, 70)
-		button.text = passive.ability_name + "\n(Passive)"
-		button.pressed.connect(func(): _on_owned_passive_pressed(passive))
+		button.text = ("» " if selected else "") + passive.ability_name + "\n(Passive)"
+		button.pressed.connect(func(): _on_owned_pressed(Kind.PASSIVE, passive))
 		owned_grid.add_child(button)
 
 
-func _on_owned_ability_pressed(ability: Ability) -> void:
-	_selection_source = Source.OWNED_ABILITY
-	_selection_index = -1
-	_selected_ability = ability
-	_selected_passive = null
-	_refresh_details()
+func _on_slot_pressed(kind: Kind, index: int) -> void:
+	var component = ability_component if kind == Kind.ACTIVE else passive_component
+	var resource: Resource = component.slots[index] if index < component.slots.size() else null
+	_handle_click(kind, Place.SLOT, index, resource)
 
 
-func _on_owned_passive_pressed(passive: PassiveAbility) -> void:
-	_selection_source = Source.OWNED_PASSIVE
-	_selection_index = -1
-	_selected_ability = null
-	_selected_passive = passive
-	_refresh_details()
+func _on_owned_pressed(kind: Kind, resource: Resource) -> void:
+	_handle_click(kind, Place.BACKPACK, -1, resource)
 
 
-func _on_active_slot_pressed(index: int) -> void:
-	var ability: Ability = (
-		ability_component.slots[index] if index < ability_component.slots.size() else null
-	)
-	if ability == null:
+## The whole interaction model: first click picks something up, a second
+## click of the same kind swaps it with whatever's there (empty slot, filled
+## slot, or a backpack entry - all handled the same way by _swap()).
+## Clicking the exact same thing again cancels the pick.
+func _handle_click(kind: Kind, place: Place, index: int, resource: Resource) -> void:
+	if not _has_selection:
+		if resource == null:
+			return  # nothing to pick up
+		_set_selection(kind, place, index, resource)
 		return
 
-	_selection_source = Source.ACTIVE_SLOT
-	_selection_index = index
-	_selected_ability = ability
-	_selected_passive = null
-	_refresh_details()
-
-
-func _on_passive_slot_pressed(index: int) -> void:
-	var passive: PassiveAbility = (
-		passive_component.slots[index] if index < passive_component.slots.size() else null
-	)
-	if passive == null:
+	if _is_current_selection(kind, place, index, resource):
+		_clear_selection()
+		_refresh()
 		return
 
-	_selection_source = Source.PASSIVE_SLOT
-	_selection_index = index
-	_selected_ability = null
-	_selected_passive = passive
-	_refresh_details()
+	if kind != _sel_kind:
+		# Active and passive can't swap with each other. Treat this as
+		# "start a new pick" if they clicked something real, otherwise just
+		# drop the pending selection.
+		_clear_selection()
+		if resource != null:
+			_set_selection(kind, place, index, resource)
+		else:
+			_refresh()
+		return
+
+	_swap(place, index, resource)
+	_clear_selection()
+	_refresh()
+
+
+func _is_current_selection(kind: Kind, place: Place, index: int, resource: Resource) -> bool:
+	if not _has_selection or kind != _sel_kind or place != _sel_place:
+		return false
+	if place == Place.SLOT:
+		return index == _sel_index
+	return resource == _sel_resource
+
+
+func _set_selection(kind: Kind, place: Place, index: int, resource: Resource) -> void:
+	_has_selection = true
+	_sel_kind = kind
+	_sel_place = place
+	_sel_index = index
+	_sel_resource = resource
+	_refresh()
+
+
+func _clear_selection() -> void:
+	_has_selection = false
+	_sel_index = -1
+	_sel_resource = null
+
+
+## Swaps whatever is currently selected with the thing at (target_place,
+## target_index, target_resource). Both sides can be empty, filled, or a
+## backpack entry - every combination reduces to "each side's item, if any,
+## moves to where the other one was".
+func _swap(target_place: Place, target_index: int, target_resource: Resource) -> void:
+	if _sel_place == Place.SLOT and target_place == Place.SLOT:
+		_swap_slots(_sel_kind, _sel_index, target_index)
+	elif _sel_place == Place.SLOT and target_place == Place.BACKPACK:
+		_move_into_slot(_sel_kind, target_resource, _sel_index)
+	elif _sel_place == Place.BACKPACK and target_place == Place.SLOT:
+		_move_into_slot(_sel_kind, _sel_resource, target_index)
+	# BACKPACK <-> BACKPACK: the backpack is unordered, nothing to change.
+
+
+func _swap_slots(kind: Kind, a: int, b: int) -> void:
+	if a == b:
+		return
+
+	# Untyped on purpose - AbilityComponent and PassiveAbilityComponent share
+	# no common ancestor beyond Node, but both expose the same equip_at()/
+	# unequip_at() shape, so this dispatches by duck typing at runtime.
+	var component = ability_component if kind == Kind.ACTIVE else passive_component
+	var item_a: Resource = component.unequip_at(a)
+	var item_b: Resource = component.unequip_at(b)
+
+	if item_b:
+		component.equip_at(a, item_b)
+	if item_a:
+		component.equip_at(b, item_a)
+
+	if kind == Kind.ACTIVE:
+		player.ability_bars.refresh(ability_component)
+
+
+## Puts `resource` into slot `index`, pulling it out of the backpack first
+## and returning whatever was displaced back into the backpack.
+func _move_into_slot(kind: Kind, resource: Resource, index: int) -> void:
+	var component = ability_component if kind == Kind.ACTIVE else passive_component
+	var backpack: Array = inventory.abilities if kind == Kind.ACTIVE else inventory.passive_abilities
+
+	backpack.erase(resource)
+	var displaced: Resource = component.equip_at(index, resource)
+	if displaced:
+		backpack.append(displaced)
+
+	if kind == Kind.ACTIVE:
+		player.ability_bars.refresh(ability_component)
 
 
 func _refresh_details() -> void:
-	if _selection_source == Source.NONE:
+	if not _has_selection:
 		details_panel.hide()
 		return
 
 	details_panel.show()
 
-	if _selected_ability:
-		ability_name_label.text = _selected_ability.ability_name
-		ability_description_label.text = _selected_ability.description
-		ability_stats_label.text = "Cooldown: %.1fs" % _selected_ability.cooldown
-	elif _selected_passive:
-		ability_name_label.text = _selected_passive.ability_name
-		ability_description_label.text = _selected_passive.description
+	if _sel_kind == Kind.ACTIVE:
+		var ability := _sel_resource as Ability
+		ability_name_label.text = ability.ability_name
+		ability_description_label.text = ability.description
+		ability_stats_label.text = "Cooldown: %.1fs" % ability.cooldown
+	else:
+		var passive := _sel_resource as PassiveAbility
+		ability_name_label.text = passive.ability_name
+		ability_description_label.text = passive.description
 		ability_stats_label.text = "Passive - always active once equipped"
 
-	var is_slot := (
-		_selection_source == Source.ACTIVE_SLOT
-		or _selection_source == Source.PASSIVE_SLOT
+	ability_description_label.text += (
+		"\n\nClick another slot or owned ability to swap places, or click this again to cancel."
 	)
-	action_button.text = "UNEQUIP" if is_slot else "EQUIP"
+
+	action_button.visible = _sel_place == Place.SLOT
+	action_button.text = "UNEQUIP"
 
 
-func _on_action_pressed() -> void:
-	match _selection_source:
-		Source.OWNED_ABILITY:
-			_equip_ability(_selected_ability)
-		Source.OWNED_PASSIVE:
-			_equip_passive(_selected_passive)
-		Source.ACTIVE_SLOT:
-			_unequip_active(_selection_index)
-		Source.PASSIVE_SLOT:
-			_unequip_passive(_selection_index)
+func _on_unequip_pressed() -> void:
+	if not _has_selection or _sel_place != Place.SLOT:
+		return
+
+	if _sel_kind == Kind.ACTIVE:
+		var removed := ability_component.unequip_at(_sel_index)
+		if removed:
+			inventory.abilities.append(removed)
+			player.ability_bars.refresh(ability_component)
+	else:
+		var removed := passive_component.unequip_at(_sel_index)
+		if removed:
+			inventory.passive_abilities.append(removed)
 
 	_clear_selection()
 	_refresh()
-
-
-func _clear_selection() -> void:
-	_selection_source = Source.NONE
-	_selection_index = -1
-	_selected_ability = null
-	_selected_passive = null
-
-
-## Fills the first empty active slot, or overwrites slot 0 if every slot is
-## full - whatever gets displaced goes back into the owned pool rather than
-## being lost.
-func _equip_ability(ability: Ability) -> void:
-	inventory.abilities.erase(ability)
-
-	var index: int = ability_component.slots.find(null)
-	if index == -1:
-		index = 0
-
-	var displaced := ability_component.equip_at(index, ability)
-	if displaced:
-		inventory.abilities.append(displaced)
-
-	player.ability_bars.refresh(ability_component)
-
-
-func _equip_passive(passive: PassiveAbility) -> void:
-	inventory.passive_abilities.erase(passive)
-
-	var index: int = passive_component.slots.find(null)
-	if index == -1:
-		index = 0
-
-	var displaced := passive_component.equip_at(index, passive)
-	if displaced:
-		inventory.passive_abilities.append(displaced)
-
-
-func _unequip_active(index: int) -> void:
-	var ability := ability_component.unequip_at(index)
-	if ability:
-		inventory.abilities.append(ability)
-		player.ability_bars.refresh(ability_component)
-
-
-func _unequip_passive(index: int) -> void:
-	var passive := passive_component.unequip_at(index)
-	if passive:
-		inventory.passive_abilities.append(passive)
