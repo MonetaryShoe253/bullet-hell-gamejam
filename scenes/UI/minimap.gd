@@ -37,7 +37,11 @@ const FOG_OF_WAR_ENABLED := false
 ## Fixed zoom - pixels per dungeon tile. Higher = more zoomed in. Kept
 ## moderate on purpose: enough room to see a corridor's actual bend clearly,
 ## not so much that only a sliver of the current room fits on screen.
-const PIXELS_PER_TILE := 1.2
+const PIXELS_PER_TILE := 1.3
+
+## A few pixels of breathing room between the drawn content and the widget's
+## own edge, so rooms/corridors don't render flush against the border.
+const PADDING := 12.0
 
 ## How quickly the view re-centres on the player, in lerp-per-second terms -
 ## low enough that panning reads as catching up rather than snapping.
@@ -223,7 +227,8 @@ func _draw_cell_rects(rects: Array, color: Color, origin: Vector2) -> void:
 ## axis where the map is *smaller* than the window, centres on the map
 ## instead of clamping into a degenerate (min > max) range.
 func _clamped_origin(bounds: Rect2i) -> Vector2:
-	var half_view: Vector2 = size / PIXELS_PER_TILE / 2.0
+	var usable: Vector2 = size - Vector2(PADDING, PADDING) * 2.0
+	var half_view: Vector2 = usable / PIXELS_PER_TILE / 2.0
 	var center := _view_center
 
 	if bounds.size.x > half_view.x * 2.0:
@@ -240,7 +245,7 @@ func _clamped_origin(bounds: Rect2i) -> Vector2:
 
 
 func _to_screen(cell: Vector2, origin: Vector2) -> Vector2:
-	return (cell - origin) * PIXELS_PER_TILE
+	return (cell - origin) * PIXELS_PER_TILE + Vector2(PADDING, PADDING)
 
 
 ## Grey until the room controller says otherwise - the start room has no
