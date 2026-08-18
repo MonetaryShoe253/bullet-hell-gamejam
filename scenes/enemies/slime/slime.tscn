@@ -1,7 +1,7 @@
 [gd_scene format=3 uid="uid://cwnk4a18w8tta"]
 
 [ext_resource type="Script" uid="uid://sc54sni26t8x" path="res://scenes/enemies/enemy/enemy.gd" id="1_script"]
-[ext_resource type="Texture2D" uid="uid://jtfxwipqeon8" path="res://assets/Wing/enemy_sauceblob.png" id="2_tex"]
+[ext_resource type="Texture2D" uid="uid://jtfxwipqeon8" path="res://assets/enemies/enemy_sauceblob.png" id="2_tex"]
 [ext_resource type="PackedScene" uid="uid://hamwnbllhiuu" path="res://scenes/components/hurtbox/hurt_box.tscn" id="3_hurtbox"]
 [ext_resource type="PackedScene" uid="uid://do4swhon6n2q2" path="res://scenes/components/health/health_component.tscn" id="4_health"]
 
@@ -36,9 +36,6 @@ movement_pattern = null
 spread_angle = null
 spread_projectiles = null
 circle_projectiles = null
-circle_rotation_speed = null
-circle_rotation_min = null
-circle_rotation_max = null
 burst_count = null
 burst_delay = null
 

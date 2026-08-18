@@ -18,7 +18,7 @@ config/icon="res://icon.svg"
 [autoload]
 
 GameState="*res://scripts/game_state.gd"
-Fx="*res://scripts/fx.gd"
+Fx="*res://scripts/helpers/fx.gd"
 MetaProgression="*uid://b74fp3hp2wlf8"
 
 [display]

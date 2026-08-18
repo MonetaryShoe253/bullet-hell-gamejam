@@ -1,7 +1,7 @@
 [gd_scene format=3 uid="uid://cgkmebodaryei"]
 
 [ext_resource type="Script" uid="uid://bxpm47jm72nwr" path="res://scenes/player/player.gd" id="1_8afob"]
-[ext_resource type="SpriteFrames" path="res://assets/Wing/player_anim/player_sprite_frames.tres" id="2_dovo2"]
+[ext_resource type="SpriteFrames" path="res://assets/Player/player_anim/player_sprite_frames.tres" id="2_dovo2"]
 [ext_resource type="PackedScene" uid="uid://do4swhon6n2q2" path="res://scenes/components/health/health_component.tscn" id="3_gmlin"]
 [ext_resource type="PackedScene" uid="uid://hamwnbllhiuu" path="res://scenes/components/hurtbox/hurt_box.tscn" id="3_lvxji"]
 [ext_resource type="PackedScene" uid="uid://bcajnu0wmt0dd" path="res://scenes/components/inventory/inventory_component.tscn" id="5_0owmy"]
@@ -9,10 +9,10 @@
 [ext_resource type="PackedScene" uid="uid://m7dvd11aqb4x" path="res://scenes/UI/energy_bar.tscn" id="6_75vfm"]
 [ext_resource type="PackedScene" uid="uid://wen7cw6175o8" path="res://scenes/components/stats/stats_component.tscn" id="6_qek5x"]
 [ext_resource type="Script" uid="uid://d7b6xlys2gmy" path="res://scenes/components/abilities/abilities_component.gd" id="7_fm80t"]
-[ext_resource type="Script" uid="uid://c24n76nrnb3o1" path="res://scripts/abilities/abilities.gd" id="8_gx1jg"]
+[ext_resource type="Script" uid="uid://c24n76nrnb3o1" path="res://scripts/progression/abilities/abilities.gd" id="8_gx1jg"]
 [ext_resource type="PackedScene" uid="uid://cxel0xtrtcdel" path="res://scenes/UI/ability_bar.tscn" id="13_gx1jg"]
 [ext_resource type="Script" uid="uid://duetqoik5vdep" path="res://scenes/components/abilities/passive_ability_component.gd" id="14_pasvc"]
-[ext_resource type="Script" uid="uid://b4oy2lqi0n2ie" path="res://scripts/abilities/passive_ability.gd" id="15_pasv2"]
+[ext_resource type="Script" uid="uid://b4oy2lqi0n2ie" path="res://scripts/progression/abilities/passive_ability.gd" id="15_pasv2"]
 [ext_resource type="Resource" path="res://resources/passive_abilities/force_field.tres" id="16_ffldr"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_gmlin"]

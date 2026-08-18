@@ -1,6 +1,6 @@
 [gd_resource type="Resource" script_class="ForceFieldAbility" format=3]
 
-[ext_resource type="Script" path="res://scripts/abilities/force_field_ability.gd" id="1_ffld"]
+[ext_resource type="Script" uid="uid://clni4m2orvlf5" path="res://scripts/progression/abilities/force_field_ability.gd" id="1_ffld"]
 
 [resource]
 script = ExtResource("1_ffld")

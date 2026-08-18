@@ -1,6 +1,6 @@
 [gd_resource type="Resource" script_class="DamageWaveAbility" format=3]
 
-[ext_resource type="Script" uid="uid://cghv0jgqsjnpb" path="res://scripts/abilities/damage_wave_ability.gd" id="1_dwave"]
+[ext_resource type="Script" uid="uid://cghv0jgqsjnpb" path="res://scripts/progression/abilities/damage_wave_ability.gd" id="1_dwave"]
 
 [resource]
 script = ExtResource("1_dwave")

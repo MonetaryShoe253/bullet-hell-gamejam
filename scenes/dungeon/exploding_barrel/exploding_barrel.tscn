@@ -1,7 +1,7 @@
-[gd_scene load_steps=6 format=3]
+[gd_scene format=3]
 
-[ext_resource type="Script" path="res://scenes/dungeon/exploding_barrel/exploding_barrel.gd" id="1"]
-[ext_resource type="Texture2D" path="res://assets/Wing/decorations/oil_barrel.png" id="2"]
+[ext_resource type="Script" uid="uid://updsp532xbkr" path="res://scenes/dungeon/exploding_barrel/exploding_barrel.gd" id="1"]
+[ext_resource type="Texture2D" uid="uid://dolb7ex5gqpdr" path="res://assets/Dungeon/decorations/oil_barrel.png" id="2"]
 [ext_resource type="PackedScene" uid="uid://hamwnbllhiuu" path="res://scenes/components/hurtbox/hurt_box.tscn" id="3"]
 [ext_resource type="PackedScene" uid="uid://do4swhon6n2q2" path="res://scenes/components/health/health_component.tscn" id="4"]
 

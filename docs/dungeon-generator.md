@@ -1,5 +1,7 @@
 # Dungeon generator
 
+#WARNING: THIS MAY BE OUTDATED - LOGIC HAS CHANGED 
+
 BSP room-and-corridor generator, rendered with `Dungeon_Tileset.png` from the
 2D Pixel Dungeon Asset Pack.
 

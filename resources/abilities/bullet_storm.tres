@@ -1,6 +1,6 @@
 [gd_resource type="Resource" script_class="BulletStormAbility" format=3]
 
-[ext_resource type="Script" uid="uid://b2v6yyh1ciw5p" path="res://scripts/abilities/bullet_storm_ability.gd" id="1_bstrm"]
+[ext_resource type="Script" uid="uid://b2v6yyh1ciw5p" path="res://scripts/progression/abilities/bullet_storm_ability.gd" id="1_bstrm"]
 
 [resource]
 script = ExtResource("1_bstrm")

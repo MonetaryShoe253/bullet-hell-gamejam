@@ -1,7 +1,7 @@
 [gd_scene format=3 uid="uid://d0tu6eohh56ju"]
 
 [ext_resource type="Script" uid="uid://bx2l0ng3ly0a0" path="res://scenes/projectiles/playerbullet/playerbullet.gd" id="1_86h7u"]
-[ext_resource type="Texture2D" path="res://assets/Wing/player_bullet.png" id="2_ch4me"]
+[ext_resource type="Texture2D" uid="uid://b8njwp30ngtsj" path="res://assets/Player/projectiles/player_bullet.png" id="2_ch4me"]
 
 [node name="PlayerBullet" type="Area2D" unique_id=2118731839]
 scale = Vector2(0.4, 0.4)

@@ -1,8 +1,8 @@
-[gd_scene load_steps=4 format=3]
+[gd_scene format=3]
 
-[ext_resource type="Script" path="res://scenes/dungeon/exploding_barrel/shockwave_vfx.gd" id="1"]
-[ext_resource type="Texture2D" path="res://assets/Wing/decorations/potted_plant.png" id="2"]
-[ext_resource type="Shader" path="res://assets/shaders/shockwave.gdshader" id="3"]
+[ext_resource type="Script" uid="uid://dq0fp6edxbcud" path="res://scenes/dungeon/exploding_barrel/shockwave_vfx.gd" id="1"]
+[ext_resource type="Texture2D" uid="uid://bn2xfhv4ur3rj" path="res://assets/Dungeon/decorations/potted_plant.png" id="2"]
+[ext_resource type="Shader" uid="uid://e4k8tibacv7" path="res://assets/shaders/shockwave.gdshader" id="3"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_shockwave"]
 shader = ExtResource("3")

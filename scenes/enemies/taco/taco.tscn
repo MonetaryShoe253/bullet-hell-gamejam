@@ -1,7 +1,7 @@
 [gd_scene format=3 uid="uid://diy1ayk1tm2ei"]
 
 [ext_resource type="Script" uid="uid://sc54sni26t8x" path="res://scenes/enemies/enemy/enemy.gd" id="1_script"]
-[ext_resource type="Texture2D" uid="uid://bejh7gvmu83fc" path="res://assets/Wing/enemies/taco.png" id="2_tex"]
+[ext_resource type="Texture2D" uid="uid://bejh7gvmu83fc" path="res://assets/enemies/taco.png" id="2_tex"]
 [ext_resource type="PackedScene" uid="uid://hamwnbllhiuu" path="res://scenes/components/hurtbox/hurt_box.tscn" id="3_hurtbox"]
 [ext_resource type="PackedScene" uid="uid://do4swhon6n2q2" path="res://scenes/components/health/health_component.tscn" id="4_health"]
 

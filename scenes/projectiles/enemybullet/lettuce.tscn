@@ -1,7 +1,7 @@
 [gd_scene format=3 uid="uid://dwpsr013pbwr4"]
 
 [ext_resource type="Script" uid="uid://cp6c3je12muh4" path="res://scenes/projectiles/enemybullet/enemybullet.gd" id="1_cxore"]
-[ext_resource type="Texture2D" uid="uid://cm80hptsjwnfl" path="res://assets/Wing/projectiles/lettuce.png" id="2_tex"]
+[ext_resource type="Texture2D" uid="uid://cm80hptsjwnfl" path="res://assets/enemies/projectiles/lettuce.png" id="2_tex"]
 
 [node name="EnemyBullet" type="Area2D" unique_id=1992369220]
 scale = Vector2(0.4, 0.4)

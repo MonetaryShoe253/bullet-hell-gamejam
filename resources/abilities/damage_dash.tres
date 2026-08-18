@@ -1,6 +1,6 @@
 [gd_resource type="Resource" script_class="DamageDashAbility" format=3]
 
-[ext_resource type="Script" uid="uid://c528heqxdywiv" path="res://scripts/abilities/damage_dash_ability.gd" id="1_ddash"]
+[ext_resource type="Script" uid="uid://c528heqxdywiv" path="res://scripts/progression/abilities/damage_dash_ability.gd" id="1_ddash"]
 
 [resource]
 script = ExtResource("1_ddash")
