@@ -147,9 +147,28 @@ func _spawn_cell(gen: DungeonGenerator, room: Rect2i, definition: Dictionary, wa
 	return _random_room_cell(gen, room, exclude + used)
 
 
-func spawn_boss(room: Rect2i, room_controller: RoomController, on_spawned: Callable = Callable()) -> void:
-	_spawn(EnemyCatalog.BOSS_STATS, room.position + room.size / 2, room_controller, on_spawned)
+func spawn_boss(
+	room: Rect2i,
+	room_controller: RoomController,
+	on_spawned: Callable = Callable()
+) -> void:
 
+	var boss_index := GameState.level - 1
+
+	boss_index = clampi(
+		boss_index,
+		0,
+		EnemyCatalog.BOSSES.size() - 1
+	)
+
+	var boss_definition: Dictionary = EnemyCatalog.BOSSES[boss_index]
+
+	_spawn(
+		boss_definition,
+		room.position + room.size / 2,
+		room_controller,
+		on_spawned
+	)
 
 func _random_room_cell(gen: DungeonGenerator, room: Rect2i, exclude: Array = []) -> Vector2i:
 	var margin := 4

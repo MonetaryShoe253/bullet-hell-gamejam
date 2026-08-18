@@ -68,14 +68,39 @@ const ENEMIES: Array[Dictionary] = [
 	},
 ]
 
-const BOSS_STATS: Dictionary = {
-	"id": &"slime_boss", "scene": SlimeScene,
-	"color": Color(0.75, 0.3, 0.95, 1), "health": 220.0,
-	"damage": 12.0, "move_speed": 70.0, "fire_rate": 0.2,
-	"money_reward": 60, "scale": 2.4,
-	"shot_pattern": Enemy.ShotPattern.CIRCLE,
+const BOSSES: Array[Dictionary] = [
+	{
+		"id": &"burger_boss",
+		"scene": BurgerScene,		
+		"color": Color(0.75, 0.3, 0.95, 1),
+		"health": 280.0,
+		"damage": 10.0,
+		"move_speed": 100.0,
+		"fire_rate": 0.15,
+		"money_reward": 70,		
+		"scale": 2.4,
+		"shot_pattern": Enemy.ShotPattern.SPIRAL,
+		"movement_pattern": Enemy.MovementPattern.ORBIT,
+		"spiral_projectiles": 4,
+		"spiral_rotation_speed": 5.7,
+		"preferred_distance": 150.0,
+	},
+	{
+	"id": &"slime_boss",
+	"scene": SlimeScene,
+	"color": Color(0.75, 0.3, 0.95, 1),
+	"health": 220.0,
+	"damage": 12.0,
+	"move_speed": 70.0,
+	"fire_rate": 0.2,
+	"money_reward": 60,
+	"scale": 2.4,
+	"shot_pattern": Enemy.ShotPattern.SPIRAL,
 	"movement_pattern": Enemy.MovementPattern.CHASE,
+	"spiral_projectiles": 12,
+	"spiral_rotation_speed": 7.0,
 }
+]
 
 
 static func eligible(level: int, theme: DungeonGenerator.RoomTheme) -> Array[Dictionary]:

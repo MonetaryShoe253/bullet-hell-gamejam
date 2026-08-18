@@ -13,7 +13,8 @@ enum ShotPattern {
 	SINGLE,
 	SPREAD,
 	BURST,
-	CIRCLE
+	CIRCLE,
+	SPIRAL
 }
 @export var shot_pattern: ShotPattern = ShotPattern.SINGLE
 
@@ -21,7 +22,8 @@ enum MovementPattern {
 	KITE,
 	CHASE,
 	BOUNCE,
-	STRAFE
+	STRAFE,
+	ORBIT
 }
 @export var movement_pattern: MovementPattern = MovementPattern.KITE
 
@@ -35,13 +37,12 @@ var projectile_scene := preload("res://scenes/projectiles/enemybullet/enemybulle
 @export var spread_projectiles: int = 3
 @export var circle_projectiles: int = 12
 
-@export var circle_rotation_speed: float = 7.0 # degrees per volley
-var circle_rotation: float = 0.0
-@export var circle_rotation_min: float = 0.0
-@export var circle_rotation_max: float = 120.0
-
 @export var burst_count: int = 3
 @export var burst_delay: float = 0.1
+
+@export var spiral_projectiles: int = 2
+@export var spiral_rotation_speed: float = 12.0
+var spiral_rotation: float = 0.0
 
 @onready var visual: CanvasItem = $Sprite2D
 @onready var health_component: HealthComponent = $Components/HealthComponent
@@ -85,6 +86,15 @@ func configure(stats: Dictionary) -> void:
 		shot_pattern = stats.shot_pattern
 	if stats.has("movement_pattern"):
 		movement_pattern = stats.movement_pattern
+	if stats.has("preferred_distance"):
+		preferred_distance = stats.preferred_distance
+	if stats.has("distance_tolerance"):
+		distance_tolerance = stats.distance_tolerance
+	if stats.has("spiral_projectiles"):
+		spiral_projectiles = stats.spiral_projectiles
+	if stats.has("spiral_rotation_speed"):
+		spiral_rotation_speed = stats.spiral_rotation_speed
+		
 
 func _physics_process(_delta: float) -> void:
 	if not can_see_player():
@@ -101,7 +111,9 @@ func _physics_process(_delta: float) -> void:
 			_bounce(_delta)
 		MovementPattern.STRAFE:
 			_strafe(_delta)
-
+		MovementPattern.ORBIT:
+			_orbit()
+	
 func can_see_player() -> bool:
 	if player == null:
 		return false
@@ -125,12 +137,18 @@ func fire_at_player() -> void:
 	match shot_pattern:
 		ShotPattern.SINGLE:
 			fire_single(direction)
+
 		ShotPattern.SPREAD:
 			fire_spread(direction)
+
 		ShotPattern.BURST:
 			fire_burst(direction)
+
 		ShotPattern.CIRCLE:
 			fire_circle()
+
+		ShotPattern.SPIRAL:
+			fire_spiral()
 
 func spawn_projectile(direction: Vector2) -> void:
 	var proj: EnemyProjectile = projectile_scene.instantiate()
@@ -157,21 +175,10 @@ func fire_spread(direction: Vector2) -> void:
 func fire_circle() -> void:
 	for i in range(circle_projectiles):
 		var angle := TAU * i / circle_projectiles
-		angle += deg_to_rad(circle_rotation)
 
 		var direction := Vector2.RIGHT.rotated(angle)
+
 		spawn_projectile(direction)
-
-	# Update rotation
-	circle_rotation += circle_rotation_speed
-
-	if circle_rotation >= circle_rotation_max:
-		circle_rotation = circle_rotation_max
-		circle_rotation_speed = -abs(circle_rotation_speed)
-
-	elif circle_rotation <= circle_rotation_min:
-		circle_rotation = circle_rotation_min
-		circle_rotation_speed = abs(circle_rotation_speed)
 
 func fire_burst(_direction: Vector2) -> void:
 	for i in range(burst_count):
@@ -181,6 +188,22 @@ func fire_burst(_direction: Vector2) -> void:
 		var direction := (player.global_position - global_position).normalized()
 		spawn_projectile(direction)
 		await get_tree().create_timer(burst_delay).timeout
+		
+func fire_spiral() -> void:
+	for i in range(spiral_projectiles):
+		var angle := (
+			deg_to_rad(spiral_rotation)
+			+ TAU * i / spiral_projectiles
+		)
+
+		var direction := Vector2.RIGHT.rotated(angle)
+
+		spawn_projectile(direction)
+
+	spiral_rotation = fmod(
+		spiral_rotation + spiral_rotation_speed,
+		360.0
+	)
 
 func _kite() -> void:
 	if player == null:
@@ -250,6 +273,38 @@ func _bounce(_delta: float) -> void:
 	var desired_dir := (target_pos - global_position).normalized()
 
 	velocity = desired_dir * move_speed * 1.15
+	move_and_slide()
+	
+func _orbit() -> void:
+	if player == null:
+		return
+
+	var to_player := player.global_position - global_position
+	var distance := to_player.length()
+
+	if distance <= 0.0:
+		velocity = Vector2.ZERO
+		return
+
+	var toward_player := to_player.normalized()
+
+	var sideways := Vector2(
+		-toward_player.y,
+		toward_player.x
+	)
+
+	var movement := sideways
+
+	# Too far away: orbit while moving inward.
+	if distance > preferred_distance + distance_tolerance:
+		movement += toward_player * 0.5
+
+	# Too close: orbit while moving outward.
+	elif distance < preferred_distance - distance_tolerance:
+		movement -= toward_player * 0.5
+
+	velocity = movement.normalized() * move_speed
+
 	move_and_slide()
 
 func _on_damaged(amount: float) -> void:
