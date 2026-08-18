@@ -13,9 +13,14 @@ func _ready() -> void:
 func _physics_process(delta: float) -> void:
 	position += direction * speed * delta
 
-func launch(start_position: Vector2, target_direction: Vector2) -> void:
+func launch(
+	start_position: Vector2,
+	target_direction: Vector2,
+	projectile_damage: float
+) -> void:
 	global_position = start_position
 	direction = target_direction.normalized()
+	damage = projectile_damage
 	rotation = direction.angle()
 
 func _on_body_entered(body: Node2D) -> void:

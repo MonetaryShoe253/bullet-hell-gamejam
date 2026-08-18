@@ -155,6 +155,10 @@ func _clear_level_entities() -> void:
 
 
 func generate_dungeon() -> void:
+	
+	if player and is_instance_valid(player):
+		player.global_position = Vector2(-100000, -100000)
+		
 	_clear_level_entities()
 
 	_generator = DungeonGenerator.new()

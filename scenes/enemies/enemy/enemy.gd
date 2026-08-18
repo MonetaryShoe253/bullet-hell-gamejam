@@ -14,7 +14,11 @@ enum ShotPattern {
 	SPREAD,
 	BURST,
 	CIRCLE,
-	SPIRAL
+	SPIRAL,
+	WAVE,
+	SHOTGUN,
+	ALTERNATING_SPREAD,
+	RING_GAP
 }
 @export var shot_pattern: ShotPattern = ShotPattern.SINGLE
 
@@ -31,7 +35,7 @@ var strafe_direction: float = 1.0
 var strafe_timer: float = 0.0
 var bounce_phase: float = 0.0
 
-var projectile_scene := preload("res://scenes/projectiles/enemybullet/enemybullet.tscn")
+@export var projectile_scene: PackedScene
 
 @export var spread_angle: float = 20.0
 @export var spread_projectiles: int = 3
@@ -43,6 +47,27 @@ var projectile_scene := preload("res://scenes/projectiles/enemybullet/enemybulle
 @export var spiral_projectiles: int = 2
 @export var spiral_rotation_speed: float = 12.0
 var spiral_rotation: float = 0.0
+
+@export var wave_angle: float = 45.0
+@export var wave_step: float = 8.0
+
+var wave_rotation: float = -45.0
+var wave_direction: float = 1.0
+
+@export var shotgun_projectiles: int = 6
+@export var shotgun_angle: float = 35.0
+
+@export var alternating_projectiles: int = 5
+@export var alternating_angle: float = 60.0
+@export var alternating_offset: float = 10.0
+
+var alternating_side: float = 1.0
+
+@export var ring_gap_projectiles: int = 16
+@export var ring_gap_size: float = 50.0
+@export var ring_gap_rotation_speed: float = 15.0
+
+var ring_gap_rotation: float = 0.0
 
 @onready var visual: CanvasItem = $Sprite2D
 @onready var health_component: HealthComponent = $Components/HealthComponent
@@ -94,6 +119,29 @@ func configure(stats: Dictionary) -> void:
 		spiral_projectiles = stats.spiral_projectiles
 	if stats.has("spiral_rotation_speed"):
 		spiral_rotation_speed = stats.spiral_rotation_speed
+	if stats.has("wave_angle"):
+		wave_angle = stats.wave_angle
+		wave_rotation = -wave_angle
+	if stats.has("wave_step"):
+		wave_step = stats.wave_step
+	if stats.has("shotgun_projectiles"):
+		shotgun_projectiles = stats.shotgun_projectiles
+	if stats.has("shotgun_angle"):
+		shotgun_angle = stats.shotgun_angle		
+	if stats.has("alternating_projectiles"):
+		alternating_projectiles = stats.alternating_projectiles
+	if stats.has("alternating_angle"):
+		alternating_angle = stats.alternating_angle
+	if stats.has("alternating_offset"):
+		alternating_offset = stats.alternating_offset
+	if stats.has("ring_gap_projectiles"):
+		ring_gap_projectiles = stats.ring_gap_projectiles
+	if stats.has("ring_gap_size"):
+		ring_gap_size = stats.ring_gap_size
+	if stats.has("ring_gap_rotation_speed"):
+		ring_gap_rotation_speed = stats.ring_gap_rotation_speed
+	if stats.has("projectile_scene"):
+		projectile_scene = stats.projectile_scene
 		
 
 func _physics_process(_delta: float) -> void:
@@ -150,10 +198,34 @@ func fire_at_player() -> void:
 		ShotPattern.SPIRAL:
 			fire_spiral()
 
+		ShotPattern.WAVE:
+			fire_wave(direction)
+
+		ShotPattern.SHOTGUN:
+			fire_shotgun(direction)
+
+		ShotPattern.ALTERNATING_SPREAD:
+			fire_alternating_spread(direction)
+			
+		ShotPattern.RING_GAP:
+			fire_ring_gap()
+
 func spawn_projectile(direction: Vector2) -> void:
+	if projectile_scene == null:
+		push_warning(
+			"Enemy has no projectile scene assigned: " + name
+		)
+		return
+
 	var proj: EnemyProjectile = projectile_scene.instantiate()
+
 	get_tree().current_scene.add_child(proj)
-	proj.launch(global_position, direction)
+
+	proj.launch(
+		global_position,
+		direction,
+		projectile_damage
+	)
 
 func fire_single(direction: Vector2) -> void:
 	spawn_projectile(direction)
@@ -204,6 +276,74 @@ func fire_spiral() -> void:
 		spiral_rotation + spiral_rotation_speed,
 		360.0
 	)
+	
+func fire_wave(direction: Vector2) -> void:
+	var bullet_direction := direction.rotated(
+		deg_to_rad(wave_rotation)
+	)
+
+	spawn_projectile(bullet_direction)
+
+	wave_rotation += wave_step * wave_direction
+
+	if wave_rotation >= wave_angle:
+		wave_rotation = wave_angle
+		wave_direction = -1.0
+
+	elif wave_rotation <= -wave_angle:
+		wave_rotation = -wave_angle
+		wave_direction = 1.0
+
+func fire_alternating_spread(direction: Vector2) -> void:
+	if alternating_projectiles <= 1:
+		spawn_projectile(direction)
+		return
+
+	var total_angle := deg_to_rad(alternating_angle)
+	var start_angle := -total_angle / 2.0
+	var step := total_angle / (alternating_projectiles - 1)
+
+	var offset := deg_to_rad(
+		alternating_offset * alternating_side
+	)
+
+	for i in range(alternating_projectiles):
+		var angle := start_angle + step * i + offset
+
+		spawn_projectile(
+			direction.rotated(angle)
+		)
+
+	alternating_side *= -1.0
+
+func fire_ring_gap() -> void:
+	var gap_half_size := ring_gap_size / 2.0
+
+	for i in range(ring_gap_projectiles):
+		var angle_degrees := (
+			360.0 * i / ring_gap_projectiles
+		)
+
+		var relative_angle := wrapf(
+			angle_degrees - ring_gap_rotation,
+			-180.0,
+			180.0
+		)
+
+		# Don't fire bullets inside the gap.
+		if abs(relative_angle) < gap_half_size:
+			continue
+
+		var direction := Vector2.RIGHT.rotated(
+			deg_to_rad(angle_degrees)
+		)
+
+		spawn_projectile(direction)
+
+	ring_gap_rotation = fmod(
+		ring_gap_rotation + ring_gap_rotation_speed,
+		360.0
+	)
 
 func _kite() -> void:
 	if player == null:
@@ -221,6 +361,21 @@ func _kite() -> void:
 		velocity = Vector2.ZERO
 
 	move_and_slide()
+	
+func fire_shotgun(direction: Vector2) -> void:
+	var half_angle := shotgun_angle / 2.0
+
+	for i in range(shotgun_projectiles):
+		var random_angle := randf_range(
+			-half_angle,
+			half_angle
+		)
+
+		var bullet_direction := direction.rotated(
+			deg_to_rad(random_angle)
+		)
+
+		spawn_projectile(bullet_direction)
 
 func _chase() -> void:
 	if player == null:
