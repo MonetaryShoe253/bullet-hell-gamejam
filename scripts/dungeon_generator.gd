@@ -110,6 +110,16 @@ var reserved_cells: Dictionary = {}
 ## RoomController's entry trigger is built from these cells, not room_rect.
 var room_cells: Dictionary = {}
 
+## Every corridor's centreline, as carved: [from, bend, to] in cell space,
+## one entry per _carve_corridor() call (including the stairs room's own
+## corridor). Kept separately from `grid` so a renderer (see minimap.gd) can
+## draw an actual clean path instead of trying to reverse-engineer one from
+## leftover floor cells, which is fragile against every cleanup/doorway-
+## widening pass that can add stray cells near a corridor in unpredictable
+## places - the recorded centreline is exactly what generation intended,
+## whatever the final grid ends up looking like.
+var corridor_paths: Array[PackedVector2Array] = []
+
 ## The leaf partition each entry of `rooms` came from, same order. Needed to
 ## grow the boss room out to fill its partition once the roles are handed out.
 var _room_nodes: Array[BSPNode] = []
@@ -157,6 +167,7 @@ func generate(seed_value: int = -1, level: int = 1) -> void:
 	stairs_room = Rect2i()
 	stairs_cell = Vector2i.ZERO
 	room_cells.clear()
+	corridor_paths.clear()
 	room_plans.clear()
 	room_wall_cells.clear()
 	enemy_spawn_zones.clear()
@@ -1010,6 +1021,7 @@ func _carve_corridor(from: Vector2i, to: Vector2i) -> void:
 	var bend: Vector2i = Vector2i(to.x, from.y) if rng.randf() < 0.5 else Vector2i(from.x, to.y)
 	_carve_line(from, bend)
 	_carve_line(bend, to)
+	corridor_paths.append(PackedVector2Array([Vector2(from), Vector2(bend), Vector2(to)]))
 
 
 func _carve_line(a: Vector2i, b: Vector2i) -> void:
