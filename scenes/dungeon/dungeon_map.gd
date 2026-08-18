@@ -58,84 +58,7 @@ var player: Node2D
 
 const DemonPortalScene := preload("res://scenes/dungeon/demon_portal.tscn")
 
-## Cosmetic clutter scattered across ordinary fight rooms - no collision, just
-## flavor so rooms stop reading as repeats of the same bare arena.
-const DECORATION_PATHS: Array[String] = [
-	"res://assets/Wing/decorations/stacked_chairs.png",
-	"res://assets/Wing/decorations/condiment_station.png",
-	"res://assets/Wing/decorations/jukebox.png",
-	"res://assets/Wing/decorations/potted_plant.png",
-	"res://assets/Wing/decorations/trash_can.png",
-	"res://assets/Wing/decorations/wing_crate.png",
-	"res://assets/Wing/vending_machine.png",
-]
-
-## Extra decorations per NORMAL room theme, mixed in alongside the neutral
-## pool above so a themed room reads as e.g. "the burger room" at a glance
-## while still keeping some baseline diner clutter.
-const THEME_DECORATIONS: Dictionary = {
-	DungeonGenerator.RoomTheme.BURGER: [
-		"res://assets/Wing/decorations/burger_grill.png",
-		"res://assets/Wing/decorations/burger_stack.png",
-	],
-	DungeonGenerator.RoomTheme.TACO: [
-		"res://assets/Wing/decorations/taco_salsa.png",
-		"res://assets/Wing/decorations/taco_tortillas.png",
-	],
-	DungeonGenerator.RoomTheme.PIZZA: [
-		"res://assets/Wing/decorations/pizza_oven.png",
-		"res://assets/Wing/decorations/pizza_boxes.png",
-	],
-}
-
-## Cover the player and enemies can physically hide behind (collision_layer 1,
-## same as walls - blocks movement, line of sight, and bullets for free with
-## no custom scripting). See _scatter_obstacles().
-const OBSTACLE_PATHS: Array[String] = [
-	"res://assets/Wing/obstacles/kitchen_pillar.png",
-	"res://assets/Wing/obstacles/supply_stack.png",
-]
-
-const ShopkeeperTexture := preload("res://assets/Wing/shopkeeper.png")
-const ExplodingBarrelScene := preload("res://scenes/dungeon/exploding_barrel/exploding_barrel.tscn")
-
-## Chance any given NORMAL room gets one of the exploding barrels - favoured
-## heavily per the brief so it shows up as a recurring tool/hazard rather
-## than a rare novelty.
-const BARREL_CHANCE := 0.6
-
-var _decoration_rng := RandomNumberGenerator.new()
-
-
 # --- atlas coordinates (column, row) in the 16px grid ---
-
-## Flat block of (37, 19, 26) - the same near-black baked into the wall tiles.
-const SOLID_ROCK := Vector2i(8, 7)
-
-## Straight wall runs, named for which way the wall faces. A north wall is the
-## one drawn *above* a floor cell, so it is the piece whose full-height brick
-## face you see; a south wall is drawn below the floor and only shows the wall's
-## top capping, with rock below it.
-const NORTH_WALL: Array[Vector2i] = [Vector2i(1, 0), Vector2i(2, 0), Vector2i(3, 0), Vector2i(4, 0)]
-const SOUTH_WALL: Array[Vector2i] = [Vector2i(1, 4), Vector2i(2, 4), Vector2i(3, 4), Vector2i(4, 4),
-		Vector2i(1, 5), Vector2i(2, 5)]
-const WEST_WALL: Array[Vector2i] = [Vector2i(0, 0), Vector2i(0, 1), Vector2i(0, 2), Vector2i(0, 3)]
-const EAST_WALL: Array[Vector2i] = [Vector2i(5, 0), Vector2i(5, 1), Vector2i(5, 2), Vector2i(5, 3)]
-
-## Convex corners - the outside of a bend, with floor only on the named diagonal.
-## These double as the plain wall runs' end caps, which is why CONVEX_NW and
-## WEST_WALL[0] are the same tile.
-const CONVEX_NW := Vector2i(0, 0)
-const CONVEX_NE := Vector2i(5, 0)
-const CONVEX_SW := Vector2i(0, 4)
-const CONVEX_SE := Vector2i(5, 4)
-
-## Concave corners - the inside of a bend, with floor on two perpendicular sides.
-## The artist only drew the two that sit below floor: a wall cap running east or
-## west with the side wall's post attached. _wall_atlas_coords() explains what
-## happens for the other two.
-const CONCAVE_NW: Array[Vector2i] = [Vector2i(0, 5), Vector2i(4, 5)]  # floor to the north and west
-const CONCAVE_NE: Array[Vector2i] = [Vector2i(3, 5), Vector2i(5, 5)]  # floor to the north and east
 
 ## Props marking out the special rooms, drawn on PropLayer above the floor.
 ## Every one of these has a transparent background in the atlas, so it sits on
@@ -156,6 +79,8 @@ const WEST := Vector2i(-1, 0)
 
 var _generator: DungeonGenerator
 var _spawner: EnemySpawner
+var _renderer: DungeonRenderer
+var _decorator: DungeonDecorator
 var _room_controllers: Array[RoomController] = []
 var _stairs_trigger: Area2D
 var _shop_trigger: Area2D
@@ -215,18 +140,16 @@ func _clear_level_entities() -> void:
 
 	# Godot uniquifies sibling names ("DemonPortal", "DemonPortal2", ...) since
 	# there can be several, so match by prefix rather than tracking an array.
-	# Decorations/obstacles/barrels are named "Decoration" wherever they live
-	# (self for cosmetic sprites, gameplay_layer for anything with collision -
-	# see _spawn_decoration()/_spawn_obstacle()/_spawn_barrel()), so both
-	# parents need the same sweep; the player is gameplay_layer's only other
-	# child and doesn't match either prefix.
+	# Decorations/barrels are named "Decoration" wherever they live. Cosmetic
+	# sprites are children of this node and barrels live in gameplay_layer, so
+	# both parents need the sweep; permanent cover is TileMap wall geometry now.
+	# The player is gameplay_layer's only other child and does not match.
 	for child in get_children():
 		if child.name.begins_with("DemonPortal") or child.name.begins_with("Decoration"):
 			child.queue_free()
 	for child in gameplay_layer.get_children():
 		if child.name.begins_with("Decoration"):
 			child.queue_free()
-	_occupied_cells.clear()
 
 	boss_health_bar.visible = false
 
@@ -237,18 +160,17 @@ func generate_dungeon() -> void:
 	_generator = DungeonGenerator.new()
 	_generator.map_size = map_size
 
-	_generator.generate(-1 if use_random_seed else fixed_seed)
+	_generator.generate(-1 if use_random_seed else fixed_seed, GameState.level)
 
+	_renderer = DungeonRenderer.new(tile_layer, tile_source_id, map_size, void_margin)
+	_decorator = DungeonDecorator.new(self, tile_layer, gameplay_layer)
 	_paint(_generator)
 
 	_spawn_player()
 	_spawner = EnemySpawner.new(gameplay_layer, tile_layer, player)
 
 	_setup_rooms(_generator)
-	_scatter_obstacles(_generator)
-	_scatter_decorations(_generator)
-	_scatter_barrels(_generator)
-	_spawn_shopkeeper(_generator)
+	_decorator.scatter(_generator)
 
 	_spawn_shop_trigger()
 	
@@ -278,228 +200,6 @@ func _setup_rooms(gen: DungeonGenerator) -> void:
 		rc.player_entered.connect(_on_room_player_entered)
 		rc.all_enemies_cleared.connect(_on_room_cleared)
 		_room_controllers.append(rc)
-
-
-## Cells any scatter pass (obstacles/decorations/barrels) has already claimed
-## this generation, keyed by room - shared across all three so they never
-## stack on the same tile. Obstacles run first (see _scatter_obstacles()) so
-## cover always wins the spot; decorations and barrels then work around it.
-var _occupied_cells: Dictionary = {}
-
-
-## Cover the player and enemies can physically hide behind - a StaticBody2D
-## on the same physics layer as the tileset's walls, so it blocks movement,
-## enemy sightlines (PlayerSight already masks in that layer) and both
-## projectile types for free, no custom scripting needed. Cell positions come
-## from the generator itself (gen.obstacle_cells) rather than being rolled
-## here, since it already knows which rooms/spots are safe once the grid is
-## finished; this only turns that data into nodes.
-func _scatter_obstacles(gen: DungeonGenerator) -> void:
-	_decoration_rng.seed = gen.seed_used
-	_occupied_cells.clear()
-	for room: Rect2i in gen.obstacle_cells:
-		var placed: Array[Vector2i] = []
-		placed.assign(_occupied_cells.get(room, []))
-		for cell: Vector2i in gen.obstacle_cells[room]:
-			var path: String = OBSTACLE_PATHS[_decoration_rng.randi_range(0, OBSTACLE_PATHS.size() - 1)]
-			_spawn_obstacle(load(path), cell)
-			placed.append(cell)
-		_occupied_cells[room] = placed
-
-
-## Cosmetic clutter (no collision) scattered across ordinary fight rooms so
-## they read as distinct, fully-themed spaces instead of repeats of the same
-## bare arena. Start/shop/boss already get their own hand-placed dressing via
-## _decorate_start()/_decorate_shop()/_decorate_boss(), so this only touches
-## NORMAL rooms. Plain Sprite2D children rather than PropLayer tiles - these
-## art pieces don't live in Dungeon_Tileset.png's atlas.
-func _scatter_decorations(gen: DungeonGenerator) -> void:
-	for room: Rect2i in gen.rooms:
-		if gen.kind_of(room) == DungeonGenerator.RoomKind.NORMAL:
-			_scatter_room(gen, room)
-
-
-## Lines the room's actual silhouette with decorations - reading straight off
-## the grid (via _classify_room_cells()) rather than assuming a plain
-## rectangle, so this works the same for an L-shaped or indented room as a
-## square one - then adds interior clutter scaled to floor area on top. The
-## pool is weighted heavily toward the room's own theme (3:1 against the
-## neutral pool) so a room reads as "the burger room" at a glance rather than
-## a random assortment.
-func _scatter_room(gen: DungeonGenerator, room: Rect2i) -> void:
-	if room.size.x < 6 or room.size.y < 6:
-		return  # too small for wall-lining to read as anything but clutter
-
-	var theme: DungeonGenerator.RoomTheme = gen.theme_of(room)
-	var pool: Array = []
-	for i in 3:
-		pool.append_array(THEME_DECORATIONS.get(theme, []))
-	pool.append_array(DECORATION_PATHS)
-
-	var cells: Dictionary = _classify_room_cells(gen, room)
-
-	# The sides of the room, densely - this is the main "10x more
-	# decorations" density lever. Spacing (not per-cell chance) is what
-	# actually controls the count here: a chance-only roll scales with
-	# perimeter length, which swings wildly between a small room and a huge
-	# arena, so a flat 80%-and-6-cells-apart reads as "lined" at any size
-	# instead of "fine on a small room, hundreds deep on a big one".
-	for cell: Vector2i in _claim_from_candidates(room, cells.wall, 0.8, 6):
-		_spawn_decoration(load(pool[_decoration_rng.randi_range(0, pool.size() - 1)]), cell)
-
-	# Interior clutter too, so a big arena doesn't stay empty in the middle
-	# once the walls are dressed - same spacing-led approach, just sparser.
-	for cell: Vector2i in _claim_from_candidates(room, cells.interior, 0.5, 9):
-		_spawn_decoration(load(pool[_decoration_rng.randi_range(0, pool.size() - 1)]), cell)
-
-
-## One exploding barrel in most rooms - favoured heavily (BARREL_CHANCE) per
-## the brief so it's a recurring tool/hazard, not a rare novelty.
-func _scatter_barrels(gen: DungeonGenerator) -> void:
-	for room: Rect2i in gen.rooms:
-		if gen.kind_of(room) != DungeonGenerator.RoomKind.NORMAL:
-			continue
-		if _decoration_rng.randf() >= BARREL_CHANCE:
-			continue
-		var cells: Dictionary = _classify_room_cells(gen, room)
-		var candidates: Array[Vector2i] = cells.interior if not cells.interior.is_empty() else cells.wall
-		var claimed: Array[Vector2i] = _claim_from_candidates(room, candidates, 1.0, 5)
-		if not claimed.is_empty():
-			_spawn_barrel(claimed[0])
-
-
-## Every floor cell in `room`, split into cells touching a non-floor
-## neighbour ("wall", i.e. hugging the room's actual silhouette - an L-shape
-## or an indent both fall out of this correctly since it reads the grid, not
-## a bounding-rect assumption) versus the rest ("interior"), with anything
-## within 2 cells of a doorway excluded from both so props never block or
-## crowd an entrance.
-func _classify_room_cells(gen: DungeonGenerator, room: Rect2i) -> Dictionary:
-	var door_cells: Array[Vector2i] = []
-	for span: Array in gen.get_room_exits(room):
-		door_cells.append_array(span)
-
-	var wall_cells: Array[Vector2i] = []
-	var interior_cells: Array[Vector2i] = []
-	for x in range(room.position.x, room.end.x):
-		for y in range(room.position.y, room.end.y):
-			var cell := Vector2i(x, y)
-			if not gen.grid.has(cell):
-				continue
-			if _near_any(cell, door_cells, 2):
-				continue
-			var touches_wall := false
-			for offset: Vector2i in [Vector2i(1, 0), Vector2i(-1, 0), Vector2i(0, 1), Vector2i(0, -1)]:
-				if not gen.grid.has(cell + offset):
-					touches_wall = true
-					break
-			if touches_wall:
-				wall_cells.append(cell)
-			else:
-				interior_cells.append(cell)
-	return {"wall": wall_cells, "interior": interior_cells}
-
-
-func _near_any(cell: Vector2i, others: Array[Vector2i], radius: int) -> bool:
-	var radius_sq: int = radius * radius
-	for other: Vector2i in others:
-		if cell.distance_squared_to(other) <= radius_sq:
-			return true
-	return false
-
-
-## Rolls each of `candidates` independently at `take_chance`, skipping
-## anything within `min_spacing` of a cell an earlier pass this generation
-## already claimed (see _occupied_cells) so props never stack on the same
-## tile. Order-independent by design - candidates is typically already in
-## grid-scan order, not shuffled, since shuffling would need Godot's global
-## RNG and break the "same seed, same layout" guarantee the rest of the
-## generator relies on.
-func _claim_from_candidates(room: Rect2i, candidates: Array[Vector2i], take_chance: float, min_spacing: int) -> Array[Vector2i]:
-	var placed: Array[Vector2i] = []
-	placed.assign(_occupied_cells.get(room, []))
-	var claimed: Array[Vector2i] = []
-
-	for cell: Vector2i in candidates:
-		if _decoration_rng.randf() >= take_chance:
-			continue
-		if _near_any(cell, placed, min_spacing):
-			continue
-		placed.append(cell)
-		claimed.append(cell)
-
-	_occupied_cells[room] = placed
-	return claimed
-
-
-## A shopkeeper standing at the shop's counter, just behind the wares
-## _decorate_shop() already lays out on the floor there.
-func _spawn_shopkeeper(gen: DungeonGenerator) -> void:
-	var room: Rect2i = gen.shop_room
-	if room.size == Vector2i.ZERO:
-		return
-
-	var middle: Vector2i = room.position + room.size / 2
-	var cell: Vector2i = middle + Vector2i(0, -2)
-	if room.has_point(cell) and gen.grid.has(cell):
-		_spawn_decoration(ShopkeeperTexture, cell)
-
-
-## Floor clutter only - no collision, and z_index -1 keeps it under the
-## floor's own default-z sprites (player, enemies, projectiles) regardless of
-## sibling/add order, since a plain Sprite2D here isn't part of
-## gameplay_layer's y-sort group.
-func _spawn_decoration(texture: Texture2D, cell: Vector2i) -> void:
-	var sprite := Sprite2D.new()
-	sprite.name = "Decoration"
-	sprite.texture = texture
-	sprite.texture_filter = 1
-	sprite.z_index = -1
-	sprite.position = tile_layer.map_to_local(cell)
-	# force_readable_name=true: without it, add_child() resolves a name
-	# collision (guaranteed here - there are dozens of these per dungeon now)
-	# with an illegible "@Sprite2D@43"-style internal name instead of
-	# "Decoration2", and _clear_level_entities()'s begins_with() sweep misses
-	# it entirely - decorations silently piling up across level transitions
-	# instead of being cleared. Same reasoning applies to every add_child()
-	# below that names a node for that sweep to find.
-	add_child(sprite, true)
-
-
-## Cover: a StaticBody2D on the tileset's own wall physics layer, so it blocks
-## movement/sightlines/bullets exactly like a wall with zero extra scripting.
-## Lives in gameplay_layer (y-sort) so the player and enemies can actually be
-## occluded by - and hide behind - a tall pillar instead of it always
-## drawing in front or behind by luck of add order.
-func _spawn_obstacle(texture: Texture2D, cell: Vector2i) -> void:
-	var body := StaticBody2D.new()
-	body.name = "Decoration"  # reuses _clear_level_entities()'s prefix sweep
-	body.collision_layer = 1
-	body.collision_mask = 0
-	body.position = tile_layer.map_to_local(cell)
-	gameplay_layer.add_child(body, true)
-
-	var shape := CollisionShape2D.new()
-	var rect := RectangleShape2D.new()
-	rect.size = Vector2(20, 20)
-	shape.shape = rect
-	body.add_child(shape)
-
-	var sprite := Sprite2D.new()
-	sprite.texture = texture
-	sprite.texture_filter = 1
-	# Anchor the sprite's *base* to the collider so a tall pillar's sprite
-	# extends upward from where it physically stands, matching where the
-	# y-sort actually occludes from.
-	sprite.offset = Vector2(0, -texture.get_height() / 2.0 + 8.0)
-	body.add_child(sprite)
-
-
-func _spawn_barrel(cell: Vector2i) -> void:
-	var barrel := ExplodingBarrelScene.instantiate()
-	barrel.name = "Decoration"  # reuses _clear_level_entities()'s prefix sweep
-	barrel.position = tile_layer.map_to_local(cell)
-	gameplay_layer.add_child(barrel, true)
 
 
 func _on_room_player_entered(rc: RoomController) -> void:
@@ -635,27 +335,10 @@ func _advance_level() -> void:
 
 
 func _paint(gen: DungeonGenerator) -> void:
-	tile_layer.clear()
-
-	# Solid rock first, then the wall ring, then floor. Later passes overwrite
-	# earlier ones, so each cell ends up with the most specific piece that fits.
-	var filled := Rect2i(Vector2i.ZERO, map_size).grow(void_margin)
-	for y in range(filled.position.y, filled.end.y):
-		for x in range(filled.position.x, filled.end.x):
-			tile_layer.set_cell(Vector2i(x, y), tile_source_id, SOLID_ROCK)
-
-	for cell: Vector2i in gen.get_wall_cells():
-		tile_layer.set_cell(cell, tile_source_id, _wall_atlas_coords(cell, gen.grid))
-
-	for cell: Vector2i in gen.grid:
-		tile_layer.set_cell(cell, tile_source_id, _floor_atlas_coords(cell, gen.grid))
-
+	_renderer.paint(gen)
 	_paint_props(gen)
 
 
-## Marks out the three special rooms. Nothing here changes the dungeon - it only
-## makes the roles the generator assigned visible at a glance, both for playing
-## and for checking a screenshot.
 func _paint_props(gen: DungeonGenerator) -> void:
 	prop_layer.clear()
 	if not show_room_props:
@@ -779,82 +462,3 @@ func _set_prop(gen: DungeonGenerator, room: Rect2i, cell: Vector2i, atlas: Vecto
 func _set_wall_prop(gen: DungeonGenerator, cell: Vector2i, atlas: Vector2i) -> void:
 	if not gen.grid.has(cell) and gen.grid.has(cell + SOUTH):
 		prop_layer.set_cell(cell, tile_source_id, atlas)
-
-
-func _floor_atlas_coords(cell: Vector2i, grid: Dictionary) -> Vector2i:
-	var wall_n: bool = not grid.has(cell + NORTH)
-	var wall_s: bool = not grid.has(cell + SOUTH)
-	var wall_w: bool = not grid.has(cell + WEST)
-	var wall_e: bool = not grid.has(cell + EAST)
-
-	# Rows 1/2/3 carry north-edge shading, no shading, and south-edge shading;
-	# columns 1/2-3/4 do the same for west and east. A cell walled on both
-	# opposite sides can only show one of them - the generator's cleanup makes
-	# floor at least three cells thick, so in practice this never comes up.
-	var row: int = 2
-	if wall_n and not wall_s:
-		row = 1
-	elif wall_s and not wall_n:
-		row = 3
-
-	var col: int = 2 + _variant_index(cell, 2)  # two interchangeable interior variants
-	if wall_w and not wall_e:
-		col = 1
-	elif wall_e and not wall_w:
-		col = 4
-
-	return Vector2i(col, row)
-
-
-func _wall_atlas_coords(cell: Vector2i, grid: Dictionary) -> Vector2i:
-	var n: bool = grid.has(cell + NORTH)
-	var s: bool = grid.has(cell + SOUTH)
-	var e: bool = grid.has(cell + EAST)
-	var w: bool = grid.has(cell + WEST)
-
-	# Concave corners before straight runs: a cell with floor on two
-	# perpendicular sides needs the piece that turns, not either straight wall.
-	if n and w:
-		return _variant(cell, CONCAVE_NW)
-	if n and e:
-		return _variant(cell, CONCAVE_NE)
-
-	# The mirrored pair (floor to the south plus floor to one side) has no art.
-	# A north wall is a full-tile-tall brick face, which leaves no room to also
-	# draw the side wall's post the way the south-facing corners do. Falling
-	# through to the plain north wall is the right call: the face is the loud
-	# part of the silhouette, and the floor beside it supplies its own edge
-	# shading, so the corner still reads as a corner.
-	if s:
-		return _variant(cell, NORTH_WALL)
-	if n:
-		return _variant(cell, SOUTH_WALL)
-	if e:
-		return _variant(cell, WEST_WALL)
-	if w:
-		return _variant(cell, EAST_WALL)
-
-	# No orthogonal floor left, so this is the outside of a bend. Cleanup
-	# guarantees at most one diagonal touches floor, making the choice unambiguous.
-	if grid.has(cell + Vector2i(1, 1)):
-		return CONVEX_NW
-	if grid.has(cell + Vector2i(-1, 1)):
-		return CONVEX_NE
-	if grid.has(cell + Vector2i(1, -1)):
-		return CONVEX_SW
-	if grid.has(cell + Vector2i(-1, -1)):
-		return CONVEX_SE
-
-	return SOLID_ROCK
-
-
-## Picks between interchangeable variants of the same piece. Hashing the cell
-## rather than pulling from an RNG keeps the choice stable: repainting the same
-## grid gives the same picture, whatever order the cells come out of the dictionary.
-func _variant(cell: Vector2i, options: Array[Vector2i]) -> Vector2i:
-	return options[_variant_index(cell, options.size())]
-
-
-func _variant_index(cell: Vector2i, count: int) -> int:
-	var hash_value: int = (cell.x * 73856093) ^ (cell.y * 19349663)
-	return (hash_value & 0x7fffffff) % count

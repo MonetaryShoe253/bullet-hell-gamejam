@@ -1,106 +1,14 @@
 class_name EnemySpawner
 extends RefCounted
-## Decides how many enemies, of what type, and where, for a room - and scales
-## their stats to the current GameState.level. One instance per dungeon.
-
-const SlimeScene := preload("res://scenes/enemies/slime/slime.tscn")
-const BurgerScene := preload("res://scenes/enemies/burger/burger.tscn")
-const TacoScene := preload("res://scenes/enemies/taco/taco.tscn")
-const PizzaScene := preload("res://scenes/enemies/pizza/pizza.tscn")
-
-## Three palette variants of the same slime sprite - only the tint changes
-## visually (per the brief, that's enough for now); health/damage/speed/
-## reward differ so they read as different threats in a fight. Mixed in
-## alongside the themed variant below so a themed room doesn't read as one
-## single reskinned copy repeated - see _pick_variant().
-const SLIME_TYPES: Array[Dictionary] = [
-	{
-		"scene": SlimeScene,
-		"color": Color(1, 1, 1, 1),
-		"health": 18.0,
-		"damage": 4.0,
-		"move_speed": 90.0,
-		"fire_rate": 0.8,
-		"money_reward": 4,
-		"shot_pattern": Enemy.ShotPattern.SINGLE,
-		"movement_pattern": Enemy.MovementPattern.CHASE
-	},
-	{
-		"scene": SlimeScene,
-		"color": Color(0.35, 0.65, 1.0, 1),
-		"health": 12.0,
-		"damage": 3.0,
-		"move_speed": 150.0,
-		"fire_rate": 0.5,
-		"money_reward": 5,
-		"shot_pattern": Enemy.ShotPattern.BURST,
-		"movement_pattern": Enemy.MovementPattern.STRAFE
-	},
-	{
-		"scene": SlimeScene,
-		"color": Color(1.0, 0.35, 0.35, 1),
-		"health": 32.0,
-		"damage": 7.0,
-		"move_speed": 55.0,
-		"fire_rate": 1.0,
-		"money_reward": 7,
-		"shot_pattern": Enemy.ShotPattern.SPREAD,
-		"movement_pattern": Enemy.MovementPattern.BOUNCE
-	},
-]
-
-## One stat profile per competitor food-stand theme - each already has its
-## own distinct sprite/projectile (see the scene files), so unlike the slime
-## palette these don't need color variants to read as different threats.
-const THEMED_TYPES: Dictionary = {
-	DungeonGenerator.RoomTheme.BURGER: {
-		"scene": BurgerScene,
-		"health": 22.0,
-		"damage": 5.0,
-		"move_speed": 80.0,
-		"fire_rate": 1.1,
-		"money_reward": 5,
-		"shot_pattern": Enemy.ShotPattern.SPREAD,
-		"movement_pattern": Enemy.MovementPattern.CHASE,
-	},
-	DungeonGenerator.RoomTheme.TACO: {
-		"scene": TacoScene,
-		"health": 14.0,
-		"damage": 4.0,
-		"move_speed": 140.0,
-		"fire_rate": 0.9,
-		"money_reward": 5,
-		"shot_pattern": Enemy.ShotPattern.BURST,
-		"movement_pattern": Enemy.MovementPattern.STRAFE,
-	},
-	DungeonGenerator.RoomTheme.PIZZA: {
-		"scene": PizzaScene,
-		"health": 18.0,
-		"damage": 4.5,
-		"move_speed": 100.0,
-		"fire_rate": 1.0,
-		"money_reward": 5,
-		"shot_pattern": Enemy.ShotPattern.SINGLE,
-		"movement_pattern": Enemy.MovementPattern.KITE,
-	},
-}
-
-const BOSS_STATS: Dictionary = {
-	"scene": SlimeScene,
-	"color": Color(0.75, 0.3, 0.95, 1),
-	"health": 220.0,
-	"damage": 12.0,
-	"move_speed": 70.0,
-	"fire_rate": 0.2,
-	"money_reward": 60,
-	"scale": 2.4,
-	"shot_pattern": Enemy.ShotPattern.CIRCLE,
-}
+## Creates waves from a simple threat budget and places enemies in the tactical
+## zones produced by RoomGenerator.
 
 var _parent: Node
 var _tile_layer: TileMapLayer
 var _player: Node2D
 var _rng := RandomNumberGenerator.new()
+var _wave_index_by_room: Dictionary = {}
+var _budget_by_room: Dictionary = {}
 
 
 func _init(parent: Node, tile_layer: TileMapLayer, player: Node2D) -> void:
@@ -110,107 +18,166 @@ func _init(parent: Node, tile_layer: TileMapLayer, player: Node2D) -> void:
 	_rng.randomize()
 
 
-## Fills a normal fight room with a wave of enemies matching its theme (mixed
-## with a few generic slimes for variety), spread across its floor. Rooms
-## sometimes get 2-3 waves instead of 1 - the next wave only spawns once the
-## room controller sees the current one fully dead (see
-## RoomController.waves_remaining/spawn_next_wave), and the room only
-## unlocks after the last wave.
 func spawn_room(gen: DungeonGenerator, room: Rect2i, room_controller: RoomController) -> void:
-	var wave_count := _roll_wave_count()
+	_wave_index_by_room[room] = 0
+	var room_data: Dictionary = gen.plan_of(room)
+	var difficulty := float(room_data.get("difficulty", 1.0))
+	var budget := (5.0 + float(GameState.level) * 1.15) * difficulty
+	_budget_by_room[room] = budget
+
+	var wave_count := _roll_wave_count(budget)
 	room_controller.waves_remaining = wave_count - 1
-	room_controller.spawn_next_wave = func() -> void: _spawn_wave(gen, room, room_controller)
-	_spawn_wave(gen, room, room_controller)
+	room_controller.spawn_next_wave = func() -> void: _spawn_wave(gen, room, room_controller, wave_count)
+	_spawn_wave(gen, room, room_controller, wave_count)
 
 
-## Mostly a single wave; sometimes two, rarely three - "some rooms should
-## have multiple waves" reads as an occasional escalation, not the norm.
-func _roll_wave_count() -> int:
+func _roll_wave_count(budget: float) -> int:
 	var roll := _rng.randf()
-	if roll < 0.55:
-		return 1
-	if roll < 0.85:
+	var three_chance := clampf((budget - 14.0) * 0.012, 0.0, 0.15)
+	var two_chance := clampf(0.18 + budget * 0.015, 0.18, 0.48)
+	if roll < three_chance:
+		return 3
+	if roll < three_chance + two_chance:
 		return 2
-	return 3
+	return 1
 
 
-func _spawn_wave(gen: DungeonGenerator, room: Rect2i, room_controller: RoomController) -> void:
-	var theme: DungeonGenerator.RoomTheme = gen.theme_of(room)
-	var count: int = _rng.randi_range(5, 8) + int(GameState.level / 2)
-	count = mini(count, 12)
+func _spawn_wave(gen: DungeonGenerator, room: Rect2i, room_controller: RoomController, total_waves: int) -> void:
+	var wave_index: int = _wave_index_by_room.get(room, 0)
+	var total_budget: float = _budget_by_room.get(room, 6.0)
+	var wave_budget := total_budget / float(maxi(total_waves, 1))
+	wave_budget *= 0.9 + float(wave_index) * 0.15
 
-	var exclude: Array = gen.obstacle_cells.get(room, [])
-	for i in count:
-		var variant: Dictionary = _pick_variant(theme)
-		var cell := _random_room_cell(gen, room, exclude)
-		_spawn(variant, cell, room_controller, Callable())
+	var composition := _build_composition(gen.theme_of(room), wave_budget)
+	var exclude: Array = []
+	var used: Array[Vector2i] = []
+	for definition: Dictionary in composition:
+		var cell := _spawn_cell(gen, room, definition, wave_index, exclude, used)
+		used.append(cell)
+		_spawn(definition, cell, room_controller)
 
-
-## Themed enemy most of the time (reads as "the burger room's enemies"), with
-## a plain slime mixed in for variety so a themed room isn't one sprite
-## copy-pasted across the whole fight.
-func _pick_variant(theme: DungeonGenerator.RoomTheme) -> Dictionary:
-	if THEMED_TYPES.has(theme) and _rng.randf() < 0.7:
-		return THEMED_TYPES[theme]
-	return SLIME_TYPES[_rng.randi_range(0, SLIME_TYPES.size() - 1)]
+	_wave_index_by_room[room] = wave_index + 1
 
 
-## The boss room gets one big, tough slime instead of a crowd. on_spawned, if
-## given, is called with the actual Enemy once it exists (spawning is
-## deferred - see _spawn()) so callers like the boss health bar can hook up
-## to it without knowing about that delay themselves.
+func _build_composition(theme: DungeonGenerator.RoomTheme, budget: float) -> Array[Dictionary]:
+	var pool := EnemyCatalog.eligible(GameState.level, theme)
+	var result: Array[Dictionary] = []
+	var remaining := budget
+	var attempts := 0
+
+	while remaining >= 0.8 and result.size() < 14 and attempts < 40:
+		attempts += 1
+		var affordable: Array[Dictionary] = []
+		for definition: Dictionary in pool:
+			if float(definition.get("cost", 1.0)) <= remaining + 0.2:
+				affordable.append(definition)
+		if affordable.is_empty():
+			break
+
+		var picked := _weighted_pick(affordable, theme)
+		result.append(picked)
+		remaining -= float(picked.get("cost", 1.0))
+
+	if result.is_empty() and not pool.is_empty():
+		result.append(_cheapest(pool))
+	return result
+
+
+func _weighted_pick(pool: Array[Dictionary], theme: DungeonGenerator.RoomTheme) -> Dictionary:
+	var total := 0.0
+	for definition: Dictionary in pool:
+		var weight := float(definition.get("weight", 1.0))
+		if definition.get("theme", DungeonGenerator.RoomTheme.NONE) == theme:
+			weight *= 1.7
+		total += weight
+
+	var roll := _rng.randf() * total
+	for definition: Dictionary in pool:
+		var weight := float(definition.get("weight", 1.0))
+		if definition.get("theme", DungeonGenerator.RoomTheme.NONE) == theme:
+			weight *= 1.7
+		roll -= weight
+		if roll <= 0.0:
+			return definition
+	return pool[-1]
+
+
+func _cheapest(pool: Array[Dictionary]) -> Dictionary:
+	var result := pool[0]
+	for definition: Dictionary in pool:
+		if float(definition.get("cost", 1.0)) < float(result.get("cost", 1.0)):
+			result = definition
+	return result
+
+
+func _spawn_cell(gen: DungeonGenerator, room: Rect2i, definition: Dictionary, wave_index: int, exclude: Array, used: Array[Vector2i]) -> Vector2i:
+	var zones: Array = gen.enemy_spawn_zones.get(room, [])
+	if zones.is_empty():
+		return _random_room_cell(gen, room, exclude + used)
+
+	var preferred: Array[String] = []
+	var role: EnemyCatalog.SpawnRole = definition.get("role", EnemyCatalog.SpawnRole.ANY)
+	match role:
+		EnemyCatalog.SpawnRole.FRONTLINE:
+			preferred = ["centre", "north", "south", "west", "east"]
+		EnemyCatalog.SpawnRole.BACKLINE:
+			preferred = ["north", "south", "west", "east", "centre"]
+		EnemyCatalog.SpawnRole.FLANKER:
+			preferred = ["west", "east", "north", "south", "centre"]
+		_:
+			preferred = ["north", "south", "west", "east", "centre"]
+
+	# Rotate directional preference between waves so reinforcements do not always
+	# enter from the same side.
+	if preferred.size() > 1:
+		for _i in wave_index % mini(4, preferred.size()):
+			preferred.append(preferred.pop_front())
+
+	for name: String in preferred:
+		for zone: Dictionary in zones:
+			if zone.get("name", "") != name:
+				continue
+			var valid: Array[Vector2i] = []
+			for cell: Vector2i in zone.get("cells", []):
+				if not exclude.has(cell) and not used.has(cell):
+					valid.append(cell)
+			if not valid.is_empty():
+				return valid[_rng.randi_range(0, valid.size() - 1)]
+
+	return _random_room_cell(gen, room, exclude + used)
+
+
 func spawn_boss(room: Rect2i, room_controller: RoomController, on_spawned: Callable = Callable()) -> void:
-	var cell: Vector2i = room.position + room.size / 2
-	_spawn(BOSS_STATS, cell, room_controller, on_spawned)
+	_spawn(EnemyCatalog.BOSS_STATS, room.position + room.size / 2, room_controller, on_spawned)
 
 
-## Random floor cell inside `room`, away from its edges/doorways, that isn't
-## already sitting on a cover obstacle - `exclude` is
-## gen.obstacle_cells.get(room, []), so an enemy never spawns wedged inside a
-## pillar's collider.
 func _random_room_cell(gen: DungeonGenerator, room: Rect2i, exclude: Array = []) -> Vector2i:
 	var margin := 4
 	if room.size.x <= margin * 2 or room.size.y <= margin * 2:
 		return room.position + room.size / 2
-
-	for attempt in 20:
-		var c := Vector2i(
-				_rng.randi_range(room.position.x + margin, room.end.x - margin),
-				_rng.randi_range(room.position.y + margin, room.end.y - margin))
-		if gen.grid.has(c) and not exclude.has(c):
-			return c
+	for _attempt in 20:
+		var cell := Vector2i(
+			_rng.randi_range(room.position.x + margin, room.end.x - margin),
+			_rng.randi_range(room.position.y + margin, room.end.y - margin)
+		)
+		if gen.grid.has(cell) and not exclude.has(cell):
+			return cell
 	return room.position + room.size / 2
 
 
-## Spawning happens in response to the room's trigger Area2D firing
-## body_entered, which is itself dispatched while the physics server is mid-
-## flush - adding a whole new physics-enabled subtree (collision shapes,
-## RayCast2D, the hurtbox Area2D) synchronously in that window trips Godot's
-## "can't change this state while flushing queries" guard. Deferring the
-## add_child (and everything that depends on its @onready refs) to the next
-## idle frame sidesteps that entirely.
-func _spawn(
-	base_stats: Dictionary,
-	cell: Vector2i,
-	room_controller: RoomController,
-	on_spawned: Callable = Callable()
-) -> void:
-	var scene: PackedScene = base_stats.get("scene", SlimeScene)
+func _spawn(base_stats: Dictionary, cell: Vector2i, room_controller: RoomController, on_spawned: Callable = Callable()) -> void:
+	var scene: PackedScene = base_stats.get("scene", EnemyCatalog.SlimeScene)
 	var enemy: Enemy = scene.instantiate()
-
 	enemy.player = _player
 	enemy.position = _tile_layer.map_to_local(cell)
-
 	var stats := _scaled(base_stats)
 	var parent := _parent
 
 	(func() -> void:
 		parent.add_child(enemy)
 		enemy.configure(stats)
-
 		if room_controller:
 			room_controller.register_enemy(enemy)
-
 		if on_spawned.is_valid():
 			on_spawned.call(enemy)
 	).call_deferred()

@@ -37,7 +37,9 @@ var map_size := Vector2i(260, 180)
 var min_partition_size := 48      # keep this >= min_room_size + padding*2 + a margin
 var min_room_size := 24           # bullet-hell arenas want generous space, not tiny rooms
 var room_padding := 5           # gap between a room and its partition edge
-var corridor_width := 5           # wide enough to dodge while transitioning rooms
+var corridor_width := 5           # main corridor body width
+var min_doorway_width := 7        # openings into rooms are widened to this many floor cells
+var doorway_throat_depth := 3     # widen a few cells both inside and outside the room edge
 
 ## The start room is deliberately small and cozy rather than arena-sized -
 ## shrunk down from whatever _create_rooms() rolled for it once its identity
@@ -79,11 +81,22 @@ var room_adjacency: Dictionary = {}
 ## Rect2i -> RoomTheme, NORMAL rooms only. See RoomTheme.
 var room_themes: Dictionary = {}
 
-## Rect2i -> Array[Vector2i], cover-obstacle (pillar/crate stack) spots per
-## NORMAL room. Decided here rather than by the renderer since this is the
-## only place that knows the *final* grid - the renderer just turns these
-## into StaticBody2D nodes (see dungeon_map.gd's _scatter_obstacles()).
-var obstacle_cells: Dictionary = {}
+## Rect2i -> Array[Vector2i], floor cells removed by RoomGenerator to make
+## permanent internal wall structures. These are metadata/debug data only; the
+## actual collision/visuals come from the TileMap because the cells are absent
+## from grid.
+var room_wall_cells: Dictionary = {}
+
+## Rect2i -> Dictionary. Procedural combat data for each NORMAL room.
+var room_plans: Dictionary = {}
+
+## Rect2i -> Array[Dictionary]. Each entry is {"name": String, "cells": Array[Vector2i]}.
+## EnemySpawner uses these instead of choosing arbitrary floor cells.
+var enemy_spawn_zones: Dictionary = {}
+
+## Rect2i -> Array[Vector2i]. Cells deliberately kept clear around entrances,
+## exits and the room centre so generated cover never creates cheap choke points.
+var reserved_cells: Dictionary = {}
 
 ## Rect2i -> Array[Vector2i], each room's actual floor cells - captured right
 ## after _vary_room_shapes() but *before* _connect_rooms() carves corridors,
@@ -133,7 +146,7 @@ class BSPNode:
 		return left == null and right == null
 
 
-func generate(seed_value: int = -1) -> void:
+func generate(seed_value: int = -1, level: int = 1) -> void:
 	grid.clear()
 	rooms.clear()
 	_room_nodes.clear()
@@ -144,6 +157,10 @@ func generate(seed_value: int = -1) -> void:
 	stairs_room = Rect2i()
 	stairs_cell = Vector2i.ZERO
 	room_cells.clear()
+	room_plans.clear()
+	room_wall_cells.clear()
+	enemy_spawn_zones.clear()
+	reserved_cells.clear()
 	seed_used = seed_value if seed_value >= 0 else randi()
 	rng.seed = seed_used
 	_boss_connected = false
@@ -187,7 +204,14 @@ func generate(seed_value: int = -1) -> void:
 		_clean_up()
 	if _enforce_boss_single_entrance():
 		_clean_up()
-	_place_obstacles()
+	# Trimming only ever fixed openings that were too wide. Irregular room edges
+	# can also leave a corridor touching a room through a 1-2 tile pinch, which is
+	# connected in the grid but too narrow for the player collider. Widen every
+	# real opening to a short, guaranteed doorway throat before room interiors are
+	# designed, so RoomGenerator also reserves the corrected entrance area.
+	if _widen_narrow_exits():
+		_clean_up()
+	RoomGenerator.new().generate_all(self, rng, level)
 
 
 ## What job a room has, looked up by its rect. Room rects come from disjoint BSP
@@ -459,6 +483,10 @@ func _assign_themes() -> void:
 ## before any corridor is carved.
 func _capture_room_cells() -> void:
 	room_cells.clear()
+	room_plans.clear()
+	room_wall_cells.clear()
+	enemy_spawn_zones.clear()
+	reserved_cells.clear()
 	for room: Rect2i in rooms:
 		var cells: Array[Vector2i] = []
 		for x in range(room.position.x, room.end.x):
@@ -470,6 +498,7 @@ func _capture_room_cells() -> void:
 
 
 enum RoomShape { RECTANGLE, L_SHAPE, INDENTED, DIAGONAL }
+
 
 ## Random non-rectangular silhouettes for NORMAL rooms - "just a bare
 ## rectangle to fight in" is the complaint this exists to answer, and
@@ -585,45 +614,10 @@ func _erase_rect(r: Rect2i) -> void:
 			grid.erase(Vector2i(x, y))
 
 
-## Several cover spots per NORMAL room - scaled to room area so a big arena
-## gets meaningfully more pillars to fight around than a small one, not just
-## a fixed one-or-two regardless of size. Runs last, after the grid is
-## completely finished (cleanup/trim can still reshape a room's edges up to
-## that point), picking cells the same "random spot, skip if too close to an
-## already-picked one" way _random_room_cell()-style helpers already use
-## elsewhere - just kept here instead since this generator has no Node/scene
-## access to place the actual obstacle nodes itself.
-func _place_obstacles() -> void:
-	obstacle_cells.clear()
-	var margin := 4
-	var min_spacing := 6
+## Combat metadata and internal wall geometry are populated by RoomGenerator after the base dungeon geometry is final.
 
-	for room: Rect2i in rooms:
-		if kind_of(room) != RoomKind.NORMAL:
-			continue
-		if room.size.x <= margin * 2 or room.size.y <= margin * 2:
-			continue  # too small to spare floor for cover without choking the arena
-
-		var area: int = room.size.x * room.size.y
-		var count: int = clampi(area / 250, 2, 6)
-		var placed: Array[Vector2i] = []
-		for i in count:
-			for attempt in 12:
-				var cell := Vector2i(
-						rng.randi_range(room.position.x + margin, room.end.x - margin),
-						rng.randi_range(room.position.y + margin, room.end.y - margin))
-				if not grid.has(cell):
-					continue
-				var too_close := false
-				for other: Vector2i in placed:
-					if cell.distance_squared_to(other) < min_spacing * min_spacing:
-						too_close = true
-						break
-				if not too_close:
-					placed.append(cell)
-					break
-		if not placed.is_empty():
-			obstacle_cells[room] = placed
+func plan_of(room: Rect2i) -> Dictionary:
+	return room_plans.get(room, {})
 
 
 ## The largest room the partition behind `rooms[index]` could possibly hold.
@@ -856,6 +850,54 @@ func _span_direction(room: Rect2i, cell: Vector2i) -> Vector2i:
 
 ## Returns true if any span actually got trimmed, so the caller knows whether
 ## a follow-up _clean_up() pass is worth its cost.
+## Guarantees that every physical opening into a room has enough clearance for
+## the player. `_carve_corridor()` creates a corridor_width-wide strip, but an
+## irregular room silhouette or a corridor that meets a corner can expose only a
+## fraction of that strip at the room boundary. Connectivity checks still pass in
+## that case because even one floor cell is technically reachable.
+##
+## We widen a short throat around the midpoint of every undersized existing span.
+## This only ADDS floor, so it cannot disconnect the dungeon. The expansion goes
+## both a few cells into the room and a few cells back into the corridor, avoiding
+## a one-tile bottleneck immediately on either side of the boundary.
+func _widen_narrow_exits() -> bool:
+	var target_width: int = maxi(min_doorway_width, corridor_width)
+	# An odd width keeps the throat centred on the existing opening midpoint.
+	if target_width % 2 == 0:
+		target_width += 1
+
+	var target_rooms: Array[Rect2i] = rooms.duplicate()
+	if stairs_room.size != Vector2i.ZERO:
+		target_rooms.append(stairs_room)
+
+	var edge_dirs: Array[Vector2i] = [
+		Vector2i(0, -1), Vector2i(0, 1),
+		Vector2i(-1, 0), Vector2i(1, 0),
+	]
+	var changed := false
+
+	for room: Rect2i in target_rooms:
+		for dir: Vector2i in edge_dirs:
+			# Snapshot the spans before carving this edge; carving can only merge or
+			# enlarge them, never invalidate the midpoint we are fixing.
+			var spans: Array = _edge_spans(room, dir)
+			for span: Array in spans:
+				if span.is_empty() or span.size() >= target_width:
+					continue
+
+				var midpoint: Vector2i = span[span.size() / 2]
+				var along := Vector2i(1, 0) if dir.y != 0 else Vector2i(0, 1)
+				var half: int = target_width / 2
+
+				for lateral in range(-half, half + 1):
+					var edge_cell := midpoint + along * lateral
+					for depth in range(-doorway_throat_depth, doorway_throat_depth + 1):
+						if _set_floor(edge_cell + dir * depth):
+							changed = true
+
+	return changed
+
+
 func _trim_wide_exits() -> bool:
 	var max_span: int = corridor_width + 2
 	var seal_depth: int = room_padding + corridor_width
