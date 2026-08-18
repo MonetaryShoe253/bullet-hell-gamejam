@@ -84,22 +84,37 @@ func _player_owns_item(item: Item) -> bool:
 	return item in player.inventory.items
 
 
+## Checked by reference first, then by name as a fallback - a preset ability
+## placed directly into a slot in the editor (rather than dragging in the
+## shared .tres resource) creates its own separate object with a matching
+## ability_name, which the reference check alone would miss and let the shop
+## re-offer forever. Comparing names too means that mistake fails safe.
 func _player_owns_ability(ability: Ability) -> bool:
 	if player == null:
 		return false
-	return (
-		ability in player.ability_component.slots
-		or ability in player.inventory.abilities
-	)
+	if ability in player.ability_component.slots or ability in player.inventory.abilities:
+		return true
+	for owned: Ability in player.ability_component.slots:
+		if owned and owned.ability_name == ability.ability_name:
+			return true
+	for owned: Ability in player.inventory.abilities:
+		if owned.ability_name == ability.ability_name:
+			return true
+	return false
 
 
 func _player_owns_passive(passive: PassiveAbility) -> bool:
 	if player == null:
 		return false
-	return (
-		passive in player.passive_ability_component.slots
-		or passive in player.inventory.passive_abilities
-	)
+	if passive in player.passive_ability_component.slots or passive in player.inventory.passive_abilities:
+		return true
+	for owned: PassiveAbility in player.passive_ability_component.slots:
+		if owned and owned.ability_name == passive.ability_name:
+			return true
+	for owned: PassiveAbility in player.inventory.passive_abilities:
+		if owned.ability_name == passive.ability_name:
+			return true
+	return false
 
 
 func reset_shop() -> void:
