@@ -57,7 +57,6 @@ func die() -> void:
 	if not is_dead():
 		return
 	died.emit()
-	get_owner().queue_free()
 
 
 func is_dead() -> bool:

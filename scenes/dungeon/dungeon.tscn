@@ -172,6 +172,7 @@ theme_override_font_sizes/font_size = 22
 text = "Cluck Coins: 0"
 
 [node name="Minimap" type="Control" parent="HUD" unique_id=262197716]
+clip_contents = true
 layout_mode = 3
 anchors_preset = 1
 anchor_left = 1.0
@@ -181,7 +182,6 @@ offset_top = 10.0
 offset_right = -10.0
 offset_bottom = 190.0
 grow_horizontal = 0
-clip_contents = true
 script = ExtResource("5_minimap")
 
 [node name="BossHealthBar" parent="." unique_id=845301674 instance=ExtResource("4_boss_hp")]
