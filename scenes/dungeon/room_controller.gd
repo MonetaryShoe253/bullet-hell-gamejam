@@ -157,21 +157,36 @@ func _build_gate(tile_layer: TileMapLayer, span: Array) -> void:
 
 
 func _on_trigger_body_entered(body: Node) -> void:
-	if body.is_in_group("player"):
-		player_entered.emit(self)
+	if not body.is_in_group("player"):
+		return
+
+	if (
+		kind == DungeonGenerator.RoomKind.BOSS
+		and not cleared
+	):
+		MusicManager.play_boss_music()
+
+	player_entered.emit(self)
 
 
 func _on_enemy_died() -> void:
 	_enemies_alive -= 1
+
 	if _enemies_alive > 0:
 		return
 
 	if waves_remaining > 0:
 		waves_remaining -= 1
+
 		if spawn_next_wave.is_valid():
 			spawn_next_wave.call()
+
 		return
 
 	cleared = true
 	unlock()
+
+	if kind == DungeonGenerator.RoomKind.BOSS:
+		MusicManager.play_dungeon_music()
+
 	all_enemies_cleared.emit(self)

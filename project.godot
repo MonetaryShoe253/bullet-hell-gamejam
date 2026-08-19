@@ -20,6 +20,7 @@ config/icon="res://icon.svg"
 GameState="*res://scripts/game_state.gd"
 Fx="*res://scripts/helpers/fx.gd"
 MetaProgression="*uid://b74fp3hp2wlf8"
+MusicManager="*uid://bx2a31sonxkvy"
 
 [display]
 
