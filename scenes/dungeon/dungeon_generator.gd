@@ -72,6 +72,15 @@ var stairs_cell := Vector2i.ZERO
 ## gate/trigger logic don't each have to recompute where "the gate" is.
 var boss_gate_cells: Array[Vector2i] = []
 
+## Direction from the boss room centre toward its deliberate dungeon entrance.
+## Recorded from the actual corridor route when BSP connectivity attaches the boss,
+## so presentation code never has to guess which physical opening is the entrance.
+var boss_entrance_direction := Vector2i.ZERO
+
+## Most recently carved corridor polyline. Used only while building connectivity so
+## the boss entrance direction can be captured from the route that really succeeded.
+var _last_corridor_route: Array[Vector2i] = []
+
 ## Rect2i -> Array[Rect2i], which rooms a corridor directly connects. Built
 ## alongside the corridors themselves in _connect_rooms()/_carve_stairs_room().
 ## Used by the minimap to know which unexplored rooms are worth showing as
@@ -99,19 +108,19 @@ var enemy_spawn_zones: Dictionary = {}
 var reserved_cells: Dictionary = {}
 
 ## Rect2i -> Array[Vector2i], each room's actual floor cells - captured right
-## after _vary_room_shapes() but *before* _connect_rooms() carves corridors,
-## specifically so a corridor that later clips through a room's rectangular
-## bounding box (corridors are straight lines between room centres with no
-## awareness of any third room sitting in between - see _carve_corridor())
-## is never mistaken for part of that room. room_rect alone can't be trusted
+## after _vary_room_shapes() but *before* _connect_rooms() carves corridors.
+## Keeping this snapshot means corridor floor is never mistaken for room interior
+## by triggers, even though _carve_corridor() now actively routes around unrelated
+## room rectangles. room_rect alone still can't be trusted
 ## for this: it stays the room's full bounding box even after shape variation
 ## carves an L-shape/indent/diagonal out of it, and even a still-rectangular
-## room's rect can end up overlapping a corridor that merely grazes it.
+## room's rect can contain cells later added by doorway widening/cleanup.
 ## RoomController's entry trigger is built from these cells, not room_rect.
 var room_cells: Dictionary = {}
 
-## Every corridor's centreline, as carved: [from, bend, to] in cell space,
-## one entry per _carve_corridor() call (including the stairs room's own
+## Every corridor's centreline, as carved, in cell space (normally 3 points for
+## an L route, 4 when a room-avoiding dogleg is needed), one entry per
+## successful _carve_corridor() call (including the stairs room's own
 ## corridor). Kept separately from `grid` so a renderer (see minimap.gd) can
 ## draw an actual clean path instead of trying to reverse-engineer one from
 ## leftover floor cells, which is fragile against every cleanup/doorway-
@@ -166,8 +175,12 @@ func generate(seed_value: int = -1, level: int = 1) -> void:
 	player_spawn = Vector2i.ZERO
 	stairs_room = Rect2i()
 	stairs_cell = Vector2i.ZERO
+	boss_gate_cells.clear()
+	boss_entrance_direction = Vector2i.ZERO
+	_last_corridor_route.clear()
 	room_cells.clear()
 	corridor_paths.clear()
+	room_adjacency.clear()
 	room_plans.clear()
 	room_wall_cells.clear()
 	enemy_spawn_zones.clear()
@@ -702,21 +715,33 @@ func _connect_rooms(node: BSPNode) -> Array[Rect2i]:
 	var right_rooms: Array[Rect2i] = _connect_rooms(node.right)
 
 	if not left_rooms.is_empty() and not right_rooms.is_empty():
-		var best_a: Rect2i = left_rooms[0]
-		var best_b: Rect2i = right_rooms[0]
-		var best_dist: int = 1 << 30
+		# Nearest is still preferred, but a pair whose corridor cannot avoid a third
+		# room is skipped in favour of the next-nearest pair across this BSP split.
+		# That keeps the spanning tree connected without ever falling back to the old
+		# unsafe behaviour of carving straight through an unrelated arena.
+		var candidates: Array[Dictionary] = []
 		for a: Rect2i in left_rooms:
 			for b: Rect2i in right_rooms:
 				var delta: Vector2i = _center(a) - _center(b)
 				var dist: int = delta.x * delta.x + delta.y * delta.y
-				if dist < best_dist:
-					best_dist = dist
-					best_a = a
-					best_b = b
-		_carve_corridor(_center(best_a), _center(best_b))
-		_add_adjacency(best_a, best_b)
-		if best_a == boss_room or best_b == boss_room:
-			_boss_connected = true
+				candidates.append({"a": a, "b": b, "dist": dist})
+		candidates.sort_custom(func(lhs, rhs): return int(lhs["dist"]) < int(rhs["dist"]))
+
+		var connected := false
+		for candidate: Dictionary in candidates:
+			var best_a: Rect2i = candidate.a
+			var best_b: Rect2i = candidate.b
+			if not _carve_corridor(_center(best_a), _center(best_b), best_a, best_b):
+				continue
+			_add_adjacency(best_a, best_b)
+			if best_a == boss_room or best_b == boss_room:
+				_boss_connected = true
+				_record_boss_entrance_direction(best_a, best_b, _last_corridor_route)
+			connected = true
+			break
+
+		if not connected:
+			push_error("DungeonGenerator: no room-safe corridor across BSP split (seed %d)" % seed_used)
 
 	var all_rooms: Array[Rect2i] = []
 	all_rooms.append_array(left_rooms)
@@ -764,7 +789,14 @@ func _carve_stairs_room() -> bool:
 	stairs_room = candidate
 	_carve_rect(stairs_room)
 	stairs_cell = _center(stairs_room)
-	_carve_corridor(Vector2i(gate_x, top - 1), stairs_cell)
+	if not _carve_corridor(Vector2i(gate_x, top - 1), stairs_cell, boss_room, stairs_room):
+		# Do not leave an unreachable dedicated room behind if its connecting route
+		# cannot be made without touching another room. The caller already supports
+		# the no-stairs-room case by using the boss gate itself as the level exit.
+		_erase_rect(stairs_room)
+		stairs_room = Rect2i()
+		stairs_cell = Vector2i.ZERO
+		return false
 	return true
 
 
@@ -857,6 +889,64 @@ func _span_direction(room: Rect2i, cell: Vector2i) -> Vector2i:
 	if cell.x == room.position.x - 1:
 		return Vector2i(-1, 0)
 	return Vector2i(1, 0)
+
+
+## Returns the physical opening belonging to the deliberate boss corridor. Unlike
+## presentation code that used to pick "the first non-north exit", this is tied to
+## the route that actually connected the boss during BSP generation.
+func get_boss_entrance_span() -> Array:
+	if boss_room.size == Vector2i.ZERO or boss_entrance_direction == Vector2i.ZERO:
+		return []
+
+	var spans: Array = _edge_spans(boss_room, boss_entrance_direction)
+	if spans.is_empty():
+		return []
+
+	# The corridor is routed from/to the room centre, so choose the span whose
+	# midpoint is closest to the centre on the axis running along this wall.
+	var centre := _center(boss_room)
+	var best: Array = spans[0]
+	var best_distance := 1 << 30
+	for span: Array in spans:
+		if span.is_empty():
+			continue
+		var mid: Vector2i = span[span.size() / 2]
+		var distance: int = abs(mid.x - centre.x) if boss_entrance_direction.y != 0 else abs(mid.y - centre.y)
+		if distance < best_distance:
+			best_distance = distance
+			best = span
+	return best
+
+
+func _record_boss_entrance_direction(a: Rect2i, b: Rect2i, route: Array[Vector2i]) -> void:
+	if route.size() < 2:
+		return
+
+	var boss_at_start := a == boss_room
+	var boss_at_end := b == boss_room
+	if not boss_at_start and not boss_at_end:
+		return
+
+	var boss_centre := _center(boss_room)
+	var neighbour := boss_centre
+	if boss_at_start:
+		for i in range(1, route.size()):
+			if route[i] != boss_centre:
+				neighbour = route[i]
+				break
+	else:
+		for i in range(route.size() - 2, -1, -1):
+			if route[i] != boss_centre:
+				neighbour = route[i]
+				break
+
+	var delta: Vector2i = neighbour - boss_centre
+	if delta == Vector2i.ZERO:
+		return
+	if abs(delta.x) >= abs(delta.y):
+		boss_entrance_direction = Vector2i(1 if delta.x > 0 else -1, 0)
+	else:
+		boss_entrance_direction = Vector2i(0, 1 if delta.y > 0 else -1)
 
 
 ## Returns true if any span actually got trimmed, so the caller knows whether
@@ -1016,12 +1106,154 @@ func _carve_rect(r: Rect2i) -> void:
 			_set_floor(Vector2i(x, y))
 
 
-func _carve_corridor(from: Vector2i, to: Vector2i) -> void:
-	# L-shaped: pick a random bend point so corridors aren't all uniform.
-	var bend: Vector2i = Vector2i(to.x, from.y) if rng.randf() < 0.5 else Vector2i(from.x, to.y)
-	_carve_line(from, bend)
-	_carve_line(bend, to)
-	corridor_paths.append(PackedVector2Array([Vector2(from), Vector2(bend), Vector2(to)]))
+## Carves a corridor without allowing it to clip or skim along an unrelated room.
+## The old implementation picked either L bend blindly, so a long leg could pass
+## through a third room (or close enough that the corridor_width strip touched its
+## outer edge). That fused the corridor to the room and get_room_exits() correctly
+## reported the resulting whole-wall opening, which combat locking then filled with
+## a wall of gates.
+##
+## Try both cheap one-bend routes first. If both are blocked, try a two-bend dogleg
+## around the rooms. All route tests use the full corridor width plus two rock cells
+## of clearance. Two cells matter because _clean_up() deliberately removes a
+## one-cell-thick wall between floor regions, so a single-cell gap would fuse again.
+## A route that passes validation therefore cannot create an accidental room
+## opening. `room_a` and `room_b` are the only rooms the corridor may touch.
+func _carve_corridor(
+		from: Vector2i,
+		to: Vector2i,
+		room_a: Rect2i = Rect2i(),
+		room_b: Rect2i = Rect2i()
+) -> bool:
+	_last_corridor_route.clear()
+	var bends: Array[Vector2i] = [Vector2i(to.x, from.y), Vector2i(from.x, to.y)]
+	if rng.randf() < 0.5:
+		bends.reverse()
+
+	for bend: Vector2i in bends:
+		var route: Array[Vector2i] = [from, bend, to]
+		if _corridor_route_is_clear(route, room_a, room_b):
+			_carve_corridor_route(route)
+			_last_corridor_route = route.duplicate()
+			return true
+
+	var fallback := _find_corridor_dogleg(from, to, room_a, room_b)
+	if not fallback.is_empty():
+		_carve_corridor_route(fallback)
+		_last_corridor_route = fallback.duplicate()
+		return true
+
+	return false
+
+
+func _carve_corridor_route(route: Array[Vector2i]) -> void:
+	for i in range(route.size() - 1):
+		_carve_line(route[i], route[i + 1])
+
+	var packed := PackedVector2Array()
+	for point: Vector2i in route:
+		packed.append(Vector2(point))
+	corridor_paths.append(packed)
+
+
+## Finds a simple two-bend route when both ordinary L shapes hit another room.
+## Horizontal doglegs deliberately put their shared X column outside both endpoint
+## rooms, so the source/destination each get one clean side opening rather than the
+## fallback running parallel through their own wall. Vertical doglegs do the same
+## with a shared Y row. Shortest valid detour wins.
+func _find_corridor_dogleg(
+		from: Vector2i,
+		to: Vector2i,
+		room_a: Rect2i,
+		room_b: Rect2i
+) -> Array[Vector2i]:
+	var best: Array[Vector2i] = []
+	var best_length: int = 1 << 30
+	var half: int = corridor_width / 2
+	var edge_margin: int = half + 2
+
+	var endpoint_clearance: int = half + 2
+	for x in range(edge_margin, map_size.x - edge_margin):
+		if _coordinate_near_room_x(x, room_a, endpoint_clearance) \
+				or _coordinate_near_room_x(x, room_b, endpoint_clearance):
+			continue
+		var route: Array[Vector2i] = [from, Vector2i(x, from.y), Vector2i(x, to.y), to]
+		if _corridor_route_is_clear(route, room_a, room_b):
+			var length := _route_length(route)
+			if length < best_length:
+				best = route
+				best_length = length
+
+	for y in range(edge_margin, map_size.y - edge_margin):
+		if _coordinate_near_room_y(y, room_a, endpoint_clearance) \
+				or _coordinate_near_room_y(y, room_b, endpoint_clearance):
+			continue
+		var route: Array[Vector2i] = [from, Vector2i(from.x, y), Vector2i(to.x, y), to]
+		if _corridor_route_is_clear(route, room_a, room_b):
+			var length := _route_length(route)
+			if length < best_length:
+				best = route
+				best_length = length
+
+	return best
+
+
+func _coordinate_near_room_x(x: int, room: Rect2i, clearance: int) -> bool:
+	return room.size != Vector2i.ZERO \
+			and x >= room.position.x - clearance and x < room.end.x + clearance
+
+
+func _coordinate_near_room_y(y: int, room: Rect2i, clearance: int) -> bool:
+	return room.size != Vector2i.ZERO \
+			and y >= room.position.y - clearance and y < room.end.y + clearance
+
+
+func _route_length(route: Array[Vector2i]) -> int:
+	var total := 0
+	for i in range(route.size() - 1):
+		total += abs(route[i + 1].x - route[i].x) + abs(route[i + 1].y - route[i].y)
+	return total
+
+
+func _corridor_route_is_clear(route: Array[Vector2i], room_a: Rect2i, room_b: Rect2i) -> bool:
+	for i in range(route.size() - 1):
+		if not _corridor_segment_is_clear(route[i], route[i + 1], room_a, room_b):
+			return false
+	return true
+
+
+func _corridor_segment_is_clear(a: Vector2i, b: Vector2i, room_a: Rect2i, room_b: Rect2i) -> bool:
+	var half: int = corridor_width / 2
+	var min_x: int = mini(a.x, b.x) - half
+	var max_x: int = maxi(a.x, b.x) + (corridor_width - half - 1)
+	var min_y: int = mini(a.y, b.y) - half
+	var max_y: int = maxi(a.y, b.y) + (corridor_width - half - 1)
+
+	# Keep two rock tiles beyond the carved strip. One is not enough: _clean_up()
+	# intentionally opens a one-cell wall with floor on both sides, which would
+	# silently fuse the corridor to the unrelated room again after routing.
+	var rock_clearance := 2
+	var footprint := Rect2i(
+			Vector2i(min_x - rock_clearance, min_y - rock_clearance),
+			Vector2i(
+					max_x - min_x + 1 + rock_clearance * 2,
+					max_y - min_y + 1 + rock_clearance * 2))
+	if not _interior().encloses(footprint):
+		return false
+
+	for room: Rect2i in rooms:
+		if room == room_a or room == room_b:
+			continue
+		if footprint.intersects(room):
+			return false
+
+	# stairs_room is not part of `rooms`, but once it exists it deserves the same
+	# protection from any later dedicated corridor.
+	if stairs_room.size != Vector2i.ZERO and stairs_room != room_a and stairs_room != room_b:
+		if footprint.intersects(stairs_room):
+			return false
+
+	return true
 
 
 func _carve_line(a: Vector2i, b: Vector2i) -> void:
