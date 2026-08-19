@@ -151,6 +151,11 @@ const _ORTHOGONAL: Array[Vector2i] = [
 	Vector2i(1, 0), Vector2i(-1, 0), Vector2i(0, 1), Vector2i(0, -1),
 ]
 
+const NORTH := Vector2i(0, -1)
+const SOUTH := Vector2i(0, 1)
+const WEST := Vector2i(-1, 0)
+const EAST := Vector2i(1, 0)
+
 
 class BSPNode:
 	var rect: Rect2i
@@ -731,12 +736,21 @@ func _connect_rooms(node: BSPNode) -> Array[Rect2i]:
 		for candidate: Dictionary in candidates:
 			var best_a: Rect2i = candidate.a
 			var best_b: Rect2i = candidate.b
-			if not _carve_corridor(_center(best_a), _center(best_b), best_a, best_b):
+
+			var carved: bool
+			if best_a == boss_room:
+				carved = _carve_boss_corridor(best_b)
+			elif best_b == boss_room:
+				carved = _carve_boss_corridor(best_a)
+			else:
+				carved = _carve_corridor(_center(best_a), _center(best_b), best_a, best_b)
+
+			if not carved:
 				continue
+
 			_add_adjacency(best_a, best_b)
 			if best_a == boss_room or best_b == boss_room:
 				_boss_connected = true
-				_record_boss_entrance_direction(best_a, best_b, _last_corridor_route)
 			connected = true
 			break
 
@@ -772,32 +786,91 @@ func _carve_stairs_room() -> bool:
 	if boss_room.size == Vector2i.ZERO:
 		return false
 
-	var gate_x: int = boss_room.position.x + boss_room.size.x / 2 - 1
-	var top: int = boss_room.position.y
-	boss_gate_cells = [Vector2i(gate_x, top), Vector2i(gate_x + 1, top)]
+	# Prefer the wall opposite the real dungeon entrance. This keeps the post-boss
+	# route visually separate from the grand entrance and prevents the two prop
+	# sets from competing for the same doorway.
+	var preferred := -boss_entrance_direction
+	if preferred == Vector2i.ZERO:
+		preferred = NORTH
 
-	var stairs_w := 10
-	var stairs_h := 8
-	var candidate := Rect2i(
-			gate_x - stairs_w / 2 + 1, top - room_padding - 1 - stairs_h,
-			stairs_w, stairs_h)
+	var sides: Array[Vector2i] = [preferred]
+	for side: Vector2i in [NORTH, SOUTH, WEST, EAST]:
+		if side != preferred and side != boss_entrance_direction:
+			sides.append(side)
+
+	# If no dedicated landing fits, keep a sensible in-arena fallback location on
+	# the preferred side so the level can still end cleanly.
+	boss_gate_cells = _boss_gate_cells_on_side(preferred)
+
+	for side: Vector2i in sides:
+		if _try_carve_stairs_on_side(side):
+			return true
+
+	return false
+
+
+func _try_carve_stairs_on_side(side: Vector2i) -> bool:
+	var along_size := 10
+	var depth_size := 8
+	var gap := room_padding + 1
+	var boss_centre := _center(boss_room)
+
+	var candidate: Rect2i
+	var corridor_start: Vector2i
+
+	if side == NORTH:
+		candidate = Rect2i(
+				boss_centre.x - along_size / 2,
+				boss_room.position.y - gap - depth_size,
+				along_size, depth_size)
+		corridor_start = Vector2i(boss_centre.x, boss_room.position.y - 1)
+	elif side == SOUTH:
+		candidate = Rect2i(
+				boss_centre.x - along_size / 2,
+				boss_room.end.y + gap,
+				along_size, depth_size)
+		corridor_start = Vector2i(boss_centre.x, boss_room.end.y)
+	elif side == WEST:
+		candidate = Rect2i(
+				boss_room.position.x - gap - depth_size,
+				boss_centre.y - along_size / 2,
+				depth_size, along_size)
+		corridor_start = Vector2i(boss_room.position.x - 1, boss_centre.y)
+	else: # EAST
+		candidate = Rect2i(
+				boss_room.end.x + gap,
+				boss_centre.y - along_size / 2,
+				depth_size, along_size)
+		corridor_start = Vector2i(boss_room.end.x, boss_centre.y)
+
 	if not _interior().encloses(candidate):
 		return false
 	if _touches_floor(candidate.grow(1)):
-		return false  # would fuse with whatever's already there - drop it, same as not fitting
+		return false
 
 	stairs_room = candidate
 	_carve_rect(stairs_room)
 	stairs_cell = _center(stairs_room)
-	if not _carve_corridor(Vector2i(gate_x, top - 1), stairs_cell, boss_room, stairs_room):
-		# Do not leave an unreachable dedicated room behind if its connecting route
-		# cannot be made without touching another room. The caller already supports
-		# the no-stairs-room case by using the boss gate itself as the level exit.
+
+	if not _carve_corridor(corridor_start, stairs_cell, boss_room, stairs_room):
 		_erase_rect(stairs_room)
 		stairs_room = Rect2i()
 		stairs_cell = Vector2i.ZERO
 		return false
+
+	boss_gate_cells = _boss_gate_cells_on_side(side)
 	return true
+
+
+func _boss_gate_cells_on_side(side: Vector2i) -> Array[Vector2i]:
+	var c := _center(boss_room)
+	if side == NORTH:
+		return [Vector2i(c.x - 1, boss_room.position.y), Vector2i(c.x, boss_room.position.y)]
+	if side == SOUTH:
+		return [Vector2i(c.x - 1, boss_room.end.y - 1), Vector2i(c.x, boss_room.end.y - 1)]
+	if side == WEST:
+		return [Vector2i(boss_room.position.x, c.y - 1), Vector2i(boss_room.position.x, c.y)]
+	return [Vector2i(boss_room.end.x - 1, c.y - 1), Vector2i(boss_room.end.x - 1, c.y)]
 
 
 ## True if any cell of `rect` is already floor. Used before carving a new
@@ -1119,6 +1192,113 @@ func _carve_rect(r: Rect2i) -> void:
 ## one-cell-thick wall between floor regions, so a single-cell gap would fuse again.
 ## A route that passes validation therefore cannot create an accidental room
 ## opening. `room_a` and `room_b` are the only rooms the corridor may touch.
+## Connects the dungeon to the boss through the nearest sensible wall rather
+## than routing all the way to the arena centre. The first segment is forced
+## straight outward from that wall before normal L/dogleg routing begins, so a
+## huge boss room cannot create a long corridor merely because its centre is far
+## from the neighbouring room.
+func _carve_boss_corridor(other_room: Rect2i) -> bool:
+	var info: Dictionary = _boss_anchor_toward(other_room)
+	var anchor: Vector2i = info["anchor"]
+	var outward: Vector2i = info["direction"]
+	var escape: Vector2i = anchor + outward * (room_padding + corridor_width)
+	var target: Vector2i = _center(other_room)
+
+	var bends: Array[Vector2i] = [
+		Vector2i(target.x, escape.y),
+		Vector2i(escape.x, target.y),
+	]
+
+	# Prefer the L whose second segment is shortest after leaving the boss.
+	bends.sort_custom(func(a: Vector2i, b: Vector2i) -> bool:
+		var la: int = absi(a.x - escape.x) + absi(a.y - escape.y) + absi(target.x - a.x) + absi(target.y - a.y)
+		var lb: int = absi(b.x - escape.x) + absi(b.y - escape.y) + absi(target.x - b.x) + absi(target.y - b.y)
+		return la < lb
+	)
+
+	for bend: Vector2i in bends:
+		var route: Array[Vector2i] = [anchor, escape, bend, target]
+		_remove_duplicate_route_points(route)
+		if _corridor_route_is_clear(route, boss_room, other_room):
+			_carve_corridor_route(route)
+			_last_corridor_route = route.duplicate()
+			boss_entrance_direction = outward
+			return true
+
+	var tail: Array[Vector2i] = _find_corridor_dogleg(escape, target, boss_room, other_room)
+	if not tail.is_empty():
+		var route: Array[Vector2i] = [anchor]
+		route.append_array(tail)
+		_remove_duplicate_route_points(route)
+		if _corridor_route_is_clear(route, boss_room, other_room):
+			_carve_corridor_route(route)
+			_last_corridor_route = route.duplicate()
+			boss_entrance_direction = outward
+			return true
+
+	return false
+
+
+func _boss_anchor_toward(other_room: Rect2i) -> Dictionary:
+	var other: Vector2i = _center(other_room)
+	var margin: int = corridor_width / 2 + 2
+	var min_x: int = boss_room.position.x + margin
+	var max_x: int = boss_room.end.x - margin - 1
+	var min_y: int = boss_room.position.y + margin
+	var max_y: int = boss_room.end.y - margin - 1
+
+	var options: Array[Dictionary] = [
+		{
+			"anchor": Vector2i(clampi(other.x, min_x, max_x), boss_room.position.y),
+			"direction": NORTH
+		},
+		{
+			"anchor": Vector2i(clampi(other.x, min_x, max_x), boss_room.end.y - 1),
+			"direction": SOUTH
+		},
+		{
+			"anchor": Vector2i(boss_room.position.x, clampi(other.y, min_y, max_y)),
+			"direction": WEST
+		},
+		{
+			"anchor": Vector2i(boss_room.end.x - 1, clampi(other.y, min_y, max_y)),
+			"direction": EAST
+		},
+	]
+
+	var best: Dictionary = options[0]
+	var best_dist: int = 1 << 30
+	for option: Dictionary in options:
+		var anchor: Vector2i = option["anchor"]
+		var direction: Vector2i = option["direction"]
+
+		# Only consider sides that actually face toward the neighbouring room.
+		var facing: bool = true
+		if direction == NORTH:
+			facing = other.y < boss_room.position.y
+		elif direction == SOUTH:
+			facing = other.y >= boss_room.end.y
+		elif direction == WEST:
+			facing = other.x < boss_room.position.x
+		elif direction == EAST:
+			facing = other.x >= boss_room.end.x
+
+		var dist: int = absi(anchor.x - other.x) + absi(anchor.y - other.y)
+		if facing:
+			dist -= 100000
+		if dist < best_dist:
+			best_dist = dist
+			best = option
+
+	return best
+
+
+func _remove_duplicate_route_points(route: Array[Vector2i]) -> void:
+	for i in range(route.size() - 1, 0, -1):
+		if route[i] == route[i - 1]:
+			route.remove_at(i)
+
+
 func _carve_corridor(
 		from: Vector2i,
 		to: Vector2i,

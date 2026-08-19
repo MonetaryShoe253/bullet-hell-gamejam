@@ -52,6 +52,13 @@ extends Node2D
 ## Draws the ladder / wares / gate that mark out the start, shop and boss rooms.
 @export var show_room_props := true
 
+## Debug/testing: skip traversal and start directly in the boss arena.
+## Leave this false for normal gameplay. When enabled, the player is placed near
+## the boss-room centre and the boss encounter is started immediately after the
+## room controllers are built.
+@export_category("Testing")
+@export var test_start_at_boss := true
+
 ## Players and Enemies
 @export var player_scene: PackedScene
 var player: Node2D
@@ -93,7 +100,11 @@ func _ready() -> void:
 
 
 func _spawn_player() -> void:
-	var spawn_position := tile_layer.map_to_local(_generator.player_spawn)
+	var spawn_cell: Vector2i = _generator.player_spawn
+	if test_start_at_boss and _generator.boss_room.size != Vector2i.ZERO:
+		spawn_cell = _boss_test_spawn_cell()
+
+	var spawn_position := tile_layer.map_to_local(spawn_cell)
 
 	if player == null or not is_instance_valid(player):
 		# First dungeon - create the player.
@@ -111,6 +122,29 @@ func _spawn_player() -> void:
 	player.position = spawn_position
 
 	print("Player positioned at: ", spawn_position)
+
+
+## Prefer the boss-room centre, but choose the closest captured playable floor
+## cell defensively in case future boss-room shaping/cover makes the exact centre
+## unavailable.
+func _boss_test_spawn_cell() -> Vector2i:
+	var room: Rect2i = _generator.boss_room
+	var centre: Vector2i = room.position + room.size / 2
+	var cells: Array = _generator.room_cells.get(room, [])
+	if cells.is_empty():
+		return centre
+
+	var best: Vector2i = cells[0]
+	var best_distance := 1 << 30
+	for candidate: Vector2i in cells:
+		if not _generator.grid.has(candidate):
+			continue
+		var delta := candidate - centre
+		var distance := delta.x * delta.x + delta.y * delta.y
+		if distance < best_distance:
+			best = candidate
+			best_distance = distance
+	return best
 
 
 func _on_money_changed(total: int) -> void:
@@ -180,6 +214,8 @@ func generate_dungeon() -> void:
 	await get_tree().physics_frame
 
 	_setup_rooms(_generator)
+	if test_start_at_boss:
+		_start_boss_test_encounter()
 	_decorator.scatter(_generator)
 
 	_spawn_shop_trigger()
@@ -212,6 +248,17 @@ func _setup_rooms(gen: DungeonGenerator) -> void:
 		_room_controllers.append(rc)
 
 
+## Starting inside an Area2D before it exists does not reliably produce the same
+## body_entered edge as walking through its doorway. In boss-test mode, invoke
+## the normal room-entry path explicitly once setup is complete.
+func _start_boss_test_encounter() -> void:
+	for rc: RoomController in _room_controllers:
+		if rc.kind == DungeonGenerator.RoomKind.BOSS:
+			_on_room_player_entered(rc)
+			return
+	push_warning("Boss test mode enabled, but no boss RoomController was created")
+
+
 func _on_room_player_entered(rc: RoomController) -> void:
 	if rc.cleared:
 		return
@@ -241,21 +288,19 @@ func _on_room_cleared(rc: RoomController) -> void:
 ## collider itself is owned by the RoomController; this only handles what the
 ## player sees.
 func _paint_gate(rc: RoomController, locked: bool) -> void:
-	var boss_entrance: Array = []
-	if rc.kind == DungeonGenerator.RoomKind.BOSS:
-		boss_entrance = _generator.get_boss_entrance_span()
-
 	for span: Array in rc.exits:
 		if span.is_empty():
 			continue
 
-		# The boss entrance has its own permanent portal treatment. Its physics
-		# collider still locks normally through RoomController, but ordinary gate
-		# tiles must never overwrite the unique entrance art.
-		if rc.kind == DungeonGenerator.RoomKind.BOSS and _same_span(span, boss_entrance):
-			for cell: Vector2i in span:
-				prop_layer.set_cell(cell, -1)
-			continue
+		# The deliberate dungeon entrance uses the demon-portal threshold instead
+		# of ordinary door tiles. Other boss openings (notably the post-boss stairs
+		# side) still use normal gate art, so portal props never overlap the stairs.
+		if rc.kind == DungeonGenerator.RoomKind.BOSS:
+			var boss_entrance: Array = _generator.get_boss_entrance_span()
+			if _same_span(span, boss_entrance):
+				for cell: Vector2i in span:
+					prop_layer.set_cell(cell, -1)
+				continue
 
 		# Exit spans on north/south walls run along X and use the gate art as drawn.
 		# Exit spans on west/east walls run along Y, so rotate each atlas tile 90 degrees.
@@ -392,7 +437,7 @@ func _paint_props(gen: DungeonGenerator) -> void:
 	_decorate_start(gen)
 	_decorate_shop(gen)
 	_decorate_boss(gen)
-	_place_boss_portal(gen)
+	_place_boss_portals(gen)
 
 
 func _decorate_start(gen: DungeonGenerator) -> void:
@@ -428,14 +473,10 @@ func _decorate_boss(gen: DungeonGenerator) -> void:
 	if room.size == Vector2i.ZERO:
 		return
 
-	# The gate goes on the floor row against the north wall, so it reads as the
-	# way out of the arena, with a torch to either side up on the wall itself.
-	var gate_x: int = room.position.x + room.size.x / 2 - 1
-	var top: int = room.position.y
-	for i in PROP_GATE.size():
-		_set_prop(gen, room, Vector2i(gate_x + i, top), PROP_GATE[i])
-	_set_wall_prop(gen, Vector2i(gate_x - 2, top - 1), PROP_TORCH[0])
-	_set_wall_prop(gen, Vector2i(gate_x + 3, top - 1), PROP_TORCH[1])
+	# Boss doorways are decorated from the generator's real exit spans in
+	# _place_boss_portals(). Do not hard-code a gate on the north wall here: the
+	# combat entrance can be on any side, and doing so made the north side look
+	# special even when it was not an actual doorway.
 
 	# Leftovers of whoever came before, spread to the corners so they read as
 	# arena dressing rather than a pile in the middle.
@@ -454,39 +495,72 @@ func _decorate_boss(gen: DungeonGenerator) -> void:
 ## tell what's behind that door before they walk in. Sitting beside the door
 ## rather than on top of it keeps them clear of the gate art, which already
 ## overlays that same span once the room locks.
-func _place_boss_portal(gen: DungeonGenerator) -> void:
+func _place_boss_portals(gen: DungeonGenerator) -> void:
 	var room: Rect2i = gen.boss_room
 	if room.size == Vector2i.ZERO:
 		return
 
-	var entrance_span: Array = gen.get_boss_entrance_span()
-	if entrance_span.is_empty():
-		push_warning("DungeonMap: boss entrance span could not be resolved for seed %d" % gen.seed_used)
+	# Only the deliberate dungeon-side entrance gets the grand portal treatment.
+	# The stairs opening is intentionally excluded and is placed on another side
+	# by DungeonGenerator whenever possible.
+	var entrance: Array = gen.get_boss_entrance_span()
+	if entrance.is_empty():
+		push_warning("DungeonMap: boss room has no deliberate entrance span for seed %d" % gen.seed_used)
 		return
 
-	var first: Vector2i = entrance_span[0]
-	var last: Vector2i = entrance_span[entrance_span.size() - 1]
-	var mid: Vector2i = entrance_span[entrance_span.size() / 2]
-	var along: Vector2i = Vector2i(0, 1) if first.x == last.x else Vector2i(1, 0)
-	var outward: Vector2i = gen.boss_entrance_direction
+	_place_boss_portal_span(room, entrance)
 
-	# Put the animated portals immediately beyond the two shoulders of the opening.
-	# Deriving the offset from the real span keeps the composition centred for any
-	# doorway width and works identically on horizontal and vertical walls.
-	var half_span: int = entrance_span.size() / 2
-	var flank_offset: int = half_span + 2
-	var left_anchor: Vector2i = mid - along * flank_offset - outward
-	var right_anchor: Vector2i = mid + along * flank_offset - outward
 
-	_spawn_portal(left_anchor)
-	_spawn_portal(right_anchor)
+func _place_boss_portal_span(room: Rect2i, span: Array) -> void:
+	if span.is_empty():
+		return
 
-	# A second, wider pair makes the approach read as a boss threshold rather than
-	# two ordinary props. They sit one tile farther toward the approaching corridor
-	# and farther apart, producing a layered portal avenue with the same existing art.
-	var outer_offset: int = flank_offset + 3
-	_spawn_portal(mid - along * outer_offset + outward * 2)
-	_spawn_portal(mid + along * outer_offset + outward * 2)
+	var first: Vector2i = span[0]
+	var last: Vector2i = span[span.size() - 1]
+	var mid: Vector2i = span[span.size() / 2]
+	var vertical_wall: bool = first.x == last.x
+	var along: Vector2i = Vector2i(0, 1) if vertical_wall else Vector2i(1, 0)
+	var outward := _boss_span_outward(room, mid)
+
+	# One pair frames the doorway shoulders. A second pair sits farther out and
+	# wider apart, producing an avenue/archway silhouette from either approach.
+	# The offsets derive from the actual doorway width so wide openings remain
+	# centred and narrow openings never collapse the portal sprites together.
+	var half_span: int = maxi(1, span.size() / 2)
+	var inner_offset: int = half_span + 2
+	var outer_offset: int = inner_offset + 3
+
+	_spawn_portal(mid - along * inner_offset + outward)
+	_spawn_portal(mid + along * inner_offset + outward)
+	_spawn_portal(mid - along * outer_offset + outward * 3)
+	_spawn_portal(mid + along * outer_offset + outward * 3)
+
+
+func _boss_span_outward(room: Rect2i, cell: Vector2i) -> Vector2i:
+	if cell.y == room.position.y - 1:
+		return NORTH
+	if cell.y == room.end.y:
+		return SOUTH
+	if cell.x == room.position.x - 1:
+		return WEST
+	if cell.x == room.end.x:
+		return EAST
+
+	# Exit spans should always be one cell outside an edge, but use the closest
+	# edge as a defensive fallback if cleanup ever hands us an unusual span.
+	var distances := {
+		NORTH: abs(cell.y - (room.position.y - 1)),
+		SOUTH: abs(cell.y - room.end.y),
+		WEST: abs(cell.x - (room.position.x - 1)),
+		EAST: abs(cell.x - room.end.x),
+	}
+	var best: Vector2i = NORTH
+	var best_distance: int = distances[NORTH]
+	for dir: Vector2i in [SOUTH, WEST, EAST]:
+		if distances[dir] < best_distance:
+			best = dir
+			best_distance = distances[dir]
+	return best
 
 
 func _spawn_portal(cell: Vector2i) -> void:
