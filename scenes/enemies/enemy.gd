@@ -18,7 +18,8 @@ enum ShotPattern {
 	WAVE,
 	SHOTGUN,
 	ALTERNATING_SPREAD,
-	RING_GAP
+	RING_GAP,
+	CROSS_BURST
 }
 @export var shot_pattern: ShotPattern = ShotPattern.SINGLE
 
@@ -68,6 +69,17 @@ var alternating_side: float = 1.0
 @export var ring_gap_rotation_speed: float = 15.0
 
 var ring_gap_rotation: float = 0.0
+
+@export var cross_burst_count: int = 3
+@export var cross_burst_projectiles: int = 5
+@export var cross_burst_angle: float = 50.0
+@export var cross_burst_rotation: float = 12.0
+@export var cross_burst_delay: float = 0.12
+
+var orbit_direction: float = 1.0
+var orbit_wall_turn_cooldown: float = 0.0
+
+@export var orbit_wall_turn_delay: float = 0.4
 
 @onready var visual: CanvasItem = $Sprite2D
 @onready var health_component: HealthComponent = $Components/HealthComponent
@@ -142,6 +154,16 @@ func configure(stats: Dictionary) -> void:
 		ring_gap_rotation_speed = stats.ring_gap_rotation_speed
 	if stats.has("projectile_scene"):
 		projectile_scene = stats.projectile_scene
+	if stats.has("cross_burst_count"):
+		cross_burst_count = stats.cross_burst_count
+	if stats.has("cross_burst_projectiles"):
+		cross_burst_projectiles = stats.cross_burst_projectiles
+	if stats.has("cross_burst_angle"):
+		cross_burst_angle = stats.cross_burst_angle
+	if stats.has("cross_burst_rotation"):
+		cross_burst_rotation = stats.cross_burst_rotation
+	if stats.has("cross_burst_delay"):
+		cross_burst_delay = stats.cross_burst_delay
 		
 
 func _physics_process(_delta: float) -> void:
@@ -160,7 +182,7 @@ func _physics_process(_delta: float) -> void:
 		MovementPattern.STRAFE:
 			_strafe(_delta)
 		MovementPattern.ORBIT:
-			_orbit()
+			_orbit(_delta)
 	
 func can_see_player() -> bool:
 	if player == null:
@@ -209,6 +231,9 @@ func fire_at_player() -> void:
 			
 		ShotPattern.RING_GAP:
 			fire_ring_gap()
+						
+		ShotPattern.CROSS_BURST:
+			fire_cross_burst(direction)
 
 func spawn_projectile(direction: Vector2) -> void:
 	if projectile_scene == null:
@@ -344,6 +369,50 @@ func fire_ring_gap() -> void:
 		ring_gap_rotation + ring_gap_rotation_speed,
 		360.0
 	)
+	
+func fire_cross_burst(_initial_direction: Vector2) -> void:
+	for burst_index in range(cross_burst_count):
+		if player == null:
+			return
+
+		# Re-aim every burst.
+		var aim_direction := (
+			player.global_position - global_position
+		).normalized()
+
+		# Alternate the spread rotation left/right.
+		var rotation_sign := 1.0
+		if burst_index % 2 == 1:
+			rotation_sign = -1.0
+
+		var rotation_offset := deg_to_rad(
+			cross_burst_rotation
+			* rotation_sign
+		)
+
+		var total_angle := deg_to_rad(cross_burst_angle)
+		var start_angle := -total_angle / 2.0
+
+		var step := 0.0
+		if cross_burst_projectiles > 1:
+			step = total_angle / (
+				cross_burst_projectiles - 1
+			)
+
+		for i in range(cross_burst_projectiles):
+			var angle := (
+				start_angle
+				+ step * i
+				+ rotation_offset
+			)
+
+			var bullet_direction := aim_direction.rotated(angle)
+
+			spawn_projectile(bullet_direction)
+
+		await get_tree().create_timer(
+			cross_burst_delay
+		).timeout
 
 func _kite() -> void:
 	if player == null:
@@ -430,9 +499,13 @@ func _bounce(_delta: float) -> void:
 	velocity = desired_dir * move_speed * 1.15
 	move_and_slide()
 	
-func _orbit() -> void:
+func _orbit(delta: float) -> void:
 	if player == null:
 		return
+
+	# Update wall-turn cooldown.
+	if orbit_wall_turn_cooldown > 0.0:
+		orbit_wall_turn_cooldown -= delta
 
 	var to_player := player.global_position - global_position
 	var distance := to_player.length()
@@ -443,10 +516,11 @@ func _orbit() -> void:
 
 	var toward_player := to_player.normalized()
 
+	# Perpendicular direction around the player.
 	var sideways := Vector2(
 		-toward_player.y,
 		toward_player.x
-	)
+	) * orbit_direction
 
 	var movement := sideways
 
@@ -461,6 +535,14 @@ func _orbit() -> void:
 	velocity = movement.normalized() * move_speed
 
 	move_and_slide()
+
+	# If we hit something, reverse the orbit direction.
+	if (
+		get_slide_collision_count() > 0
+		and orbit_wall_turn_cooldown <= 0.0
+	):
+		orbit_direction *= -1.0
+		orbit_wall_turn_cooldown = orbit_wall_turn_delay
 
 func _on_damaged(amount: float) -> void:
 	Fx.damage_number(global_position + Vector2(0, -24), amount)
