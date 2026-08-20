@@ -1,0 +1,69 @@
+[gd_scene format=3 uid="uid://l8a3ie254bsb"]
+
+[ext_resource type="PackedScene" uid="uid://1dl1typf2xi7" path="res://scenes/UI/inventory_ui.tscn" id="1_vhlkx"]
+[ext_resource type="PackedScene" uid="uid://bflqf7utyisom" path="res://scenes/UI/ability_menu_ui.tscn" id="2_pvdol"]
+[ext_resource type="PackedScene" uid="uid://dohp1shpamvax" path="res://scenes/UI/stats_menu.tscn" id="3_ote5r"]
+[ext_resource type="Script" uid="uid://xix1m8wrjvn5" path="res://scenes/UI/player_menu.gd" id="4_pmenu"]
+
+[node name="PlayerMenu" type="CanvasLayer" unique_id=1341511367]
+script = ExtResource("4_pmenu")
+
+[node name="CenterContainer" type="CenterContainer" parent="." unique_id=1178584805]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="PanelContainer" type="PanelContainer" parent="CenterContainer" unique_id=1970017090]
+custom_minimum_size = Vector2(1100, 900)
+layout_mode = 2
+
+[node name="MarginContainer" type="MarginContainer" parent="CenterContainer/PanelContainer" unique_id=1806454726]
+layout_mode = 2
+theme_override_constants/margin_left = 30
+theme_override_constants/margin_top = 30
+theme_override_constants/margin_right = 25
+theme_override_constants/margin_bottom = 25
+
+[node name="MainVBox" type="VBoxContainer" parent="CenterContainer/PanelContainer/MarginContainer" unique_id=1024389221]
+layout_mode = 2
+theme_override_constants/separation = 16
+
+[node name="Header" type="HBoxContainer" parent="CenterContainer/PanelContainer/MarginContainer/MainVBox" unique_id=650113746]
+layout_mode = 2
+
+[node name="Title" type="Label" parent="CenterContainer/PanelContainer/MarginContainer/MainVBox/Header" unique_id=931345995]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 32
+text = "PLAYER MENU"
+horizontal_alignment = 1
+
+[node name="CloseButton" type="Button" parent="CenterContainer/PanelContainer/MarginContainer/MainVBox/Header" unique_id=563893231]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(50, 50)
+layout_mode = 2
+text = "x"
+
+[node name="HSeparator" type="HSeparator" parent="CenterContainer/PanelContainer/MarginContainer/MainVBox" unique_id=1156090535]
+layout_mode = 2
+
+[node name="TabContainer" type="TabContainer" parent="CenterContainer/PanelContainer/MarginContainer/MainVBox" unique_id=1614028767]
+layout_mode = 2
+size_flags_vertical = 3
+current_tab = 2
+
+[node name="Inventory" parent="CenterContainer/PanelContainer/MarginContainer/MainVBox/TabContainer" unique_id=890608432 instance=ExtResource("1_vhlkx")]
+visible = false
+layout_mode = 2
+metadata/_tab_index = 0
+
+[node name="Abilities" parent="CenterContainer/PanelContainer/MarginContainer/MainVBox/TabContainer" unique_id=565997490 instance=ExtResource("2_pvdol")]
+visible = false
+layout_mode = 2
+metadata/_tab_index = 1
+
+[node name="Stats" parent="CenterContainer/PanelContainer/MarginContainer/MainVBox/TabContainer" unique_id=1276980509 instance=ExtResource("3_ote5r")]
+layout_mode = 2
+metadata/_tab_index = 2

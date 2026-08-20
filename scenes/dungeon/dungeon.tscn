@@ -6,10 +6,8 @@
 [ext_resource type="PackedScene" path="res://scenes/UI/boss_health_bar.tscn" id="4_boss_hp"]
 [ext_resource type="Script" uid="uid://clmn8utdyvei6" path="res://scenes/UI/minimap.gd" id="5_minimap"]
 [ext_resource type="PackedScene" uid="uid://cktjjn0cmkhvv" path="res://scenes/UI/shop_ui.tscn" id="5_vhky6"]
-[ext_resource type="PackedScene" uid="uid://1dl1typf2xi7" path="res://scenes/UI/inventory_ui.tscn" id="7_bsb75"]
 [ext_resource type="PackedScene" uid="uid://daq0vn44ulaa2" path="res://scenes/UI/death_reward_ui.tscn" id="8_h6dl1"]
-[ext_resource type="PackedScene" path="res://scenes/UI/ability_menu_ui.tscn" id="9_amenu"]
-[ext_resource type="PackedScene" uid="uid://dohp1shpamvax" path="res://scenes/UI/stats_menu.tscn" id="10_stats"]
+[ext_resource type="PackedScene" uid="uid://l8a3ie254bsb" path="res://scenes/UI/player_menu.tscn" id="11_pmenu"]
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_frwky"]
 texture = ExtResource("2_4f38h")
@@ -189,13 +187,7 @@ script = ExtResource("5_minimap")
 
 [node name="ShopUI" parent="." unique_id=1633812390 instance=ExtResource("5_vhky6")]
 
-[node name="InventoryUI" parent="." unique_id=767680652 instance=ExtResource("7_bsb75")]
-unique_name_in_owner = true
-
-[node name="AbilityMenuUI" parent="." unique_id=767680653 instance=ExtResource("9_amenu")]
-unique_name_in_owner = true
-
-[node name="StatsMenu" parent="." unique_id=767680654 instance=ExtResource("10_stats")]
+[node name="PlayerMenu" parent="." unique_id=767680652 instance=ExtResource("11_pmenu")]
 unique_name_in_owner = true
 
 [node name="DeathRewardUI" parent="." unique_id=288556813 instance=ExtResource("8_h6dl1")]

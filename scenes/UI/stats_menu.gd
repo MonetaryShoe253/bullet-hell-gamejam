@@ -1,28 +1,21 @@
 class_name StatsMenu
-extends CanvasLayer
+extends Control
 
 var _player: Player
 
 @onready var close_button: Button = %CloseButton
 
-@onready var damage_label: Label = $CenterContainer/PanelContainer/MarginContainer/MainVBox/StatsContainer/DamageLabel
-@onready var fire_rate_label: Label = $CenterContainer/PanelContainer/MarginContainer/MainVBox/StatsContainer/FireRateLabel
-@onready var health_label: Label = $CenterContainer/PanelContainer/MarginContainer/MainVBox/StatsContainer/HealthLabel
-@onready var speed_label: Label = $CenterContainer/PanelContainer/MarginContainer/MainVBox/StatsContainer/SpeedLabel
-@onready var projectile_range_label: Label = $CenterContainer/PanelContainer/MarginContainer/MainVBox/StatsContainer/ProjectileRangeLabel
-@onready var dash_cooldown_label: Label = $CenterContainer/PanelContainer/MarginContainer/MainVBox/StatsContainer/DashCooldownLabel
+@onready var damage_label: Label = $MarginContainer/MainVBox/StatsContainer/DamageLabel
+@onready var fire_rate_label: Label = $MarginContainer/MainVBox/StatsContainer/FireRateLabel
+@onready var health_label: Label = $MarginContainer/MainVBox/StatsContainer/HealthLabel
+@onready var speed_label: Label = $MarginContainer/MainVBox/StatsContainer/SpeedLabel
+@onready var projectile_range_label: Label = $MarginContainer/MainVBox/StatsContainer/ProjectileRangeLabel
+@onready var dash_cooldown_label: Label = $MarginContainer/MainVBox/StatsContainer/DashCooldownLabel
 
 
 func _ready() -> void:
-	close_button.pressed.connect(hide)
 	visibility_changed.connect(_on_visibility_changed)
 	hide()
-
-
-func _unhandled_input(event: InputEvent) -> void:
-	if event.is_action_pressed("stats_menu"):
-		visible = not visible
-		get_viewport().set_input_as_handled()
 
 
 func setup(player: Player) -> void:

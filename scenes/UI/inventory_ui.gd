@@ -1,5 +1,5 @@
 class_name InventoryUI
-extends CanvasLayer
+extends Control
 
 var player: Player
 var inventory: InventoryComponent
@@ -24,8 +24,8 @@ var item_buttons: Array[Button] = []
 
 
 func _ready() -> void:
-	close_button.pressed.connect(close)
 	equip_button.pressed.connect(_on_equip_pressed)
+	visibility_changed.connect(_on_visibility_changed)
 	
 	weapon_slot.pressed.connect(
 		func():
@@ -173,24 +173,21 @@ func _is_equipped(item: Item) -> bool:
 		or inventory.equipped_accessory == item
 	)
 
-func _unhandled_input(event: InputEvent) -> void:
-	if event.is_action_pressed("inventory"):
-		if visible:
-			close()
-		else:
-			open()
-
-		get_viewport().set_input_as_handled()
-		
 func _on_inventory_changed(_item: Item) -> void:
 	_refresh()
 
 func _on_equipment_changed() -> void:
 	_refresh()
-	
-func open() -> void:
-	_refresh()
-	show()
 
-func close() -> void:
-	hide()
+## Refreshes on show() as well as being called directly, so the panel is
+## always current the moment it becomes visible - whether that's this scene
+## being shown directly or a parent tab container switching to it.
+##
+## The inventory == null guard matters here specifically: TabContainer
+## forces its current tab's `visible` to true as part of its own setup,
+## which can fire this before setup() has ever been called - without the
+## guard that's a crash on inventory.items with inventory still null.
+func _on_visibility_changed() -> void:
+	if not visible or inventory == null:
+		return
+	_refresh()
