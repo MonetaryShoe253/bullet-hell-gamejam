@@ -1,5 +1,5 @@
 class_name AbilityMenuUI
-extends CanvasLayer
+extends Control
 
 ## ACTIVE/PASSIVE can never swap with each other - a PassiveAbility can't go
 ## in an AbilityComponent slot or vice versa.
@@ -32,8 +32,8 @@ var _sel_resource: Resource = null  # the Ability/PassiveAbility currently picke
 
 
 func _ready() -> void:
-	close_button.pressed.connect(close)
 	action_button.pressed.connect(_on_unequip_pressed)
+	visibility_changed.connect(_on_visibility_changed)
 
 	for i in active_slot_buttons.size():
 		var index := i
@@ -56,23 +56,22 @@ func setup(target_player: Player) -> void:
 	inventory.passive_ability_added.connect(_on_inventory_changed)
 
 
-func _unhandled_input(event: InputEvent) -> void:
-	if event.is_action_pressed("ability_menu"):
-		if visible:
-			close()
-		else:
-			open()
-		get_viewport().set_input_as_handled()
-
-
-func open() -> void:
+## Refreshes on show() as well as being called directly, so the panel is
+## always current the moment it becomes visible - whether that's this scene
+## being shown directly or a parent tab container switching to it. Also
+## drops any pending swap-selection from last time it was open, same as
+## open() used to before this was folded into a visibility hook.
+##
+## The player == null guard matters here specifically: TabContainer forces
+## its current tab's `visible` to true as part of its own setup, which can
+## fire this before setup() has ever been called (e.g. on scene load, before
+## dungeon_map.gd gets a chance to call it) - without the guard that's a
+## crash on ability_component.slots with ability_component still null.
+func _on_visibility_changed() -> void:
+	if not visible or player == null:
+		return
 	_clear_selection()
 	_refresh()
-	show()
-
-
-func close() -> void:
-	hide()
 
 
 func _on_inventory_changed(_added: Resource) -> void:
@@ -87,15 +86,16 @@ func _refresh() -> void:
 
 
 func _refresh_slots() -> void:
-	for i in active_slot_buttons.size():
-		var ability: Ability = (
-			ability_component.slots[i] if i < ability_component.slots.size() else null
-		)
-		var selected := _has_selection and _sel_kind == Kind.ACTIVE and _sel_place == Place.SLOT and _sel_index == i
-		active_slot_buttons[i].text = (
-			("» " if selected else "")
-			+ "ACTIVE %d\n%s" % [i + 1, ability.ability_name if ability else "Empty"]
-		)
+	if active_slot_buttons.size() > 0:
+		for i in active_slot_buttons.size():
+			var ability: Ability = (
+				ability_component.slots[i] if i < ability_component.slots.size() else null
+			)
+			var selected := _has_selection and _sel_kind == Kind.ACTIVE and _sel_place == Place.SLOT and _sel_index == i
+			active_slot_buttons[i].text = (
+				("» " if selected else "")
+				+ "ACTIVE %d\n%s" % [i + 1, ability.ability_name if ability else "Empty"]
+			)
 
 	for i in passive_slot_buttons.size():
 		var passive: PassiveAbility = (

@@ -2,55 +2,49 @@
 
 [ext_resource type="Script" uid="uid://dc1n8ud5mpe38" path="res://scenes/UI/inventory_ui.gd" id="1_brv7c"]
 
-[node name="InventoryUI" type="CanvasLayer" unique_id=767680652]
-script = ExtResource("1_brv7c")
-
-[node name="CenterContainer" type="CenterContainer" parent="." unique_id=488097434]
+[node name="InventoryUI" type="Control" unique_id=890608432]
+layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+script = ExtResource("1_brv7c")
 
-[node name="PanelContainer" type="PanelContainer" parent="CenterContainer" unique_id=190249562]
-custom_minimum_size = Vector2(900, 600)
-layout_mode = 2
-
-[node name="MarginContainer" type="MarginContainer" parent="CenterContainer/PanelContainer" unique_id=158799160]
-layout_mode = 2
+[node name="MarginContainer" type="MarginContainer" parent="." unique_id=158799160]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
 theme_override_constants/margin_left = 30
 theme_override_constants/margin_top = 30
 theme_override_constants/margin_right = 25
 theme_override_constants/margin_bottom = 25
 
-[node name="MainVBox" type="VBoxContainer" parent="CenterContainer/PanelContainer/MarginContainer" unique_id=1479340363]
+[node name="MainVBox" type="VBoxContainer" parent="MarginContainer" unique_id=1479340363]
 layout_mode = 2
 theme_override_constants/separation = 20
 
-[node name="Header" type="HBoxContainer" parent="CenterContainer/PanelContainer/MarginContainer/MainVBox" unique_id=1782008928]
+[node name="Header" type="HBoxContainer" parent="MarginContainer/MainVBox" unique_id=1782008928]
 layout_mode = 2
 
-[node name="Title" type="Label" parent="CenterContainer/PanelContainer/MarginContainer/MainVBox/Header" unique_id=788583646]
+[node name="Title" type="Label" parent="MarginContainer/MainVBox/Header" unique_id=788583646]
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_font_sizes/font_size = 32
 text = "INVENTORY"
 horizontal_alignment = 1
 
-[node name="CloseButton" type="Button" parent="CenterContainer/PanelContainer/MarginContainer/MainVBox/Header" unique_id=310774462]
-unique_name_in_owner = true
-custom_minimum_size = Vector2(50, 50)
-layout_mode = 2
-text = "X"
-
-[node name="EquipedTitle" type="Label" parent="CenterContainer/PanelContainer/MarginContainer/MainVBox" unique_id=1691397611]
+[node name="EquipedTitle" type="Label" parent="MarginContainer/MainVBox" unique_id=1691397611]
 layout_mode = 2
 text = "EQUIPPED"
 
-[node name="EquipmentSlots" type="HBoxContainer" parent="CenterContainer/PanelContainer/MarginContainer/MainVBox" unique_id=1402997232]
+[node name="EquipmentSlots" type="HBoxContainer" parent="MarginContainer/MainVBox" unique_id=1402997232]
 layout_mode = 2
 
-[node name="WeaponSlot" type="Button" parent="CenterContainer/PanelContainer/MarginContainer/MainVBox/EquipmentSlots" unique_id=2018674715]
+[node name="WeaponSlot" type="Button" parent="MarginContainer/MainVBox/EquipmentSlots" unique_id=2018674715]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(180, 100)
 layout_mode = 2
@@ -58,7 +52,7 @@ size_flags_horizontal = 3
 text = "WEAPON
 Empty"
 
-[node name="ArmourSlot" type="Button" parent="CenterContainer/PanelContainer/MarginContainer/MainVBox/EquipmentSlots" unique_id=369214623]
+[node name="ArmourSlot" type="Button" parent="MarginContainer/MainVBox/EquipmentSlots" unique_id=369214623]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(180, 100)
 layout_mode = 2
@@ -66,7 +60,7 @@ size_flags_horizontal = 3
 text = "ARMOUR
 Empty"
 
-[node name="AccessorySlot" type="Button" parent="CenterContainer/PanelContainer/MarginContainer/MainVBox/EquipmentSlots" unique_id=185542845]
+[node name="AccessorySlot" type="Button" parent="MarginContainer/MainVBox/EquipmentSlots" unique_id=185542845]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(180, 100)
 layout_mode = 2
@@ -74,50 +68,50 @@ size_flags_horizontal = 3
 text = "ACCESSORY
 Empty"
 
-[node name="HSeparator" type="HSeparator" parent="CenterContainer/PanelContainer/MarginContainer/MainVBox" unique_id=1811316019]
+[node name="HSeparator" type="HSeparator" parent="MarginContainer/MainVBox" unique_id=1811316019]
 layout_mode = 2
 
-[node name="Conent" type="HBoxContainer" parent="CenterContainer/PanelContainer/MarginContainer/MainVBox" unique_id=1760339999]
+[node name="Conent" type="HBoxContainer" parent="MarginContainer/MainVBox" unique_id=1760339999]
 layout_mode = 2
 
-[node name="InventorySection" type="VBoxContainer" parent="CenterContainer/PanelContainer/MarginContainer/MainVBox/Conent" unique_id=349825405]
+[node name="InventorySection" type="VBoxContainer" parent="MarginContainer/MainVBox/Conent" unique_id=349825405]
 layout_mode = 2
 size_flags_horizontal = 3
 
-[node name="InventoryTitle" type="Label" parent="CenterContainer/PanelContainer/MarginContainer/MainVBox/Conent/InventorySection" unique_id=135687500]
+[node name="InventoryTitle" type="Label" parent="MarginContainer/MainVBox/Conent/InventorySection" unique_id=135687500]
 layout_mode = 2
 text = "ITEMS"
 
-[node name="ItemGrid" type="GridContainer" parent="CenterContainer/PanelContainer/MarginContainer/MainVBox/Conent/InventorySection" unique_id=1736426637]
+[node name="ItemGrid" type="GridContainer" parent="MarginContainer/MainVBox/Conent/InventorySection" unique_id=1736426637]
 unique_name_in_owner = true
 layout_mode = 2
 columns = 4
 
-[node name="DetailsPanel" type="PanelContainer" parent="CenterContainer/PanelContainer/MarginContainer/MainVBox/Conent" unique_id=1347766453]
+[node name="DetailsPanel" type="PanelContainer" parent="MarginContainer/MainVBox/Conent" unique_id=1347766453]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(300, 350)
+custom_minimum_size = Vector2(300, 200)
 layout_mode = 2
 size_flags_horizontal = 3
 
-[node name="DetailsVBox" type="VBoxContainer" parent="CenterContainer/PanelContainer/MarginContainer/MainVBox/Conent/DetailsPanel" unique_id=426934812]
+[node name="DetailsVBox" type="VBoxContainer" parent="MarginContainer/MainVBox/Conent/DetailsPanel" unique_id=426934812]
 layout_mode = 2
 
-[node name="ItemName" type="Label" parent="CenterContainer/PanelContainer/MarginContainer/MainVBox/Conent/DetailsPanel/DetailsVBox" unique_id=1035000766]
+[node name="ItemName" type="Label" parent="MarginContainer/MainVBox/Conent/DetailsPanel/DetailsVBox" unique_id=1035000766]
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_font_sizes/font_size = 24
 
-[node name="ItemDescription" type="Label" parent="CenterContainer/PanelContainer/MarginContainer/MainVBox/Conent/DetailsPanel/DetailsVBox" unique_id=1238050899]
+[node name="ItemDescription" type="Label" parent="MarginContainer/MainVBox/Conent/DetailsPanel/DetailsVBox" unique_id=1238050899]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(50, 0)
 layout_mode = 2
 autowrap_mode = 3
 
-[node name="ItemStats" type="Label" parent="CenterContainer/PanelContainer/MarginContainer/MainVBox/Conent/DetailsPanel/DetailsVBox" unique_id=859782663]
+[node name="ItemStats" type="Label" parent="MarginContainer/MainVBox/Conent/DetailsPanel/DetailsVBox" unique_id=859782663]
 unique_name_in_owner = true
 layout_mode = 2
 
-[node name="EquipButton" type="Button" parent="CenterContainer/PanelContainer/MarginContainer/MainVBox/Conent/DetailsPanel/DetailsVBox" unique_id=1208345966]
+[node name="EquipButton" type="Button" parent="MarginContainer/MainVBox/Conent/DetailsPanel/DetailsVBox" unique_id=1208345966]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(0, 50)
 layout_mode = 2

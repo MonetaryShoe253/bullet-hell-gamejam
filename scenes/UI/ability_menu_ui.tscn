@@ -1,57 +1,51 @@
-[gd_scene format=3]
+[gd_scene format=3 uid="uid://bflqf7utyisom"]
 
-[ext_resource type="Script" path="res://scenes/UI/ability_menu_ui.gd" id="1_amenu"]
+[ext_resource type="Script" uid="uid://6oyog8ogx1ls" path="res://scenes/UI/ability_menu_ui.gd" id="1_amenu"]
 
-[node name="AbilityMenuUI" type="CanvasLayer"]
-script = ExtResource("1_amenu")
-
-[node name="CenterContainer" type="CenterContainer" parent="."]
+[node name="AbilityMenuUI" type="Control" unique_id=565997490]
+layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+script = ExtResource("1_amenu")
 
-[node name="PanelContainer" type="PanelContainer" parent="CenterContainer"]
-custom_minimum_size = Vector2(1000, 700)
-layout_mode = 2
-
-[node name="MarginContainer" type="MarginContainer" parent="CenterContainer/PanelContainer"]
-layout_mode = 2
+[node name="MarginContainer" type="MarginContainer" parent="." unique_id=476666086]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
 theme_override_constants/margin_left = 30
 theme_override_constants/margin_top = 30
 theme_override_constants/margin_right = 25
 theme_override_constants/margin_bottom = 25
 
-[node name="MainVBox" type="VBoxContainer" parent="CenterContainer/PanelContainer/MarginContainer"]
+[node name="MainVBox" type="VBoxContainer" parent="MarginContainer" unique_id=315942216]
 layout_mode = 2
 theme_override_constants/separation = 16
 
-[node name="Header" type="HBoxContainer" parent="CenterContainer/PanelContainer/MarginContainer/MainVBox"]
+[node name="Header" type="HBoxContainer" parent="MarginContainer/MainVBox" unique_id=1606617286]
 layout_mode = 2
 
-[node name="Title" type="Label" parent="CenterContainer/PanelContainer/MarginContainer/MainVBox/Header"]
+[node name="Title" type="Label" parent="MarginContainer/MainVBox/Header" unique_id=1018761506]
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_font_sizes/font_size = 32
 text = "ABILITIES"
 horizontal_alignment = 1
 
-[node name="CloseButton" type="Button" parent="CenterContainer/PanelContainer/MarginContainer/MainVBox/Header"]
-unique_name_in_owner = true
-custom_minimum_size = Vector2(50, 50)
-layout_mode = 2
-text = "X"
-
-[node name="ActiveTitle" type="Label" parent="CenterContainer/PanelContainer/MarginContainer/MainVBox"]
+[node name="ActiveTitle" type="Label" parent="MarginContainer/MainVBox" unique_id=865304643]
 layout_mode = 2
 text = "ACTIVE SLOTS"
 
-[node name="ActiveSlots" type="HBoxContainer" parent="CenterContainer/PanelContainer/MarginContainer/MainVBox"]
+[node name="ActiveSlots" type="HBoxContainer" parent="MarginContainer/MainVBox" unique_id=1275580576]
 layout_mode = 2
 theme_override_constants/separation = 20
 
-[node name="ActiveSlot1" type="Button" parent="CenterContainer/PanelContainer/MarginContainer/MainVBox/ActiveSlots"]
+[node name="ActiveSlot1" type="Button" parent="MarginContainer/MainVBox/ActiveSlots" unique_id=567039082]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(200, 80)
 layout_mode = 2
@@ -59,7 +53,7 @@ size_flags_horizontal = 3
 text = "ACTIVE 1
 Empty"
 
-[node name="ActiveSlot2" type="Button" parent="CenterContainer/PanelContainer/MarginContainer/MainVBox/ActiveSlots"]
+[node name="ActiveSlot2" type="Button" parent="MarginContainer/MainVBox/ActiveSlots" unique_id=797730989]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(200, 80)
 layout_mode = 2
@@ -67,15 +61,15 @@ size_flags_horizontal = 3
 text = "ACTIVE 2
 Empty"
 
-[node name="PassiveTitle" type="Label" parent="CenterContainer/PanelContainer/MarginContainer/MainVBox"]
+[node name="PassiveTitle" type="Label" parent="MarginContainer/MainVBox" unique_id=1610675172]
 layout_mode = 2
 text = "PASSIVE SLOTS"
 
-[node name="PassiveSlots" type="HBoxContainer" parent="CenterContainer/PanelContainer/MarginContainer/MainVBox"]
+[node name="PassiveSlots" type="HBoxContainer" parent="MarginContainer/MainVBox" unique_id=1173025580]
 layout_mode = 2
 theme_override_constants/separation = 20
 
-[node name="PassiveSlot1" type="Button" parent="CenterContainer/PanelContainer/MarginContainer/MainVBox/PassiveSlots"]
+[node name="PassiveSlot1" type="Button" parent="MarginContainer/MainVBox/PassiveSlots" unique_id=759441531]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(200, 80)
 layout_mode = 2
@@ -83,7 +77,7 @@ size_flags_horizontal = 3
 text = "PASSIVE 1
 Empty"
 
-[node name="PassiveSlot2" type="Button" parent="CenterContainer/PanelContainer/MarginContainer/MainVBox/PassiveSlots"]
+[node name="PassiveSlot2" type="Button" parent="MarginContainer/MainVBox/PassiveSlots" unique_id=820029806]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(200, 80)
 layout_mode = 2
@@ -91,51 +85,51 @@ size_flags_horizontal = 3
 text = "PASSIVE 2
 Empty"
 
-[node name="HSeparator" type="HSeparator" parent="CenterContainer/PanelContainer/MarginContainer/MainVBox"]
+[node name="HSeparator" type="HSeparator" parent="MarginContainer/MainVBox" unique_id=1007420441]
 layout_mode = 2
 
-[node name="Content" type="HBoxContainer" parent="CenterContainer/PanelContainer/MarginContainer/MainVBox"]
+[node name="Content" type="HBoxContainer" parent="MarginContainer/MainVBox" unique_id=599264661]
 layout_mode = 2
 theme_override_constants/separation = 20
 
-[node name="OwnedSection" type="VBoxContainer" parent="CenterContainer/PanelContainer/MarginContainer/MainVBox/Content"]
+[node name="OwnedSection" type="VBoxContainer" parent="MarginContainer/MainVBox/Content" unique_id=677277736]
 layout_mode = 2
 size_flags_horizontal = 3
 
-[node name="OwnedTitle" type="Label" parent="CenterContainer/PanelContainer/MarginContainer/MainVBox/Content/OwnedSection"]
+[node name="OwnedTitle" type="Label" parent="MarginContainer/MainVBox/Content/OwnedSection" unique_id=919299596]
 layout_mode = 2
 text = "OWNED (unequipped)"
 
-[node name="OwnedGrid" type="GridContainer" parent="CenterContainer/PanelContainer/MarginContainer/MainVBox/Content/OwnedSection"]
+[node name="OwnedGrid" type="GridContainer" parent="MarginContainer/MainVBox/Content/OwnedSection" unique_id=45805391]
 unique_name_in_owner = true
 layout_mode = 2
 columns = 3
 
-[node name="DetailsPanel" type="PanelContainer" parent="CenterContainer/PanelContainer/MarginContainer/MainVBox/Content"]
+[node name="DetailsPanel" type="PanelContainer" parent="MarginContainer/MainVBox/Content" unique_id=1906727977]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(300, 350)
+custom_minimum_size = Vector2(300, 200)
 layout_mode = 2
 size_flags_horizontal = 3
 
-[node name="DetailsVBox" type="VBoxContainer" parent="CenterContainer/PanelContainer/MarginContainer/MainVBox/Content/DetailsPanel"]
+[node name="DetailsVBox" type="VBoxContainer" parent="MarginContainer/MainVBox/Content/DetailsPanel" unique_id=474772788]
 layout_mode = 2
 
-[node name="AbilityName" type="Label" parent="CenterContainer/PanelContainer/MarginContainer/MainVBox/Content/DetailsPanel/DetailsVBox"]
+[node name="AbilityName" type="Label" parent="MarginContainer/MainVBox/Content/DetailsPanel/DetailsVBox" unique_id=759673857]
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_font_sizes/font_size = 24
 
-[node name="AbilityDescription" type="Label" parent="CenterContainer/PanelContainer/MarginContainer/MainVBox/Content/DetailsPanel/DetailsVBox"]
+[node name="AbilityDescription" type="Label" parent="MarginContainer/MainVBox/Content/DetailsPanel/DetailsVBox" unique_id=1965711861]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(50, 0)
 layout_mode = 2
 autowrap_mode = 3
 
-[node name="AbilityStats" type="Label" parent="CenterContainer/PanelContainer/MarginContainer/MainVBox/Content/DetailsPanel/DetailsVBox"]
+[node name="AbilityStats" type="Label" parent="MarginContainer/MainVBox/Content/DetailsPanel/DetailsVBox" unique_id=168661333]
 unique_name_in_owner = true
 layout_mode = 2
 
-[node name="ActionButton" type="Button" parent="CenterContainer/PanelContainer/MarginContainer/MainVBox/Content/DetailsPanel/DetailsVBox"]
+[node name="ActionButton" type="Button" parent="MarginContainer/MainVBox/Content/DetailsPanel/DetailsVBox" unique_id=955620877]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(0, 50)
 layout_mode = 2
