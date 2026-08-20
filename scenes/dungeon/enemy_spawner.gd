@@ -10,6 +10,11 @@ var _rng := RandomNumberGenerator.new()
 var _wave_index_by_room: Dictionary = {}
 var _budget_by_room: Dictionary = {}
 
+const SpawnIndicatorScene := preload(
+	"res://scenes/effects/spawn_indicator.tscn"
+)
+const SPAWN_WARNING_DURATION := 0.65
+
 func _init(parent: Node, tile_layer: TileMapLayer, player: Node2D) -> void:
 	_parent = parent
 	_tile_layer = tile_layer
@@ -41,23 +46,68 @@ func _roll_wave_count(budget: float) -> int:
 	return 1
 
 
-func _spawn_wave(gen: DungeonGenerator, room: Rect2i, room_controller: RoomController, total_waves: int) -> void:
+func _spawn_wave(
+	gen: DungeonGenerator,
+	room: Rect2i,
+	room_controller: RoomController,
+	total_waves: int
+) -> void:
 	var wave_index: int = _wave_index_by_room.get(room, 0)
 	var total_budget: float = _budget_by_room.get(room, 6.0)
 	var wave_budget := total_budget / float(maxi(total_waves, 1))
+
 	wave_budget *= 0.9 + float(wave_index) * 0.15
 
-	var composition := _build_composition(gen.theme_of(room), wave_budget)
+	var composition := _build_composition(
+		gen.theme_of(room),
+		wave_budget
+	)
+
 	var exclude: Array = []
 	var used: Array[Vector2i] = []
+
+	var pending_spawns: Array[Dictionary] = []
+
 	for definition: Dictionary in composition:
-		var cell := _spawn_cell(gen, room, definition, wave_index, exclude, used)
+		var cell := _spawn_cell(
+			gen,
+			room,
+			definition,
+			wave_index,
+			exclude,
+			used
+		)
+
 		used.append(cell)
-		_spawn(definition, cell, room_controller)
+
+		pending_spawns.append({
+			"definition": definition,
+			"cell": cell
+		})
+
+		_spawn_indicator(cell)
+
+	await _parent.get_tree().create_timer(
+		SPAWN_WARNING_DURATION
+	).timeout
+
+	for pending: Dictionary in pending_spawns:
+		_spawn(
+			pending["definition"],
+			pending["cell"],
+			room_controller
+		)
 
 	_wave_index_by_room[room] = wave_index + 1
 
+func _spawn_indicator(cell: Vector2i) -> void:
+	var indicator: SpawnIndicator = SpawnIndicatorScene.instantiate()
 
+	indicator.position = _tile_layer.map_to_local(cell)
+	indicator.duration = SPAWN_WARNING_DURATION
+
+	_parent.add_child(indicator)
+	
 func _build_composition(theme: DungeonGenerator.RoomTheme, budget: float) -> Array[Dictionary]:
 	var pool := EnemyCatalog.eligible(GameState.level, theme)
 	var result: Array[Dictionary] = []
@@ -161,10 +211,17 @@ func spawn_boss(
 	)
 
 	var boss_definition: Dictionary = EnemyCatalog.BOSSES[boss_index]
+	var spawn_cell := room.position + room.size / 2
+
+	_spawn_indicator(spawn_cell)
+
+	await _parent.get_tree().create_timer(
+		SPAWN_WARNING_DURATION
+	).timeout
 
 	_spawn(
 		boss_definition,
-		room.position + room.size / 2,
+		spawn_cell,
 		room_controller,
 		on_spawned
 	)
