@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://ctdtwl5e1dn8i"
-path="res://.godot/imported/hot_wings.png-0914398193614debaad4348b04546da6.ctex"
+uid="uid://b3nucbdsjiv6i"
+path="res://.godot/imported/shield.png-019343ef72b9ca2fa9c27d3848d5547c.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/items/hot_wings.png"
-dest_files=["res://.godot/imported/hot_wings.png-0914398193614debaad4348b04546da6.ctex"]
+source_file="res://assets/shop/abilities/shield.png"
+dest_files=["res://.godot/imported/shield.png-019343ef72b9ca2fa9c27d3848d5547c.ctex"]
 
 [params]
 
