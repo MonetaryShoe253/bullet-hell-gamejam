@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="Item" format=3 uid="uid://ds4kowj3hkaox"]
+
+[ext_resource type="Script" uid="uid://ceuvhyf720s15" path="res://scripts/progression/items/item.gd" id="1_2h36c"]
+[ext_resource type="Texture2D" uid="uid://bn6bcb1aivj63" path="res://assets/shop/items/chop.png" id="1_ulv0p"]
+
+[resource]
+script = ExtResource("1_2h36c")
+unlock_id = &"Chicken Cleaver"
+unlock_tier = 3
+item_name = "Chicken Cleaver"
+description = "Chop, slice, then cluck"
+icon = ExtResource("1_ulv0p")
+item_type = 1
+price = 450
+damage = 3.0
+fire_rate_multiplier = 0.0
+metadata/_custom_type_script = "uid://ceuvhyf720s15"

@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="Item" format=3 uid="uid://drsdpgidatlhs"]
+
+[ext_resource type="Script" uid="uid://ceuvhyf720s15" path="res://scripts/progression/items/item.gd" id="1_2h36c"]
+[ext_resource type="Texture2D" uid="uid://do0u2v06pcu10" path="res://assets/shop/items/shield_2.png" id="1_wdm2k"]
+
+[resource]
+script = ExtResource("1_2h36c")
+unlock_id = &"Nugget Shield"
+unlock_tier = 2
+item_name = "Nugget Shield"
+description = "Crispy, sturdy, oddly defensive"
+icon = ExtResource("1_wdm2k")
+item_type = 2
+price = 300
+max_health = 20.0
+move_speed = -10.0
+fire_rate_multiplier = 0.0
+dash_cooldown = -0.3
+metadata/_custom_type_script = "uid://ceuvhyf720s15"

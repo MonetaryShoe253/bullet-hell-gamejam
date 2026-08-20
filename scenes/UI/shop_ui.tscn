@@ -1,31 +1,9 @@
 [gd_scene format=3 uid="uid://cktjjn0cmkhvv"]
 
 [ext_resource type="Script" uid="uid://ndmtkayqc8vc" path="res://scenes/UI/shop_ui.gd" id="1_5tinp"]
-[ext_resource type="Script" uid="uid://b3wq8knx2k7vo" path="res://scripts/progression/shop_upgrade.gd" id="2_yxlag"]
-[ext_resource type="Resource" uid="uid://ltregfafr6x6" path="res://resources/shop_upgrades/extra_damage.tres" id="3_m41hj"]
-[ext_resource type="Resource" uid="uid://dpuavvcjbalc" path="res://resources/shop_upgrades/extra_health.tres" id="4_6l0ir"]
-[ext_resource type="Resource" uid="uid://dcnn14ue6ajfm" path="res://resources/shop_upgrades/faster_dash.tres" id="5_4k3pv"]
-[ext_resource type="Resource" uid="uid://cxqpy7yl2a6xa" path="res://resources/shop_upgrades/faster_firing.tres" id="6_ge6mo"]
-[ext_resource type="Resource" uid="uid://cvdvemftvl3gm" path="res://resources/shop_upgrades/faster_movement.tres" id="7_m2mw0"]
-[ext_resource type="Script" uid="uid://ceuvhyf720s15" path="res://scripts/progression/items/item.gd" id="8_m2mw0"]
-[ext_resource type="Resource" uid="uid://c7t2dw5j0l84t" path="res://resources/items/bucket_helmet.tres" id="9_087to"]
-[ext_resource type="Resource" uid="uid://bjsjfcsmhyl0w" path="res://resources/items/chicken_boots.tres" id="10_57epl"]
-[ext_resource type="Resource" uid="uid://ddvuww5vs8d4r" path="res://resources/items/crispy_armour.tres" id="11_rqu28"]
-[ext_resource type="Resource" uid="uid://dei13ma05ppro" path="res://resources/items/hot_wings.tres" id="12_bxeai"]
-[ext_resource type="Script" uid="uid://c24n76nrnb3o1" path="res://scripts/progression/abilities/abilities.gd" id="13_ab1l1"]
-[ext_resource type="Resource" path="res://resources/abilities/bullet_storm.tres" id="14_bstrm"]
-[ext_resource type="Resource" path="res://resources/abilities/damage_wave.tres" id="15_dwave"]
-[ext_resource type="Resource" path="res://resources/abilities/damage_dash.tres" id="16_ddash"]
-[ext_resource type="Script" uid="uid://b4oy2lqi0n2ie" path="res://scripts/progression/abilities/passive_ability.gd" id="17_pasv1"]
-[ext_resource type="Resource" path="res://resources/passive_abilities/health_regen_on_kill.tres" id="18_hregen"]
-[ext_resource type="Resource" path="res://resources/passive_abilities/force_field.tres" id="19_ffld"]
 
 [node name="ShopUI" type="CanvasLayer" unique_id=1633812390]
 script = ExtResource("1_5tinp")
-upgrade_pool = Array[ExtResource("2_yxlag")]([ExtResource("3_m41hj"), ExtResource("4_6l0ir"), ExtResource("5_4k3pv"), ExtResource("6_ge6mo"), ExtResource("7_m2mw0")])
-item_pool = Array[ExtResource("8_m2mw0")]([ExtResource("9_087to"), ExtResource("10_57epl"), ExtResource("11_rqu28"), ExtResource("12_bxeai")])
-ability_pool = Array[ExtResource("13_ab1l1")]([ExtResource("14_bstrm"), ExtResource("15_dwave"), ExtResource("16_ddash")])
-passive_pool = Array[ExtResource("17_pasv1")]([ExtResource("18_hregen"), ExtResource("19_ffld")])
 
 [node name="CenterContainer" type="CenterContainer" parent="." unique_id=1925415414]
 anchors_preset = 15

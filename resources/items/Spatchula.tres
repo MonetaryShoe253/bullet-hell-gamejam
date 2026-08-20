@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="Item" format=3 uid="uid://bwns2hw2m7pwi"]
+
+[ext_resource type="Script" uid="uid://ceuvhyf720s15" path="res://scripts/progression/items/item.gd" id="1_2h36c"]
+[ext_resource type="Texture2D" uid="uid://bamy2fooesx11" path="res://assets/shop/items/spatchula.png" id="1_p7mlc"]
+
+[resource]
+script = ExtResource("1_2h36c")
+unlock_id = &"Spatchula"
+unlock_tier = 2
+item_name = "Spatchula"
+description = "Flip, smack, serve justice"
+icon = ExtResource("1_p7mlc")
+item_type = 1
+price = 200
+max_health = 5.0
+damage = 1.0
+fire_rate_multiplier = 0.02
+metadata/_custom_type_script = "uid://ceuvhyf720s15"

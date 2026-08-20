@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="Item" format=3 uid="uid://5uik6oodl6ag"]
+
+[ext_resource type="Script" uid="uid://ceuvhyf720s15" path="res://scripts/progression/items/item.gd" id="1_2h36c"]
+[ext_resource type="Texture2D" uid="uid://tvvs0yuge0bn" path="res://assets/shop/items/skewer.png" id="1_qmod2"]
+
+[resource]
+script = ExtResource("1_2h36c")
+unlock_id = &"Skewer"
+unlock_tier = 2
+item_name = "Skewer"
+description = "Pointy stick, serious business"
+icon = ExtResource("1_qmod2")
+item_type = 1
+price = 250
+damage = 1.25
+fire_rate_multiplier = 0.0
+projectile_range = 0.2
+metadata/_custom_type_script = "uid://ceuvhyf720s15"

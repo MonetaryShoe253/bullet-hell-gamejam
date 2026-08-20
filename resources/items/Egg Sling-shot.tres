@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="Item" format=3 uid="uid://desmdrepo3yfp"]
+
+[ext_resource type="Script" uid="uid://ceuvhyf720s15" path="res://scripts/progression/items/item.gd" id="1_2h36c"]
+[ext_resource type="Texture2D" uid="uid://b1ayy07dfrepr" path="res://assets/shop/items/sling-shot.png" id="1_np8tw"]
+
+[resource]
+script = ExtResource("1_2h36c")
+unlock_id = &"Egg Sling-shot"
+unlock_tier = 3
+item_name = "Egg Sling-shot"
+description = "Crack enemies from afar"
+icon = ExtResource("1_np8tw")
+item_type = 1
+price = 400
+damage = 1.0
+move_speed = 5.0
+fire_rate_multiplier = 0.03
+projectile_range = 0.15
+metadata/_custom_type_script = "uid://ceuvhyf720s15"

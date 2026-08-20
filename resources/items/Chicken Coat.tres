@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="Item" format=3 uid="uid://dv2ppegprd1r1"]
+
+[ext_resource type="Script" uid="uid://ceuvhyf720s15" path="res://scripts/progression/items/item.gd" id="1_0i7xq"]
+[ext_resource type="Texture2D" uid="uid://diaduw131ckdw" path="res://assets/shop/items/armour_3.png" id="1_gj0bs"]
+
+[resource]
+script = ExtResource("1_0i7xq")
+unlock_id = &"Chicken Coat"
+unlock_tier = 2
+item_name = "Chicken Coat"
+description = "Cozy coat for combat"
+icon = ExtResource("1_gj0bs")
+price = 250
+max_health = 15.0
+move_speed = 5.0
+fire_rate_multiplier = 0.0
+metadata/_custom_type_script = "uid://ceuvhyf720s15"

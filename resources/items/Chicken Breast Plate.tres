@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="Item" format=3 uid="uid://2qdf2q7bwuu6"]
+
+[ext_resource type="Script" uid="uid://ceuvhyf720s15" path="res://scripts/progression/items/item.gd" id="1_6bok7"]
+[ext_resource type="Texture2D" uid="uid://ddqyq5kj3u4lo" path="res://assets/shop/items/armour_2.png" id="1_yyjq2"]
+
+[resource]
+script = ExtResource("1_6bok7")
+unlock_id = &"Chicken Breast Plate"
+unlock_tier = 3
+item_name = "Chicken Breast Plate"
+description = "Cluck-proof chest protection"
+icon = ExtResource("1_yyjq2")
+price = 450
+max_health = 25.0
+move_speed = -15.0
+fire_rate_multiplier = 0.0
+metadata/_custom_type_script = "uid://ceuvhyf720s15"

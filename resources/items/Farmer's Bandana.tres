@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="Item" format=3 uid="uid://byjsgiqarcws0"]
+
+[ext_resource type="Script" uid="uid://ceuvhyf720s15" path="res://scripts/progression/items/item.gd" id="1_2h36c"]
+[ext_resource type="Texture2D" uid="uid://bdp7udlnbdjfx" path="res://assets/shop/items/bandana.png" id="1_ffaw2"]
+
+[resource]
+script = ExtResource("1_2h36c")
+unlock_id = &"Farmer\'s Bandana"
+unlock_tier = 2
+item_name = "Farmer's Bandana"
+description = "Sweat, dirt, chicken approved"
+icon = ExtResource("1_ffaw2")
+item_type = 2
+price = 250
+max_health = 5.0
+damage = 3.0
+move_speed = 10.0
+fire_rate_multiplier = 0.05
+metadata/_custom_type_script = "uid://ceuvhyf720s15"

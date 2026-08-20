@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="Item" format=3 uid="uid://dnuwihmw2flu5"]
+
+[ext_resource type="Script" uid="uid://ceuvhyf720s15" path="res://scripts/progression/items/item.gd" id="1_2h36c"]
+[ext_resource type="Texture2D" uid="uid://ckiarompw3qc1" path="res://assets/shop/items/toast.png" id="1_wr1y0"]
+
+[resource]
+script = ExtResource("1_2h36c")
+unlock_id = &"Toast"
+item_name = "Toast"
+description = "Crispy emergency equipment"
+icon = ExtResource("1_wr1y0")
+item_type = 2
+price = 100
+max_health = 5.0
+damage = 0.5
+fire_rate_multiplier = 0.0
+metadata/_custom_type_script = "uid://ceuvhyf720s15"

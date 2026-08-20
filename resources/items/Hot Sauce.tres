@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="Item" format=3 uid="uid://2lyk62xhgnuk"]
+
+[ext_resource type="Script" uid="uid://ceuvhyf720s15" path="res://scripts/progression/items/item.gd" id="1_2h36c"]
+[ext_resource type="Texture2D" uid="uid://brblks3dnfh3r" path="res://assets/shop/items/sauce.png" id="1_tmeph"]
+
+[resource]
+script = ExtResource("1_2h36c")
+unlock_id = &"Hot Sauce"
+unlock_tier = 2
+item_name = "Hot Sauce"
+description = "Adds heat to everything"
+icon = ExtResource("1_tmeph")
+item_type = 2
+price = 300
+max_health = -5.0
+damage = 1.25
+move_speed = 10.0
+fire_rate_multiplier = 0.03
+metadata/_custom_type_script = "uid://ceuvhyf720s15"

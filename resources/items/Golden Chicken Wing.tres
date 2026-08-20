@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="Item" format=3 uid="uid://cl0eco6r3gllr"]
+
+[ext_resource type="Script" uid="uid://ceuvhyf720s15" path="res://scripts/progression/items/item.gd" id="1_2h36c"]
+[ext_resource type="Texture2D" uid="uid://bc4s6j0sx1wqw" path="res://assets/shop/items/chicken_glowing.png" id="1_jc7am"]
+
+[resource]
+script = ExtResource("1_2h36c")
+unlock_id = &"Golden Chicken Wing"
+unlock_tier = 5
+item_name = "Golden Chicken Wing"
+description = "A wing worth worshipping"
+icon = ExtResource("1_jc7am")
+item_type = 1
+price = 1000
+damage = 5.0
+fire_rate_multiplier = 0.5
+projectile_range = 0.75
+metadata/_custom_type_script = "uid://ceuvhyf720s15"

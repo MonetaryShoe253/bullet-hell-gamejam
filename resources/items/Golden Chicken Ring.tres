@@ -1,0 +1,21 @@
+[gd_resource type="Resource" script_class="Item" format=3 uid="uid://bl66up5n1y7t1"]
+
+[ext_resource type="Script" uid="uid://ceuvhyf720s15" path="res://scripts/progression/items/item.gd" id="1_2h36c"]
+[ext_resource type="Texture2D" uid="uid://du8fbw5wm1nqj" path="res://assets/shop/items/ring.png" id="1_vcjpy"]
+
+[resource]
+script = ExtResource("1_2h36c")
+unlock_id = &"Golden Chicken Ring"
+unlock_tier = 5
+item_name = "Golden Chicken Ring"
+description = "Clucking with golden power"
+icon = ExtResource("1_vcjpy")
+item_type = 2
+price = 950
+max_health = 20.0
+damage = 5.0
+move_speed = 15.0
+fire_rate_multiplier = 0.3
+dash_cooldown = 0.3
+projectile_range = 0.7
+metadata/_custom_type_script = "uid://ceuvhyf720s15"

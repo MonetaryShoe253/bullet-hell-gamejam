@@ -7,8 +7,8 @@ signal content_unlocked(unlock_id: StringName)
 var unlocked_content: Array[StringName] = []
 
 func _ready() -> void:
-	#load_progression()
-	reset_progression()
+	load_progression()
+	#reset_progression()
 	
 func load_progression() -> void:
 	if not FileAccess.file_exists(SAVE_PATH):

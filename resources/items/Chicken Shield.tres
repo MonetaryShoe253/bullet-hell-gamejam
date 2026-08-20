@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="Item" format=3 uid="uid://xwhk20xr4cqr"]
+
+[ext_resource type="Script" uid="uid://ceuvhyf720s15" path="res://scripts/progression/items/item.gd" id="1_2h36c"]
+[ext_resource type="Texture2D" uid="uid://dvu3sbnn3u81j" path="res://assets/shop/items/shield_1.png" id="1_wwy2l"]
+
+[resource]
+script = ExtResource("1_2h36c")
+unlock_id = &"Chicken Shield"
+unlock_tier = 3
+item_name = "Chicken Shield"
+description = "Block attacks, protect chickens"
+icon = ExtResource("1_wwy2l")
+item_type = 2
+price = 450
+max_health = 30.0
+move_speed = -15.0
+fire_rate_multiplier = 0.0
+dash_cooldown = -0.1
+metadata/_custom_type_script = "uid://ceuvhyf720s15"

@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="Item" format=3 uid="uid://dpddi833bufyn"]
+
+[ext_resource type="Script" uid="uid://ceuvhyf720s15" path="res://scripts/progression/items/item.gd" id="1_2h36c"]
+[ext_resource type="Texture2D" uid="uid://dclg1tmqhni2l" path="res://assets/shop/items/helmet_5.png" id="1_panei"]
+
+[resource]
+script = ExtResource("1_2h36c")
+unlock_id = &"Egg Hat"
+unlock_tier = 2
+item_name = "Egg Hat"
+description = "Eggcellent head protection"
+icon = ExtResource("1_panei")
+price = 250
+max_health = 10.0
+fire_rate_multiplier = -0.02
+projectile_range = 0.02
+metadata/_custom_type_script = "uid://ceuvhyf720s15"

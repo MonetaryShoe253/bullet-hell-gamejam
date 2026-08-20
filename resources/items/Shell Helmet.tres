@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="Item" format=3 uid="uid://wassrpr44eqh"]
+
+[ext_resource type="Script" uid="uid://ceuvhyf720s15" path="res://scripts/progression/items/item.gd" id="1_2h36c"]
+[ext_resource type="Texture2D" uid="uid://d18fo5dchaxau" path="res://assets/shop/items/helmet_4.png" id="1_ti0kb"]
+
+[resource]
+script = ExtResource("1_2h36c")
+unlock_id = &"Shell Helmet"
+unlock_tier = 3
+item_name = "Shell Helmet"
+description = "Hard shell, harder head"
+icon = ExtResource("1_ti0kb")
+price = 350
+max_health = 25.0
+damage = 3.0
+move_speed = -10.0
+fire_rate_multiplier = 0.0
+metadata/_custom_type_script = "uid://ceuvhyf720s15"

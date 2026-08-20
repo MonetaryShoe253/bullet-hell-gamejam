@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="Item" format=3 uid="uid://dc5onwc51jukd"]
+
+[ext_resource type="Script" uid="uid://ceuvhyf720s15" path="res://scripts/progression/items/item.gd" id="1_2h36c"]
+[ext_resource type="Texture2D" uid="uid://b5b4jgk3y6de2" path="res://assets/shop/items/helmet_1.png" id="1_n215p"]
+
+[resource]
+script = ExtResource("1_2h36c")
+unlock_id = &"Mascot Hood"
+unlock_tier = 2
+item_name = "Mascot Hood"
+description = "Become the chicken"
+icon = ExtResource("1_n215p")
+price = 300
+max_health = 10.0
+damage = 0.25
+move_speed = 10.0
+fire_rate_multiplier = 0.0
+dash_cooldown = 0.03
+metadata/_custom_type_script = "uid://ceuvhyf720s15"

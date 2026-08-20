@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="Item" format=3 uid="uid://dofbn7e66eikj"]
+
+[ext_resource type="Script" uid="uid://ceuvhyf720s15" path="res://scripts/progression/items/item.gd" id="1_2h36c"]
+[ext_resource type="Texture2D" uid="uid://d0mgo4mnav85m" path="res://assets/shop/items/armour_1.png" id="1_6rorq"]
+
+[resource]
+script = ExtResource("1_2h36c")
+unlock_id = &"Feather Cloak"
+unlock_tier = 3
+item_name = "Feather Cloak"
+description = "Light as a feather"
+icon = ExtResource("1_6rorq")
+price = 400
+max_health = 5.0
+move_speed = 20.0
+fire_rate_multiplier = 0.0
+dash_cooldown = 0.08
+metadata/_custom_type_script = "uid://ceuvhyf720s15"

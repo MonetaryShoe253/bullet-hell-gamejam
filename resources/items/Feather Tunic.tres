@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="Item" format=3 uid="uid://3cq4eyionys7"]
+
+[ext_resource type="Script" uid="uid://ceuvhyf720s15" path="res://scripts/progression/items/item.gd" id="1_2h36c"]
+[ext_resource type="Texture2D" uid="uid://dbd7f3co7ft5r" path="res://assets/shop/items/armour_4.png" id="1_nj8gc"]
+
+[resource]
+script = ExtResource("1_2h36c")
+unlock_id = &"Feather Tunic"
+unlock_tier = 2
+item_name = "Feather Tunic"
+description = "Soft, light, surprisingly sturdy"
+icon = ExtResource("1_nj8gc")
+price = 300
+max_health = 10.0
+move_speed = 15.0
+fire_rate_multiplier = 0.0
+dash_cooldown = 0.03
+metadata/_custom_type_script = "uid://ceuvhyf720s15"

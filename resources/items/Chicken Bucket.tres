@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="Item" format=3 uid="uid://j2j3d5qgka1y"]
+
+[ext_resource type="Script" uid="uid://ceuvhyf720s15" path="res://scripts/progression/items/item.gd" id="1_2h36c"]
+[ext_resource type="Texture2D" uid="uid://dn8j3kyoikkor" path="res://assets/shop/items/helmet_6.png" id="1_laenq"]
+
+[resource]
+script = ExtResource("1_2h36c")
+unlock_id = &"Chicken Bucket"
+unlock_tier = 3
+item_name = "Chicken Bucket"
+description = "Bucket full of cluck"
+icon = ExtResource("1_laenq")
+price = 400
+max_health = 20.0
+damage = 1.0
+move_speed = -5.0
+fire_rate_multiplier = 0.0
+metadata/_custom_type_script = "uid://ceuvhyf720s15"

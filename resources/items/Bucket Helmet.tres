@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="Item" format=3 uid="uid://dgsp5ddn1101o"]
+
+[ext_resource type="Script" uid="uid://ceuvhyf720s15" path="res://scripts/progression/items/item.gd" id="1_2h36c"]
+[ext_resource type="Texture2D" uid="uid://dcnqkmnlfapiy" path="res://assets/shop/items/helmet_2.png" id="1_jsvke"]
+
+[resource]
+script = ExtResource("1_2h36c")
+unlock_id = &"Bucket Helmet"
+item_name = "Bucket Helmet"
+description = "Head protection, bucket shaped"
+icon = ExtResource("1_jsvke")
+price = 150
+max_health = 15.0
+move_speed = -5.0
+fire_rate_multiplier = 0.0
+metadata/_custom_type_script = "uid://ceuvhyf720s15"

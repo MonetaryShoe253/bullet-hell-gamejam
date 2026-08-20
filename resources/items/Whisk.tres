@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="Item" format=3 uid="uid://c0oawwfigjbde"]
+
+[ext_resource type="Script" uid="uid://ceuvhyf720s15" path="res://scripts/progression/items/item.gd" id="1_2h36c"]
+[ext_resource type="Texture2D" uid="uid://ueeish883mcm" path="res://assets/shop/items/whisk.png" id="1_iydax"]
+
+[resource]
+script = ExtResource("1_2h36c")
+unlock_id = &"Whisk"
+unlock_tier = 2
+item_name = "Whisk"
+description = "Whip enemies into shape"
+icon = ExtResource("1_iydax")
+item_type = 1
+price = 250
+damage = 0.5
+move_speed = 5.0
+fire_rate_multiplier = 0.05
+metadata/_custom_type_script = "uid://ceuvhyf720s15"

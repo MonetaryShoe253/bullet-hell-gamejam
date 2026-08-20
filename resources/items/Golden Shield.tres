@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="Item" format=3 uid="uid://cg3f1kjguxah8"]
+
+[ext_resource type="Script" uid="uid://ceuvhyf720s15" path="res://scripts/progression/items/item.gd" id="1_2h36c"]
+[ext_resource type="Texture2D" uid="uid://m3l7l63ip4cy" path="res://assets/shop/items/shield_3.png" id="1_fgfwb"]
+
+[resource]
+script = ExtResource("1_2h36c")
+unlock_id = &"Golden Shield"
+unlock_tier = 5
+item_name = "Golden Shield"
+description = "Shiny protection for champions"
+icon = ExtResource("1_fgfwb")
+item_type = 2
+price = 900
+max_health = 50.0
+fire_rate_multiplier = 0.0
+metadata/_custom_type_script = "uid://ceuvhyf720s15"

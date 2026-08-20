@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="Item" format=3 uid="uid://dmcyikdvpteot"]
+
+[ext_resource type="Script" uid="uid://ceuvhyf720s15" path="res://scripts/progression/items/item.gd" id="1_2h36c"]
+[ext_resource type="Texture2D" uid="uid://lh74iiux7y7s" path="res://assets/shop/items/egg_gun.png" id="1_m0p8j"]
+
+[resource]
+script = ExtResource("1_2h36c")
+unlock_id = &"Egg Launcher"
+unlock_tier = 4
+item_name = "Egg Launcher"
+description = "Breakfast at high velocity"
+icon = ExtResource("1_m0p8j")
+item_type = 1
+price = 700
+damage = 2.0
+move_speed = 10.0
+fire_rate_multiplier = 0.08
+projectile_range = 0.4
+metadata/_custom_type_script = "uid://ceuvhyf720s15"

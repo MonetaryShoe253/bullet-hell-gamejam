@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="Item" format=3 uid="uid://dkv3ifq71yrts"]
+
+[ext_resource type="Script" uid="uid://ceuvhyf720s15" path="res://scripts/progression/items/item.gd" id="1_2h36c"]
+[ext_resource type="Texture2D" uid="uid://djxmmfwg04jei" path="res://assets/shop/items/crossbow.png" id="1_q0pol"]
+
+[resource]
+script = ExtResource("1_2h36c")
+unlock_id = &"Crossbow"
+unlock_tier = 3
+item_name = "Crossbow"
+description = "Point, shoot, reload, repeat"
+icon = ExtResource("1_q0pol")
+item_type = 1
+price = 500
+damage = 2.0
+fire_rate_multiplier = 0.03
+projectile_range = 2.0
+metadata/_custom_type_script = "uid://ceuvhyf720s15"

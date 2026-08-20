@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="Item" format=3 uid="uid://bei2011k5o0g7"]
+
+[ext_resource type="Script" uid="uid://ceuvhyf720s15" path="res://scripts/progression/items/item.gd" id="1_2h36c"]
+[ext_resource type="Texture2D" uid="uid://bab2suhlk3bhc" path="res://assets/shop/items/pan.png" id="1_oiywt"]
+
+[resource]
+script = ExtResource("1_2h36c")
+unlock_id = &"Fried Egg Pan"
+unlock_tier = 3
+item_name = "Fried Egg Pan"
+description = "Breakfast meets blunt force"
+icon = ExtResource("1_oiywt")
+item_type = 1
+price = 500
+max_health = 5.0
+damage = 3.0
+move_speed = -20.0
+fire_rate_multiplier = 0.04
+metadata/_custom_type_script = "uid://ceuvhyf720s15"

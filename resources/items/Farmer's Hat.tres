@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="Item" format=3 uid="uid://coqy4rr6dkhtd"]
+
+[ext_resource type="Script" uid="uid://ceuvhyf720s15" path="res://scripts/progression/items/item.gd" id="1_2h36c"]
+[ext_resource type="Texture2D" uid="uid://iu6wag3f7aj6" path="res://assets/shop/items/helmet_3.png" id="1_fmtxy"]
+
+[resource]
+script = ExtResource("1_2h36c")
+unlock_id = &"Farmer\'s Hat"
+item_name = "Farmer's Hat"
+description = "Classic crop-tending headwear"
+icon = ExtResource("1_fmtxy")
+price = 150
+max_health = 5.0
+move_speed = 10.0
+fire_rate_multiplier = 0.0
+projectile_range = 0.1
+metadata/_custom_type_script = "uid://ceuvhyf720s15"

@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="Item" format=3 uid="uid://b7wqrtpliut1y"]
+
+[ext_resource type="Script" uid="uid://ceuvhyf720s15" path="res://scripts/progression/items/item.gd" id="1_2h36c"]
+[ext_resource type="Texture2D" uid="uid://dli2xutw56teo" path="res://assets/shop/items/corn.png" id="1_lklly"]
+
+[resource]
+script = ExtResource("1_2h36c")
+unlock_id = &"Cob of Corn"
+item_name = "Cob of Corn"
+description = "Farm-fresh blunt weapon"
+icon = ExtResource("1_lklly")
+item_type = 1
+price = 100
+max_health = 5.0
+damage = 0.5
+move_speed = 10.0
+fire_rate_multiplier = 0.0
+metadata/_custom_type_script = "uid://ceuvhyf720s15"

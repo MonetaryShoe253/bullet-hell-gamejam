@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="Item" format=3 uid="uid://bh5deu7ajra2y"]
+
+[ext_resource type="Script" uid="uid://ceuvhyf720s15" path="res://scripts/progression/items/item.gd" id="1_2h36c"]
+[ext_resource type="Texture2D" uid="uid://cfkk14btp5xc2" path="res://assets/shop/items/feather_sword.png" id="1_ytwuq"]
+
+[resource]
+script = ExtResource("1_2h36c")
+unlock_id = &"Feather Sword"
+unlock_tier = 3
+item_name = "Feather Sword"
+description = "Light blade, sharp feathers"
+icon = ExtResource("1_ytwuq")
+item_type = 1
+price = 450
+damage = 1.5
+move_speed = 10.0
+fire_rate_multiplier = 0.0
+metadata/_custom_type_script = "uid://ceuvhyf720s15"

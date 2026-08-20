@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="Item" format=3 uid="uid://b367fto4rglk4"]
+
+[ext_resource type="Script" uid="uid://ceuvhyf720s15" path="res://scripts/progression/items/item.gd" id="1_2h36c"]
+[ext_resource type="Texture2D" uid="uid://ccanfq55c8yro" path="res://assets/shop/items/armour_5.png" id="1_nthv0"]
+
+[resource]
+script = ExtResource("1_2h36c")
+unlock_id = &"Barrel Armour"
+unlock_tier = 4
+item_name = "Barrel Armour"
+description = "Oak-powered body protection"
+icon = ExtResource("1_nthv0")
+price = 600
+max_health = 40.0
+move_speed = -30.0
+fire_rate_multiplier = 0.0
+metadata/_custom_type_script = "uid://ceuvhyf720s15"
