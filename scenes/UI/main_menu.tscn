@@ -1,4 +1,4 @@
-[gd_scene format=3 uid="uid://btxuo3ekvju0y"]
+[gd_scene format=3 uid="uid://vpxfxhcs27o5"]
 
 [ext_resource type="Script" uid="uid://db0olx7a6vu44" path="res://scenes/UI/main_menu.gd" id="1"]
 [ext_resource type="Texture2D" uid="uid://qqfo7v41jf36" path="res://assets/Player/mascot_hero.png" id="2_yonvy"]
@@ -42,7 +42,7 @@ stretch_mode = 5
 
 [node name="TitleLabel" type="Label" parent="Panel/VBox" unique_id=656820395]
 layout_mode = 2
-theme_override_colors/font_color = Color(1, 0.55, 0.1, 1)
+theme_override_colors/font_color = Color(1, 0.54901963, 0.101960786, 1)
 theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
 theme_override_constants/outline_size = 10
 theme_override_font_sizes/font_size = 60
@@ -62,3 +62,28 @@ layout_mode = 2
 theme_override_colors/font_color = Color(1, 1, 1, 1)
 theme_override_font_sizes/font_size = 24
 text = "Play"
+
+[node name="VBox2" type="VBoxContainer" parent="Panel" unique_id=57279973]
+layout_mode = 0
+offset_left = 1689.0
+offset_top = 54.0
+offset_right = 1939.0
+offset_bottom = 320.0
+metadata/_edit_group_ = true
+
+[node name="TitleLabel" type="Label" parent="Panel/VBox2" unique_id=716408316]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.54901963, 0.101960786, 1)
+theme_override_font_sizes/font_size = 24
+text = "KEYBINDS:"
+
+[node name="SubtitleLabel" type="Label" parent="Panel/VBox2" unique_id=216071743]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.54901963, 0.101960786, 1)
+text = "WASD - MOVEMENT
+LMB - SHOOT
+RMB - DASH
+Q - ABILITY 1
+E - ABILITY 2
+TAB - ABILITIES MENU
+R - INVENTORY"
