@@ -189,8 +189,12 @@ func can_see_player() -> bool:
 		return false
 
 	var ray := $PlayerSight as RayCast2D
+	var target := ray.to_local(player.global_position)
 
-	ray.target_position = ray.to_local(player.global_position)
+	if target.is_zero_approx():
+		return true
+
+	ray.target_position = target
 	ray.force_raycast_update()
 
 	return ray.is_colliding() and ray.get_collider() == player
