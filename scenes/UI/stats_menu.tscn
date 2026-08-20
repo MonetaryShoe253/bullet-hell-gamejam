@@ -1,0 +1,83 @@
+[gd_scene format=3 uid="uid://dohp1shpamvax"]
+
+[ext_resource type="Script" uid="uid://lr32v377c0m3" path="res://scenes/UI/stats_menu.gd" id="1_bcuv6"]
+
+[node name="StatsMenuUI" type="CanvasLayer" unique_id=69318225]
+script = ExtResource("1_bcuv6")
+
+[node name="CenterContainer" type="CenterContainer" parent="." unique_id=102124672]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="PanelContainer" type="PanelContainer" parent="CenterContainer" unique_id=1920213383]
+custom_minimum_size = Vector2(1000, 700)
+layout_mode = 2
+
+[node name="MarginContainer" type="MarginContainer" parent="CenterContainer/PanelContainer" unique_id=2082987068]
+layout_mode = 2
+theme_override_constants/margin_left = 30
+theme_override_constants/margin_top = 30
+theme_override_constants/margin_right = 25
+theme_override_constants/margin_bottom = 25
+
+[node name="MainVBox" type="VBoxContainer" parent="CenterContainer/PanelContainer/MarginContainer" unique_id=1277644594]
+layout_mode = 2
+theme_override_constants/separation = 16
+
+[node name="Header" type="HBoxContainer" parent="CenterContainer/PanelContainer/MarginContainer/MainVBox" unique_id=1768955639]
+layout_mode = 2
+
+[node name="Title" type="Label" parent="CenterContainer/PanelContainer/MarginContainer/MainVBox/Header" unique_id=503242407]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 32
+text = "STATS"
+horizontal_alignment = 1
+
+[node name="CloseButton" type="Button" parent="CenterContainer/PanelContainer/MarginContainer/MainVBox/Header" unique_id=803434490]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(50, 50)
+layout_mode = 2
+text = "X"
+
+[node name="HSeparator" type="HSeparator" parent="CenterContainer/PanelContainer/MarginContainer/MainVBox" unique_id=1103024546]
+layout_mode = 2
+
+[node name="StatsContainer" type="VBoxContainer" parent="CenterContainer/PanelContainer/MarginContainer/MainVBox" unique_id=285262931]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/separation = 30
+alignment = 1
+
+[node name="DamageLabel" type="Label" parent="CenterContainer/PanelContainer/MarginContainer/MainVBox/StatsContainer" unique_id=1270714131]
+layout_mode = 2
+text = "DAMAGE: "
+horizontal_alignment = 1
+
+[node name="FireRateLabel" type="Label" parent="CenterContainer/PanelContainer/MarginContainer/MainVBox/StatsContainer" unique_id=1295208960]
+layout_mode = 2
+text = "FIRE RATE:"
+horizontal_alignment = 1
+
+[node name="HealthLabel" type="Label" parent="CenterContainer/PanelContainer/MarginContainer/MainVBox/StatsContainer" unique_id=933878143]
+layout_mode = 2
+text = "HEALTH:"
+horizontal_alignment = 1
+
+[node name="SpeedLabel" type="Label" parent="CenterContainer/PanelContainer/MarginContainer/MainVBox/StatsContainer" unique_id=859890810]
+layout_mode = 2
+text = "SPEED:"
+horizontal_alignment = 1
+
+[node name="ProjectileRangeLabel" type="Label" parent="CenterContainer/PanelContainer/MarginContainer/MainVBox/StatsContainer" unique_id=290931521]
+layout_mode = 2
+text = "PROJECTILE RANGE:"
+horizontal_alignment = 1
+
+[node name="DashCooldownLabel" type="Label" parent="CenterContainer/PanelContainer/MarginContainer/MainVBox/StatsContainer" unique_id=1860046023]
+layout_mode = 2
+text = "DASH COOLDOWN:"
+horizontal_alignment = 1

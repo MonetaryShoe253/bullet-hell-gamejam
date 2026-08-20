@@ -9,6 +9,7 @@
 [ext_resource type="PackedScene" uid="uid://1dl1typf2xi7" path="res://scenes/UI/inventory_ui.tscn" id="7_bsb75"]
 [ext_resource type="PackedScene" uid="uid://daq0vn44ulaa2" path="res://scenes/UI/death_reward_ui.tscn" id="8_h6dl1"]
 [ext_resource type="PackedScene" path="res://scenes/UI/ability_menu_ui.tscn" id="9_amenu"]
+[ext_resource type="PackedScene" uid="uid://dohp1shpamvax" path="res://scenes/UI/stats_menu.tscn" id="10_stats"]
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_frwky"]
 texture = ExtResource("2_4f38h")
@@ -192,6 +193,9 @@ script = ExtResource("5_minimap")
 unique_name_in_owner = true
 
 [node name="AbilityMenuUI" parent="." unique_id=767680653 instance=ExtResource("9_amenu")]
+unique_name_in_owner = true
+
+[node name="StatsMenu" parent="." unique_id=767680654 instance=ExtResource("10_stats")]
 unique_name_in_owner = true
 
 [node name="DeathRewardUI" parent="." unique_id=288556813 instance=ExtResource("8_h6dl1")]
