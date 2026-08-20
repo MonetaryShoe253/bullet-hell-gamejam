@@ -70,20 +70,25 @@ alignment = 1
 custom_minimum_size = Vector2(220, 220)
 layout_mode = 2
 size_flags_horizontal = 3
+autowrap_mode = 3
+icon_alignment = 1
 
 [node name="Upgrade2" type="Button" parent="CenterContainer/PanelContainer/MarginContainer/VBoxContainer/Upgrades" unique_id=1257161247]
 custom_minimum_size = Vector2(220, 220)
 layout_mode = 2
 size_flags_horizontal = 3
+icon_alignment = 1
 
 [node name="Upgrade3" type="Button" parent="CenterContainer/PanelContainer/MarginContainer/VBoxContainer/Upgrades" unique_id=846343015]
 custom_minimum_size = Vector2(220, 220)
 layout_mode = 2
 size_flags_horizontal = 3
+icon_alignment = 1
 
 [node name="ExhaustedLabel" type="Label" parent="CenterContainer/PanelContainer/MarginContainer/VBoxContainer" unique_id=846343016]
 unique_name_in_owner = true
 visible = false
+custom_minimum_size = Vector2(20, 20)
 layout_mode = 2
 theme_override_font_sizes/font_size = 22
 text = "Shop pool exhausted - keep completing runs to unlock new shop gear!"
