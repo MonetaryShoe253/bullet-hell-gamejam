@@ -10,8 +10,12 @@
 [ext_resource type="PackedScene" uid="uid://wen7cw6175o8" path="res://scenes/components/stats/stats_component.tscn" id="6_qek5x"]
 [ext_resource type="Script" uid="uid://d7b6xlys2gmy" path="res://scenes/components/abilities/abilities_component.gd" id="7_fm80t"]
 [ext_resource type="Script" uid="uid://c24n76nrnb3o1" path="res://scripts/progression/abilities/abilities.gd" id="8_gx1jg"]
+[ext_resource type="Script" uid="uid://cghv0jgqsjnpb" path="res://scripts/progression/abilities/damage_wave_ability.gd" id="9_uf5tr"]
+[ext_resource type="PackedScene" uid="uid://ccrikqg764q0y" path="res://scenes/abilities/damage_wave/damage_wave.tscn" id="10_lgqa7"]
+[ext_resource type="Script" uid="uid://c528heqxdywiv" path="res://scripts/progression/abilities/damage_dash_ability.gd" id="11_8ydkj"]
 [ext_resource type="PackedScene" uid="uid://cxel0xtrtcdel" path="res://scenes/UI/ability_bar.tscn" id="13_gx1jg"]
 [ext_resource type="Script" uid="uid://duetqoik5vdep" path="res://scenes/components/abilities/passive_ability_component.gd" id="14_pasvc"]
+[ext_resource type="Script" uid="uid://m4jmncog172n" path="res://scripts/progression/abilities/health_regen_on_kill_ability.gd" id="15_3j4b4"]
 [ext_resource type="Script" uid="uid://b4oy2lqi0n2ie" path="res://scripts/progression/abilities/passive_ability.gd" id="15_pasv2"]
 [ext_resource type="Resource" path="res://resources/passive_abilities/force_field.tres" id="16_ffldr"]
 
@@ -20,6 +24,20 @@ size = Vector2(5.3333335, 13.333334)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_nehcj"]
 size = Vector2(6, 17)
+
+[sub_resource type="Resource" id="Resource_yonvy"]
+script = ExtResource("9_uf5tr")
+ability_name = "Damage Wave"
+metadata/_custom_type_script = "uid://cghv0jgqsjnpb"
+
+[sub_resource type="Resource" id="Resource_5jstl"]
+script = ExtResource("11_8ydkj")
+ability_name = "Damage Dash"
+metadata/_custom_type_script = "uid://c528heqxdywiv"
+
+[sub_resource type="Resource" id="Resource_e2p27"]
+script = ExtResource("15_3j4b4")
+metadata/_custom_type_script = "uid://m4jmncog172n"
 
 [node name="Player" type="CharacterBody2D" unique_id=1277505981 groups=["player"]]
 texture_filter = 1
@@ -59,11 +77,11 @@ max_health = 25.0
 
 [node name="AbilityComponent" type="Node" parent="Components" unique_id=1262351499]
 script = ExtResource("7_fm80t")
-slots = Array[ExtResource("8_gx1jg")]([null, null])
+slots = Array[ExtResource("8_gx1jg")]([SubResource("Resource_yonvy"), SubResource("Resource_5jstl")])
 
 [node name="PassiveAbilityComponent" type="Node" parent="Components" unique_id=1262351500]
 script = ExtResource("14_pasvc")
-slots = Array[ExtResource("15_pasv2")]([ExtResource("16_ffldr"), null])
+slots = Array[ExtResource("15_pasv2")]([ExtResource("16_ffldr"), SubResource("Resource_e2p27")])
 
 [node name="AnimationPlayer" type="AnimationPlayer" parent="." unique_id=1940173901]
 

@@ -38,6 +38,7 @@ extends Node2D
 @onready var minimap: Control = $HUD/Minimap
 @onready var inventory_ui: InventoryUI = %InventoryUI
 @onready var ability_menu_ui: AbilityMenuUI = %AbilityMenuUI
+@onready var stats_menu: StatsMenu = %StatsMenu
 @onready var death_reward_ui: DeathRewardUI = $DeathRewardUI
 
 @export var tile_source_id := 0   # the TileSetAtlasSource id for the tileset (0 if it's the only source)
@@ -113,6 +114,7 @@ func _spawn_player() -> void:
 
 		inventory_ui.setup(player)
 		ability_menu_ui.setup(player)
+		stats_menu.setup(player)
 		print("Player created")
 	else:
 		# Next dungeon - keep existing player.
