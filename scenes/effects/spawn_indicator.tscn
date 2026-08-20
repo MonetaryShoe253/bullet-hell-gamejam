@@ -1,0 +1,12 @@
+[gd_scene format=3 uid="uid://ble1pnq2r8mx5"]
+
+[ext_resource type="Script" uid="uid://dm14f81cluupr" path="res://scenes/effects/spawn_indicator.gd" id="1_eimd0"]
+
+[node name="SpawnIndicator" type="Node2D" unique_id=925433178]
+script = ExtResource("1_eimd0")
+
+[node name="Polygon2D" type="Polygon2D" parent="." unique_id=593057512]
+color = Color(1, 0, 0, 0.64705884)
+polygon = PackedVector2Array(0, -15.999998, 16.00003, 0, 0, 16, -16, 0)
+uv = PackedVector2Array(192, 80, 223.99994, 112, 192, 143.99998, 160, 112)
+script = ExtResource("1_eimd0")
