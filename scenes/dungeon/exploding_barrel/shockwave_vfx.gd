@@ -15,3 +15,14 @@ func _ready() -> void:
 
 func _set_progress(value: float) -> void:
 	material.set_shader_parameter("progress", value)
+
+
+## Optional - callers that just want the barrel's tuned look can skip this
+## entirely. Rescales the sprite so the ring's outer edge lands at `radius`
+## world units, for effects whose blast size isn't the barrel's fixed one
+## (see ShockwavePulseAbility).
+func set_radius(radius: float) -> void:
+	var texture_size := texture.get_size()
+	if texture_size.x <= 0.0:
+		return
+	scale = Vector2.ONE * (radius * 2.0 / texture_size.x)

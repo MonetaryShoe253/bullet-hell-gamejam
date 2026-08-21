@@ -57,7 +57,7 @@ extends Node2D
 ## the boss-room centre and the boss encounter is started immediately after the
 ## room controllers are built.
 @export_category("Testing")
-@export var test_start_at_boss := false
+@export var test_start_at_boss := true
 
 ## Players and Enemies
 @export var player_scene: PackedScene
