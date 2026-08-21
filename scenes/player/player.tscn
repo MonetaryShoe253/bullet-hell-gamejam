@@ -14,10 +14,11 @@
 [ext_resource type="PackedScene" uid="uid://ccrikqg764q0y" path="res://scenes/abilities/damage_wave/damage_wave.tscn" id="10_lgqa7"]
 [ext_resource type="Script" uid="uid://c528heqxdywiv" path="res://scripts/progression/abilities/damage_dash_ability.gd" id="11_8ydkj"]
 [ext_resource type="PackedScene" uid="uid://cxel0xtrtcdel" path="res://scenes/UI/ability_bar.tscn" id="13_gx1jg"]
+[ext_resource type="PackedScene" uid="uid://cs1x3ttl4v0sx" path="res://scenes/abilities/second_life.tscn" id="14_lgqa7"]
 [ext_resource type="Script" uid="uid://duetqoik5vdep" path="res://scenes/components/abilities/passive_ability_component.gd" id="14_pasvc"]
 [ext_resource type="Script" uid="uid://m4jmncog172n" path="res://scripts/progression/abilities/health_regen_on_kill_ability.gd" id="15_3j4b4"]
+[ext_resource type="Script" uid="uid://ccjs48coihofg" path="res://scripts/progression/abilities/second_life_ability.gd" id="15_8ydkj"]
 [ext_resource type="Script" uid="uid://b4oy2lqi0n2ie" path="res://scripts/progression/abilities/passive_ability.gd" id="15_pasv2"]
-[ext_resource type="Resource" path="res://resources/passive_abilities/force_field.tres" id="16_ffldr"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_gmlin"]
 size = Vector2(5.3333335, 13.333334)
@@ -34,6 +35,11 @@ metadata/_custom_type_script = "uid://cghv0jgqsjnpb"
 script = ExtResource("11_8ydkj")
 ability_name = "Damage Dash"
 metadata/_custom_type_script = "uid://c528heqxdywiv"
+
+[sub_resource type="Resource" id="Resource_7tojy"]
+script = ExtResource("15_8ydkj")
+ability_name = "Second Life"
+price = 200
 
 [sub_resource type="Resource" id="Resource_e2p27"]
 script = ExtResource("15_3j4b4")
@@ -81,7 +87,7 @@ slots = Array[ExtResource("8_gx1jg")]([SubResource("Resource_yonvy"), SubResourc
 
 [node name="PassiveAbilityComponent" type="Node" parent="Components" unique_id=1262351500]
 script = ExtResource("14_pasvc")
-slots = Array[ExtResource("15_pasv2")]([ExtResource("16_ffldr"), SubResource("Resource_e2p27")])
+slots = Array[ExtResource("15_pasv2")]([SubResource("Resource_7tojy"), SubResource("Resource_e2p27")])
 
 [node name="AnimationPlayer" type="AnimationPlayer" parent="." unique_id=1940173901]
 

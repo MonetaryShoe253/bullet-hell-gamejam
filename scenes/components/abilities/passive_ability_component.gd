@@ -3,13 +3,18 @@ extends Node
 
 @export var slots: Array[PassiveAbility] = []
 
-func _ready() -> void:
+## Preset slots are NOT equipped from this node's own _ready(). As a child of
+## Player, this node's _ready() fires before Player's - any passive whose
+## equip() touches one of Player's other @onready vars (e.g. Second Life
+## needs health_component) would run against a still-null reference. Player
+## calls equip_all() itself instead, once its own onready setup has run.
+func equip_all() -> void:
 	var player := get_owner() as Player
 	for passive in slots:
 		if passive:
 			passive.equip(player)
 
-## Mirrors _ready()'s equip pass - without this, a passive that hooks a
+## Mirrors equip_all()'s pass - without this, a passive that hooks a
 ## persistent autoload signal (Health Regen connects to
 ## GameState.enemy_killed) would leave that connection dangling, pointing at
 ## a freed Player, every time the player is destroyed outside the normal

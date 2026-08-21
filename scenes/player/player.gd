@@ -79,6 +79,8 @@ func _ready() -> void:
 	
 	ability_bars.setup(ability_component)
 
+	passive_ability_component.equip_all()
+
 
 func _on_health_changed(current_health: float, max_health: float) -> void:
 	health_bar.max_value = max_health
