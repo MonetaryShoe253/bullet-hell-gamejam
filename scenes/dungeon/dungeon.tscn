@@ -164,7 +164,7 @@ offset_left = 8.0
 offset_top = 84.0
 offset_right = 300.0
 offset_bottom = 112.0
-theme_override_colors/font_color = Color(1, 0.85, 0.2, 1)
+theme_override_colors/font_color = Color(1, 0.8509804, 0.2, 1)
 theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
 theme_override_constants/outline_size = 3
 theme_override_font_sizes/font_size = 22
@@ -183,11 +183,29 @@ offset_bottom = 190.0
 grow_horizontal = 0
 script = ExtResource("5_minimap")
 
+[node name="CurrentLevelLabel" type="Label" parent="HUD" unique_id=1369431961]
+anchors_preset = 10
+anchor_right = 1.0
+offset_top = 8.0
+offset_bottom = 39.0
+grow_horizontal = 2
+theme_override_colors/font_color = Color(1, 0.8509804, 0.2, 1)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 3
+theme_override_font_sizes/font_size = 22
+text = "Current Level: 1"
+horizontal_alignment = 1
+
 [node name="BossHealthBar" parent="." unique_id=845301674 instance=ExtResource("4_boss_hp")]
+offset = Vector2(0, 25)
+transform = Transform2D(1, 0, 0, 1, 0, 25)
 
 [node name="ShopUI" parent="." unique_id=1633812390 instance=ExtResource("5_vhky6")]
+visible = false
 
 [node name="PlayerMenu" parent="." unique_id=767680652 instance=ExtResource("11_pmenu")]
 unique_name_in_owner = true
+visible = false
 
 [node name="DeathRewardUI" parent="." unique_id=288556813 instance=ExtResource("8_h6dl1")]
+visible = false
