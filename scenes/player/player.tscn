@@ -10,14 +10,14 @@
 [ext_resource type="PackedScene" uid="uid://wen7cw6175o8" path="res://scenes/components/stats/stats_component.tscn" id="6_qek5x"]
 [ext_resource type="Script" uid="uid://d7b6xlys2gmy" path="res://scenes/components/abilities/abilities_component.gd" id="7_fm80t"]
 [ext_resource type="Script" uid="uid://c24n76nrnb3o1" path="res://scripts/progression/abilities/abilities.gd" id="8_gx1jg"]
-[ext_resource type="Resource" uid="uid://c3vnegn3ubcjc" path="res://resources/abilities/orbiting_blades.tres" id="10_uf5tr"]
-[ext_resource type="Resource" uid="uid://vg4pw01pqvhx" path="res://resources/abilities/black_hole.tres" id="11_lgqa7"]
+[ext_resource type="Resource" uid="uid://cgldn40evkied" path="res://resources/abilities/damage_dash.tres" id="9_uf5tr"]
 [ext_resource type="PackedScene" uid="uid://cxel0xtrtcdel" path="res://scenes/UI/ability_bar.tscn" id="13_gx1jg"]
 [ext_resource type="PackedScene" uid="uid://cs1x3ttl4v0sx" path="res://scenes/abilities/second_life.tscn" id="14_lgqa7"]
 [ext_resource type="Script" uid="uid://duetqoik5vdep" path="res://scenes/components/abilities/passive_ability_component.gd" id="14_pasvc"]
 [ext_resource type="Script" uid="uid://m4jmncog172n" path="res://scripts/progression/abilities/health_regen_on_kill_ability.gd" id="15_3j4b4"]
 [ext_resource type="Script" uid="uid://ccjs48coihofg" path="res://scripts/progression/abilities/second_life_ability.gd" id="15_8ydkj"]
 [ext_resource type="Script" uid="uid://b4oy2lqi0n2ie" path="res://scripts/progression/abilities/passive_ability.gd" id="15_pasv2"]
+[ext_resource type="PackedScene" uid="uid://callru6uc08v0" path="res://scenes/components/dash/DashEffectsComponent.tscn" id="16_lgqa7"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_gmlin"]
 size = Vector2(5.3333335, 13.333334)
@@ -34,12 +34,11 @@ price = 200
 script = ExtResource("15_3j4b4")
 metadata/_custom_type_script = "uid://m4jmncog172n"
 
-[node name="Player" type="CharacterBody2D" unique_id=1277505981 node_paths=PackedStringArray("camera") groups=["player"]]
+[node name="Player" type="CharacterBody2D" unique_id=1277505981 groups=["player"]]
 texture_filter = 1
 scale = Vector2(1.5, 1.5)
 collision_layer = 2
 script = ExtResource("1_8afob")
-camera = NodePath("Camera2D")
 
 [node name="Sprite2D" type="AnimatedSprite2D" parent="." unique_id=2147301644]
 texture_filter = 1
@@ -73,11 +72,16 @@ max_health = 25.0
 
 [node name="AbilityComponent" type="Node" parent="Components" unique_id=1262351499]
 script = ExtResource("7_fm80t")
-slots = Array[ExtResource("8_gx1jg")]([ExtResource("10_uf5tr"), ExtResource("11_lgqa7")])
+slots = Array[ExtResource("8_gx1jg")]([ExtResource("9_uf5tr")])
 
 [node name="PassiveAbilityComponent" type="Node" parent="Components" unique_id=1262351500]
 script = ExtResource("14_pasvc")
 slots = Array[ExtResource("15_pasv2")]([SubResource("Resource_7tojy"), SubResource("Resource_e2p27")])
+
+[node name="DashEffectsComponent" parent="Components" unique_id=893124922 node_paths=PackedStringArray("camera", "sprite", "player") instance=ExtResource("16_lgqa7")]
+camera = NodePath("../../Camera2D")
+sprite = NodePath("../../Sprite2D")
+player = NodePath("../..")
 
 [node name="AnimationPlayer" type="AnimationPlayer" parent="." unique_id=1940173901]
 
