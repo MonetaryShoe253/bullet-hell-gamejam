@@ -619,3 +619,262 @@ func _spawn_damage_trail_ring() -> void:
 	)
 
 	tween.chain().tween_callback(ring.queue_free)
+
+
+func create_black_hole(
+	target_position: Vector2,
+	duration: float,
+	radius: float,
+	pull_strength: float,
+	explosion_damage: float
+) -> void:
+	var black_hole := Node2D.new()
+
+	get_tree().current_scene.add_child(black_hole)
+	black_hole.global_position = target_position
+
+	# Store values on the node.
+	black_hole.set_meta("radius", radius)
+	black_hole.set_meta("pull_strength", pull_strength)
+
+	_create_black_hole_visual(
+		black_hole,
+		radius
+	)
+
+	_run_black_hole(
+		black_hole,
+		duration,
+		radius,
+		pull_strength,
+		explosion_damage
+	)
+
+
+	
+func _run_black_hole(
+	black_hole: Node2D,
+	duration: float,
+	radius: float,
+	pull_strength: float,
+	explosion_damage: float
+) -> void:
+	var elapsed := 0.0
+
+	while elapsed < duration:
+		if not is_instance_valid(black_hole):
+			return
+
+		var delta := get_process_delta_time()
+
+		_pull_enemies_to_black_hole(
+			black_hole.global_position,
+			radius,
+			pull_strength,
+			delta
+		)
+
+		elapsed += delta
+
+		await get_tree().process_frame
+
+	# Explosion
+	_explode_black_hole(
+		black_hole.global_position,
+		radius,
+		explosion_damage
+	)
+
+	black_hole.queue_free()
+	
+	
+func _pull_enemies_to_black_hole(
+	center: Vector2,
+	radius: float,
+	pull_strength: float,
+	delta: float
+) -> void:
+	for enemy in get_tree().get_nodes_in_group("enemy"):
+		if not enemy is Node2D:
+			continue
+
+		var enemy_node := enemy as Node2D
+
+		var distance := enemy_node.global_position.distance_to(center)
+
+		if distance > radius:
+			continue
+
+		var direction := (
+			center - enemy_node.global_position
+		).normalized()
+
+		# Stronger as the enemy gets closer.
+		var strength := 1.0 - (distance / radius)
+
+		strength = lerpf(
+			0.35,
+			1.0,
+			strength
+		)
+
+		enemy_node.global_position += (
+			direction
+			* pull_strength
+			* strength
+			* delta
+		)
+		
+func _explode_black_hole(
+	center: Vector2,
+	radius: float,
+	damage: float
+) -> void:
+	for enemy in get_tree().get_nodes_in_group("enemy"):
+		if not enemy is Node2D:
+			continue
+
+		if enemy.global_position.distance_to(center) > radius:
+			continue
+
+		var hurt_box = enemy.get_node_or_null(
+			"Components/HurtBox"
+		)
+
+		if hurt_box != null:
+			hurt_box.take_damage(damage)
+
+	_spawn_black_hole_explosion(
+		center,
+		radius
+	)
+	
+func _create_black_hole_visual(
+	black_hole: Node2D,
+	radius: float
+) -> void:
+	# Outer gravitational ring
+	var outer_ring := Line2D.new()
+
+	outer_ring.width = 3.0
+	outer_ring.default_color = Color(
+		0.55,
+		0.25,
+		1.0,
+		0.65
+	)
+
+	outer_ring.closed = true
+
+	var segments := 48
+
+	for i in range(segments):
+		var angle := TAU * float(i) / float(segments)
+
+		outer_ring.add_point(
+			Vector2(
+				cos(angle),
+				sin(angle)
+			) * radius
+		)
+
+	black_hole.add_child(outer_ring)
+
+
+	# Inner black core
+	var core := Polygon2D.new()
+
+	var points := PackedVector2Array()
+
+	var core_radius := 20.0
+
+	for i in range(32):
+		var angle := TAU * float(i) / 32.0
+
+		points.append(
+			Vector2(
+				cos(angle),
+				sin(angle)
+			) * core_radius
+		)
+
+	core.polygon = points
+	core.color = Color(0.03, 0.01, 0.06, 1.0)
+
+	black_hole.add_child(core)
+
+
+	# Make the core pulse.
+	var tween := core.create_tween()
+
+	tween.set_loops()
+
+	tween.tween_property(
+		core,
+		"scale",
+		Vector2(1.35, 1.35),
+		0.35
+	).set_trans(Tween.TRANS_SINE)
+
+	tween.tween_property(
+		core,
+		"scale",
+		Vector2.ONE,
+		0.35
+	).set_trans(Tween.TRANS_SINE)
+	
+func _spawn_black_hole_explosion(
+	position: Vector2,
+	radius: float
+) -> void:
+	var ring := Line2D.new()
+
+	ring.width = 5.0
+	ring.default_color = Color(
+		0.75,
+		0.4,
+		1.0,
+		0.9
+	)
+
+	ring.closed = true
+
+	var segments := 48
+
+	for i in range(segments):
+		var angle := TAU * float(i) / float(segments)
+
+		ring.add_point(
+			Vector2(
+				cos(angle),
+				sin(angle)
+			) * radius
+		)
+
+	get_tree().current_scene.add_child(ring)
+
+	ring.global_position = position
+	ring.scale = Vector2(0.15, 0.15)
+
+	var tween := ring.create_tween()
+	tween.set_parallel(true)
+
+	tween.tween_property(
+		ring,
+		"scale",
+		Vector2.ONE,
+		0.18
+	).set_trans(Tween.TRANS_EXPO).set_ease(Tween.EASE_OUT)
+
+	tween.tween_property(
+		ring,
+		"modulate:a",
+		0.0,
+		0.30
+	)
+
+	tween.chain().tween_callback(
+		ring.queue_free
+	)
+
+	

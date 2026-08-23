@@ -10,8 +10,7 @@
 [ext_resource type="PackedScene" uid="uid://wen7cw6175o8" path="res://scenes/components/stats/stats_component.tscn" id="6_qek5x"]
 [ext_resource type="Script" uid="uid://d7b6xlys2gmy" path="res://scenes/components/abilities/abilities_component.gd" id="7_fm80t"]
 [ext_resource type="Script" uid="uid://c24n76nrnb3o1" path="res://scripts/progression/abilities/abilities.gd" id="8_gx1jg"]
-[ext_resource type="Script" uid="uid://ixcepyuewr1m" path="res://scripts/progression/abilities/shockwave_pulse_ability.gd" id="9_uf5tr"]
-[ext_resource type="Script" uid="uid://c528heqxdywiv" path="res://scripts/progression/abilities/damage_dash_ability.gd" id="11_8ydkj"]
+[ext_resource type="Resource" uid="uid://vg4pw01pqvhx" path="res://resources/abilities/black_hole.tres" id="11_lgqa7"]
 [ext_resource type="PackedScene" uid="uid://cxel0xtrtcdel" path="res://scenes/UI/ability_bar.tscn" id="13_gx1jg"]
 [ext_resource type="PackedScene" uid="uid://cs1x3ttl4v0sx" path="res://scenes/abilities/second_life.tscn" id="14_lgqa7"]
 [ext_resource type="Script" uid="uid://duetqoik5vdep" path="res://scenes/components/abilities/passive_ability_component.gd" id="14_pasvc"]
@@ -24,15 +23,6 @@ size = Vector2(5.3333335, 13.333334)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_nehcj"]
 size = Vector2(6, 17)
-
-[sub_resource type="Resource" id="Resource_3j4b4"]
-script = ExtResource("9_uf5tr")
-ability_name = "Shockwave Pulse"
-
-[sub_resource type="Resource" id="Resource_5jstl"]
-script = ExtResource("11_8ydkj")
-ability_name = "Damage Dash"
-metadata/_custom_type_script = "uid://c528heqxdywiv"
 
 [sub_resource type="Resource" id="Resource_7tojy"]
 script = ExtResource("15_8ydkj")
@@ -82,7 +72,7 @@ max_health = 25.0
 
 [node name="AbilityComponent" type="Node" parent="Components" unique_id=1262351499]
 script = ExtResource("7_fm80t")
-slots = Array[ExtResource("8_gx1jg")]([SubResource("Resource_3j4b4"), SubResource("Resource_5jstl")])
+slots = Array[ExtResource("8_gx1jg")]([ExtResource("11_lgqa7")])
 
 [node name="PassiveAbilityComponent" type="Node" parent="Components" unique_id=1262351500]
 script = ExtResource("14_pasvc")

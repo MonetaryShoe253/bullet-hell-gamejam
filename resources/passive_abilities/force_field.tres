@@ -2,11 +2,11 @@
 
 [ext_resource type="PackedScene" path="res://scenes/abilities/force_field/force_field.tscn" id="1_6t4kk"]
 [ext_resource type="Script" uid="uid://clni4m2orvlf5" path="res://scripts/progression/abilities/force_field_ability.gd" id="1_ffld"]
-[ext_resource type="Texture2D" uid="uid://cgo6imh1qqiww" path="res://assets/shop/abilities/feather_shield.png" id="2_b5ohj"]
+[ext_resource type="Texture2D" uid="uid://b3nucbdsjiv6i" path="res://assets/shop/abilities/shield.png" id="2_6t4kk"]
 
 [resource]
 script = ExtResource("1_ffld")
 ability_name = "Force Field"
 description = "An aura around you that damages any enemy that touches it, and keeps burning them for as long as they stay in it."
-icon = ExtResource("2_b5ohj")
+icon = ExtResource("2_6t4kk")
 price = 90

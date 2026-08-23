@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="BlackHoleAbility" format=3 uid="uid://vg4pw01pqvhx"]
+
+[ext_resource type="Texture2D" uid="uid://cgo6imh1qqiww" path="res://assets/shop/abilities/feather_shield.png" id="1_j6o08"]
+[ext_resource type="Script" uid="uid://bujgx2gdmfkjr" path="res://scripts/progression/abilities/black_hole_ability.gd" id="1_qky4d"]
+
+[resource]
+script = ExtResource("1_qky4d")
+radius = 50.0
+pull_strength = 75.0
+explosion_damage = 10.0
+ability_name = "Black Hole"
+description = "Pulls enemies into a singularity, then explodes."
+icon = ExtResource("1_j6o08")
+cooldown = 3.0
+metadata/_custom_type_script = "uid://bujgx2gdmfkjr"
