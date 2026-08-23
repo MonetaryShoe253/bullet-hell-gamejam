@@ -33,6 +33,7 @@ extends Node2D
 ## _spawn_decoration()).
 @onready var gameplay_layer: Node2D = $GameplayLayer
 @onready var money_label: Label = $HUD/MoneyLabel
+@onready var current_level_label: Label = $HUD/CurrentLevelLabel
 @onready var boss_health_bar: CanvasLayer = $BossHealthBar
 @onready var shop_ui: ShopUI = $ShopUI
 @onready var minimap: Control = $HUD/Minimap
@@ -56,7 +57,7 @@ extends Node2D
 ## the boss-room centre and the boss encounter is started immediately after the
 ## room controllers are built.
 @export_category("Testing")
-@export var test_start_at_boss := false
+@export var test_start_at_boss := true
 
 ## Players and Enemies
 @export var player_scene: PackedScene
@@ -95,6 +96,8 @@ var _shop_trigger: Area2D
 func _ready() -> void:
 	GameState.money_changed.connect(_on_money_changed)
 	_on_money_changed(GameState.money)
+	GameState.level_changed.connect(_on_level_changed)
+	_on_level_changed(GameState.level)
 	generate_dungeon()
 
 
@@ -147,7 +150,11 @@ func _boss_test_spawn_cell() -> Vector2i:
 
 func _on_money_changed(total: int) -> void:
 	if money_label:
-		money_label.text = "Cluck Coins: %d" % total	
+		money_label.text = "Cluck Coins: %d" % total
+
+func _on_level_changed(new_level: int) -> void:
+	if current_level_label:
+		current_level_label.text = "Current Level: %d" % new_level
 
 ## Tears down everything from the previous dungeon (player, enemies, gates,
 ## stairs, decorations) before a new layout is generated for the next level.

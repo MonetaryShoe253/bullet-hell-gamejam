@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="SecondLifeAbility" format=3 uid="uid://mhvocebmbmbo"]
+
+[ext_resource type="Script" uid="uid://ccjs48coihofg" path="res://scripts/progression/abilities/second_life_ability.gd" id="1_slife"]
+[ext_resource type="PackedScene" uid="uid://cs1x3ttl4v0sx" path="res://scenes/abilities/second_life.tscn" id="1_xej5n"]
+
+[resource]
+script = ExtResource("1_slife")
+ability_name = "Second Life"
+description = "The next time you would die, revive instead with half your max health back. Consumed on use."
+price = 150
+metadata/_custom_type_script = "uid://b4oy2lqi0n2ie"

@@ -1,12 +1,12 @@
-[gd_scene load_steps=2 format=3]
+[gd_scene format=3 uid="uid://bhr3ecq6grq5d"]
 
-[ext_resource type="Script" path="res://scenes/UI/level_banner.gd" id="1"]
+[ext_resource type="Script" uid="uid://c6gratvig6rvj" path="res://scenes/UI/level_banner.gd" id="1"]
 
-[node name="LevelBanner" type="CanvasLayer"]
+[node name="LevelBanner" type="CanvasLayer" unique_id=86843368]
 layer = 10
 script = ExtResource("1")
 
-[node name="Label" type="Label" parent="."]
+[node name="Label" type="Label" parent="." unique_id=411690466]
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0

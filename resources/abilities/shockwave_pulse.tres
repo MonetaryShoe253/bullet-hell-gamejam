@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="ShockwavePulseAbility" format=3]
+
+[ext_resource type="Script" path="res://scripts/progression/abilities/shockwave_pulse_ability.gd" id="1_swp"]
+
+[resource]
+script = ExtResource("1_swp")
+ability_name = "Shockwave Pulse"
+description = "Emit a pulse that destroys every projectile in a wide radius around you - player and enemy bullets alike."
+price = 80
+cooldown = 8.0
+clear_radius = 300.0
