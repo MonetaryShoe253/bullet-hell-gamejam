@@ -47,10 +47,9 @@ var _damage_ring_timer: float = 0.0
 @export var dash_camera_recovery_time: float = 0.22
 
 # Afterimages
-@export var afterimage_interval: float = 0.035
-@export var afterimage_lifetime: float = 0.20
-@export_range(0.0, 1.0) var afterimage_start_alpha: float = 0.45
-
+@export var afterimage_interval: float = 0.025
+@export var afterimage_lifetime: float = 0.45
+@export_range(0.0, 1.0) var afterimage_start_alpha: float = 0.75
 # Dash lines
 @export var dash_line_count: int = 5
 @export var dash_line_length: float = 30.0
@@ -168,13 +167,23 @@ func _on_death_reward_finished() -> void:
 	get_tree().paused = true
 
 func _physics_process(delta: float) -> void:
+		
+	# Afterimages for BOTH normal dash and Damage Dash
+	if is_dashing or is_ability_dashing:
+		_afterimage_timer -= delta
+
+		if _afterimage_timer <= 0.0:
+			_spawn_dash_afterimage()
+			_afterimage_timer = afterimage_interval
+
+	# Damage rings ONLY for Damage Dash
 	if is_ability_dashing:
 		_damage_ring_timer -= delta
 
 		if _damage_ring_timer <= 0.0:
 			_spawn_damage_trail_ring()
 			_damage_ring_timer = damage_ring_interval
-		
+			
 	if is_dashing:
 		velocity = dash_direction * dash_speed
 
@@ -417,9 +426,8 @@ func _dash_camera_end() -> void:
 
 
 func _spawn_dash_afterimage() -> void:
-	var ghost := Sprite2D.new()
-
 	var frames := sprite.sprite_frames
+
 	var texture := frames.get_frame_texture(
 		sprite.animation,
 		sprite.frame
@@ -428,21 +436,34 @@ func _spawn_dash_afterimage() -> void:
 	if texture == null:
 		return
 
+	var ghost := Sprite2D.new()
+
 	ghost.texture = texture
 
-	# Match the AnimatedSprite2D's appearance.
+	# Copy the AnimatedSprite2D appearance.
+	ghost.centered = sprite.centered
+	ghost.offset = sprite.offset
+	ghost.flip_h = sprite.flip_h
+	ghost.flip_v = sprite.flip_v
+
+	# Add to the WORLD first.
+	# This prevents it from following the player.
+	get_tree().current_scene.add_child(ghost)
+
+	# Now copy the player's current world transform.
 	ghost.global_position = sprite.global_position
 	ghost.global_rotation = sprite.global_rotation
 	ghost.global_scale = sprite.global_scale
-	ghost.flip_h = sprite.flip_h
-	ghost.flip_v = sprite.flip_v
+
 	ghost.z_index = sprite.z_index - 1
 
-	ghost.modulate.a = afterimage_start_alpha
-
-	# Add to the world rather than the Player.
-	# Otherwise the ghost would keep moving with us.
-	get_tree().current_scene.add_child(ghost)
+	# Start clearly visible.
+	ghost.modulate = Color(
+		1.0,
+		1.0,
+		1.0,
+		afterimage_start_alpha
+	)
 
 	var tween := ghost.create_tween()
 
