@@ -9,5 +9,5 @@ damage = 8.0
 ability_name = "Orbiting Blades"
 description = "Summons blades that orbit the player and damage nearby enemies."
 icon = ExtResource("1_jn7gy")
-cooldown = 7.0
+cooldown = 5.0
 metadata/_custom_type_script = "uid://b0wu87ho3uiq6"
