@@ -43,11 +43,12 @@ price = 200
 script = ExtResource("15_3j4b4")
 metadata/_custom_type_script = "uid://m4jmncog172n"
 
-[node name="Player" type="CharacterBody2D" unique_id=1277505981 groups=["player"]]
+[node name="Player" type="CharacterBody2D" unique_id=1277505981 node_paths=PackedStringArray("camera") groups=["player"]]
 texture_filter = 1
 scale = Vector2(1.5, 1.5)
 collision_layer = 2
 script = ExtResource("1_8afob")
+camera = NodePath("Camera2D")
 
 [node name="Sprite2D" type="AnimatedSprite2D" parent="." unique_id=2147301644]
 texture_filter = 1

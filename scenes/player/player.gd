@@ -24,6 +24,45 @@ var _ability_dash_damage: float = 0.0
 var _ability_dash_hit_radius: float = 0.0
 var _ability_dash_hit_enemies: Array[Node2D] = []
 
+@export var damage_ring_interval: float = 0.04
+@export var damage_ring_lifetime: float = 0.22
+
+var _damage_ring_timer: float = 0.0
+
+# ---------------------------------------------------------------------------
+# Dash Visual FX
+# ---------------------------------------------------------------------------
+
+@export_category("Dash Visual FX")
+
+@export var camera: Camera2D
+
+# Camera falls this far behind the player during a dash.
+@export var dash_camera_lag: float = 35.0
+
+# How quickly camera moves into its lag position.
+@export var dash_camera_lag_time: float = 0.08
+
+# How quickly camera catches the player afterward.
+@export var dash_camera_recovery_time: float = 0.22
+
+# Afterimages
+@export var afterimage_interval: float = 0.035
+@export var afterimage_lifetime: float = 0.20
+@export_range(0.0, 1.0) var afterimage_start_alpha: float = 0.45
+
+# Dash lines
+@export var dash_line_count: int = 5
+@export var dash_line_length: float = 30.0
+@export var dash_line_lifetime: float = 0.15
+@export var dash_line_spread: float = 18.0
+
+
+var _camera_default_position: Vector2
+var _camera_tween: Tween
+var _afterimage_timer: float = 0.0
+
+
 @onready var hurt_box: HurtboxComponent = $Components/HurtBox
 @onready var sprite: AnimatedSprite2D = $Sprite2D
 @onready var inventory: InventoryComponent = $Components/InventoryComponent
@@ -84,6 +123,8 @@ func _ready() -> void:
 
 	passive_ability_component.equip_all()
 
+	_setup_dash_camera()
+
 
 func _on_health_changed(current_health: float, max_health: float) -> void:
 	health_bar.max_value = max_health
@@ -127,11 +168,20 @@ func _on_death_reward_finished() -> void:
 	get_tree().paused = true
 
 func _physics_process(delta: float) -> void:
+	if is_ability_dashing:
+		_damage_ring_timer -= delta
+
+		if _damage_ring_timer <= 0.0:
+			_spawn_damage_trail_ring()
+			_damage_ring_timer = damage_ring_interval
+		
 	if is_dashing:
 		velocity = dash_direction * dash_speed
+
 	elif is_ability_dashing:
 		velocity = ability_dash_direction * _ability_dash_speed
 		_damage_ability_dash_path()
+
 	else:
 		var direction := Input.get_vector(
 			"move_left",
@@ -189,14 +239,20 @@ func start_dash() -> void:
 
 	health_component.invulnerable = true
 
+	_afterimage_timer = 0.0
+
+	# Dash juice
+	_dash_camera_start(dash_direction)
+	_spawn_dash_lines(dash_direction)
+
 	await get_tree().create_timer(dash_duration).timeout
 
 	is_dashing = false
 	health_component.invulnerable = false
 
+	_dash_camera_end()
+
 	dash_cooldown_remaining = stats.get_dash_cooldown()
-
-
 ## Self-contained dash used by the Damage Dash ability: moves like a normal
 ## dash and grants the same invulnerability, but tracked independently of
 ## is_dashing/can_dash so it never touches the regular dash's cooldown -
@@ -215,6 +271,7 @@ func perform_ability_dash(
 		return
 
 	is_ability_dashing = true
+
 	ability_dash_direction = (
 		get_global_mouse_position() - global_position
 	).normalized()
@@ -226,15 +283,26 @@ func perform_ability_dash(
 
 	health_component.invulnerable = true
 
+	# Start Damage Dash visual effects
+	_afterimage_timer = 0.0
+	_damage_ring_timer = 0.0
+
+	_dash_camera_start(ability_dash_direction)
+	_spawn_dash_lines(ability_dash_direction)
+
 	await get_tree().create_timer(duration).timeout
 
 	is_ability_dashing = false
 
+	# Camera catches back up
+	_dash_camera_end()
+
 	if post_invincibility_duration > 0.0:
-		await get_tree().create_timer(post_invincibility_duration).timeout
+		await get_tree().create_timer(
+			post_invincibility_duration
+		).timeout
 
 	health_component.invulnerable = false
-
 
 ## Enemies are on a collision mask the player's own CharacterBody2D doesn't
 ## test against (the player passes through them during move_and_slide), so
@@ -299,3 +367,234 @@ func _update_animation() -> void:
 	
 func apply_upgrade(upgrade: ShopUpgrade) -> void:
 	stats.apply_shop_upgrade(upgrade)
+
+
+func _setup_dash_camera() -> void:
+	if camera == null:
+		return
+
+	_camera_default_position = camera.position
+
+
+func _dash_camera_start(direction: Vector2) -> void:
+	if camera == null:
+		return
+
+	if _camera_tween != null:
+		_camera_tween.kill()
+
+	# Opposite the dash direction = camera gets left behind.
+	var lag_position := (
+		_camera_default_position
+		- direction * dash_camera_lag
+	)
+
+	_camera_tween = create_tween()
+
+	_camera_tween.tween_property(
+		camera,
+		"position",
+		lag_position,
+		dash_camera_lag_time
+	).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+
+
+func _dash_camera_end() -> void:
+	if camera == null:
+		return
+
+	if _camera_tween != null:
+		_camera_tween.kill()
+
+	_camera_tween = create_tween()
+
+	_camera_tween.tween_property(
+		camera,
+		"position",
+		_camera_default_position,
+		dash_camera_recovery_time
+	).set_trans(Tween.TRANS_QUINT).set_ease(Tween.EASE_OUT)
+
+
+func _spawn_dash_afterimage() -> void:
+	var ghost := Sprite2D.new()
+
+	var frames := sprite.sprite_frames
+	var texture := frames.get_frame_texture(
+		sprite.animation,
+		sprite.frame
+	)
+
+	if texture == null:
+		return
+
+	ghost.texture = texture
+
+	# Match the AnimatedSprite2D's appearance.
+	ghost.global_position = sprite.global_position
+	ghost.global_rotation = sprite.global_rotation
+	ghost.global_scale = sprite.global_scale
+	ghost.flip_h = sprite.flip_h
+	ghost.flip_v = sprite.flip_v
+	ghost.z_index = sprite.z_index - 1
+
+	ghost.modulate.a = afterimage_start_alpha
+
+	# Add to the world rather than the Player.
+	# Otherwise the ghost would keep moving with us.
+	get_tree().current_scene.add_child(ghost)
+
+	var tween := ghost.create_tween()
+
+	tween.tween_property(
+		ghost,
+		"modulate:a",
+		0.0,
+		afterimage_lifetime
+	).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+
+	tween.finished.connect(ghost.queue_free)
+	
+func _spawn_dash_lines(direction: Vector2) -> void:
+	var perpendicular := Vector2(-direction.y, direction.x)
+
+	for i in range(dash_line_count):
+		var line := Line2D.new()
+
+		line.width = randf_range(1.0, 2.5)
+		line.default_color = Color(1.0, 1.0, 1.0, 0.65)
+
+		# Random position across the width of the dash.
+		var side_offset := randf_range(
+			-dash_line_spread,
+			dash_line_spread
+		)
+
+		var forward_offset := randf_range(-10.0, 10.0)
+
+		var start := (
+			global_position
+			+ perpendicular * side_offset
+			+ direction * forward_offset
+		)
+
+		# Line stretches backwards from the player.
+		var end := (
+			start
+			- direction
+			* randf_range(
+				dash_line_length * 0.6,
+				dash_line_length
+			)
+		)
+
+		line.add_point(start)
+		line.add_point(end)
+
+		get_tree().current_scene.add_child(line)
+
+		var tween := line.create_tween()
+
+		tween.tween_property(
+			line,
+			"modulate:a",
+			0.0,
+			dash_line_lifetime
+		)
+
+		tween.finished.connect(line.queue_free)
+		
+func _spawn_damage_dash_ring() -> void:
+	var ring := Line2D.new()
+
+	ring.width = 2.5
+	ring.default_color = Color(1.0, 0.35, 0.15, 0.8)
+	ring.closed = true
+
+	var segments := 32
+
+	for i in range(segments):
+		var angle := TAU * float(i) / float(segments)
+
+		var point := Vector2(
+			cos(angle),
+			sin(angle)
+		) * _ability_dash_hit_radius
+
+		ring.add_point(point)
+
+	# Make the ring follow the player while the damage dash happens.
+	ring.scale = Vector2(0.25, 0.25)
+
+	add_child(ring)
+
+	var tween := ring.create_tween()
+	tween.set_parallel(true)
+
+	tween.tween_property(
+		ring,
+		"scale",
+		Vector2.ONE,
+		0.12
+	).set_trans(Tween.TRANS_EXPO).set_ease(Tween.EASE_OUT)
+
+	tween.tween_property(
+		ring,
+		"modulate:a",
+		0.0,
+		0.25
+	).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+
+	tween.chain().tween_callback(ring.queue_free)
+
+	tween.tween_property(
+		ring,
+		"modulate:a",
+		0.0,
+		0.25
+	).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+
+	tween.finished.connect(ring.queue_free)
+	
+func _spawn_damage_trail_ring() -> void:
+	var ring := Line2D.new()
+
+	ring.width = 2.0
+	ring.default_color = Color(1.0, 0.35, 0.15, 0.55)
+	ring.closed = true
+
+	var segments := 24
+
+	for i in range(segments):
+		var angle := TAU * float(i) / float(segments)
+
+		ring.add_point(
+			Vector2(cos(angle), sin(angle))
+			* _ability_dash_hit_radius
+		)
+
+	# IMPORTANT:
+	# Put it in the world so it stays behind.
+	get_tree().current_scene.add_child(ring)
+
+	ring.global_position = global_position
+
+	var tween := ring.create_tween()
+
+	tween.set_parallel(true)
+
+	tween.tween_property(
+		ring,
+		"modulate:a",
+		0.0,
+		damage_ring_lifetime
+	)
+
+	tween.tween_property(
+		ring,
+		"scale",
+		Vector2(1.15, 1.15),
+		damage_ring_lifetime
+	)
+
+	tween.chain().tween_callback(ring.queue_free)
