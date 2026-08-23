@@ -39,6 +39,7 @@ shape = SubResource("CircleShape2D_body")
 
 [node name="PlayerSight" type="RayCast2D" parent="." unique_id=1308146318]
 collision_mask = 3
+hit_from_inside = true
 
 [node name="Components" type="Node" parent="." unique_id=298541317]
 

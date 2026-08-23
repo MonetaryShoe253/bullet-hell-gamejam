@@ -1,6 +1,9 @@
 [gd_scene format=3 uid="uid://daq0vn44ulaa2"]
 
 [ext_resource type="Script" uid="uid://djtix828e1u6k" path="res://scenes/UI/death_reward_ui.gd" id="1_yt8be"]
+[ext_resource type="Texture2D" uid="uid://d0mgo4mnav85m" path="res://assets/shop/items/armour_1.png" id="2_fdblj"]
+[ext_resource type="Texture2D" uid="uid://ddqyq5kj3u4lo" path="res://assets/shop/items/armour_2.png" id="3_i0reb"]
+[ext_resource type="Texture2D" uid="uid://diaduw131ckdw" path="res://assets/shop/items/armour_3.png" id="4_4ic5s"]
 
 [node name="DeathRewardUI" type="CanvasLayer" unique_id=288556813]
 process_mode = 3
@@ -59,18 +62,22 @@ unique_name_in_owner = true
 custom_minimum_size = Vector2(280, 300)
 layout_mode = 2
 size_flags_horizontal = 3
+text = "test"
+icon = ExtResource("2_fdblj")
 
 [node name="Reward2" type="Button" parent="Background/CenterContainer/PanelContainer/MarginContainer/VBoxContainer/RewardContainer" unique_id=1646397515]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(280, 300)
 layout_mode = 2
 size_flags_horizontal = 3
+icon = ExtResource("3_i0reb")
 
 [node name="Reward3" type="Button" parent="Background/CenterContainer/PanelContainer/MarginContainer/VBoxContainer/RewardContainer" unique_id=1949193326]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(280, 300)
 layout_mode = 2
 size_flags_horizontal = 3
+icon = ExtResource("4_4ic5s")
 
 [node name="ConfirmButton" type="Button" parent="Background/CenterContainer/PanelContainer/MarginContainer/VBoxContainer" unique_id=1657120686]
 unique_name_in_owner = true

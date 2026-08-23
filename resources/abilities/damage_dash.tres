@@ -1,11 +1,13 @@
-[gd_resource type="Resource" script_class="DamageDashAbility" format=3]
+[gd_resource type="Resource" script_class="DamageDashAbility" format=3 uid="uid://cgldn40evkied"]
 
+[ext_resource type="Texture2D" uid="uid://la4c4mggam0m" path="res://assets/shop/abilities/dash.png" id="1_8ev88"]
 [ext_resource type="Script" uid="uid://c528heqxdywiv" path="res://scripts/progression/abilities/damage_dash_ability.gd" id="1_ddash"]
 
 [resource]
 script = ExtResource("1_ddash")
 ability_name = "Damage Dash"
 description = "Dash through enemies, damaging them along the way and staying invincible a little longer than usual."
+icon = ExtResource("1_8ev88")
 price = 110
 cooldown = 2.0
 metadata/_custom_type_script = "uid://c528heqxdywiv"

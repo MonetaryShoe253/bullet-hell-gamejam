@@ -45,7 +45,7 @@ var bounce_phase: float = 0.0
 @export var burst_count: int = 3
 @export var burst_delay: float = 0.1
 
-@export var spiral_projectiles: int = 2
+@export var spiral_projectiles: int = 6
 @export var spiral_rotation_speed: float = 12.0
 var spiral_rotation: float = 0.0
 
@@ -72,8 +72,8 @@ var ring_gap_rotation: float = 0.0
 
 @export var cross_burst_count: int = 3
 @export var cross_burst_projectiles: int = 5
-@export var cross_burst_angle: float = 50.0
-@export var cross_burst_rotation: float = 12.0
+@export var cross_burst_angle: float = 90.0
+@export var cross_burst_rotation: float = 30.0
 @export var cross_burst_delay: float = 0.12
 
 var orbit_direction: float = 1.0
@@ -191,13 +191,16 @@ func can_see_player() -> bool:
 	var ray := $PlayerSight as RayCast2D
 	var target := ray.to_local(player.global_position)
 
-	if target.is_zero_approx():
+	# Player is overlapping / extremely close
+	if global_position.distance_to(player.global_position) < 16.0:
 		return true
 
 	ray.target_position = target
 	ray.force_raycast_update()
 
-	return ray.is_colliding() and ray.get_collider() == player
+	var collider = ray.get_collider()
+
+	return ray.is_colliding() and collider == player
 
 func fire_at_player() -> void:
 	if player == null:
@@ -375,48 +378,47 @@ func fire_ring_gap() -> void:
 	)
 	
 func fire_cross_burst(_initial_direction: Vector2) -> void:
+	var total_angle := deg_to_rad(cross_burst_angle)
+	var start_angle := -total_angle * 0.5
+	var rotation_amount := deg_to_rad(cross_burst_rotation)
+
+	var step := 0.0
+	if cross_burst_projectiles > 1:
+		step = total_angle / float(cross_burst_projectiles - 1)
+
 	for burst_index in range(cross_burst_count):
-		if player == null:
+		if not is_instance_valid(player):
 			return
 
-		# Re-aim every burst.
 		var aim_direction := (
 			player.global_position - global_position
 		).normalized()
 
-		# Alternate the spread rotation left/right.
-		var rotation_sign := 1.0
-		if burst_index % 2 == 1:
-			rotation_sign = -1.0
+		var alternate := burst_index % 2 == 1
 
-		var rotation_offset := deg_to_rad(
-			cross_burst_rotation
-			* rotation_sign
-		)
+		var gap_offset := 0.0
+		var rotation_offset := rotation_amount
 
-		var total_angle := deg_to_rad(cross_burst_angle)
-		var start_angle := -total_angle / 2.0
-
-		var step := 0.0
-		if cross_burst_projectiles > 1:
-			step = total_angle / (
-				cross_burst_projectiles - 1
-			)
+		if alternate:
+			gap_offset = step * 0.5
+			rotation_offset = -rotation_amount
 
 		for i in range(cross_burst_projectiles):
 			var angle := (
 				start_angle
 				+ step * i
 				+ rotation_offset
+				+ gap_offset
 			)
 
-			var bullet_direction := aim_direction.rotated(angle)
+			spawn_projectile(
+				aim_direction.rotated(angle)
+			)
 
-			spawn_projectile(bullet_direction)
-
-		await get_tree().create_timer(
-			cross_burst_delay
-		).timeout
+		if burst_index < cross_burst_count - 1:
+			await get_tree().create_timer(
+				cross_burst_delay
+			).timeout
 
 func _kite() -> void:
 	if player == null:

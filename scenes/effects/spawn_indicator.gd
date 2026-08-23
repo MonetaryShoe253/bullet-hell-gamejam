@@ -12,7 +12,7 @@ func _ready() -> void:
 	tween.tween_property(
 		self,
 		"scale",
-		Vector2(1.35, 1.35),
+		Vector2(0.55, 0.55),
 		0.15
 	)
 
@@ -26,7 +26,7 @@ func _ready() -> void:
 	tween.tween_property(
 		self,
 		"scale",
-		Vector2.ONE,
+		Vector2(0.2, 0.2),
 		0.15
 	)
 

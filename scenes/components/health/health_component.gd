@@ -14,16 +14,21 @@ var invulnerable: bool = false
 
 func _ready() -> void:
 	current_health = max_health
+	
+	
+func set_max_health(new_max_health: float, heal_difference := false) -> void:
+	var old_max_health := max_health
+	max_health = max(new_max_health, 1.0)
 
-func increase_max_health(amount: float) -> void:
-	if amount <= 0.0:
-		return
+	if heal_difference:
+		var difference := max_health - old_max_health
+		if difference > 0.0:
+			current_health += difference
 
-	max_health += amount
-	current_health += amount
+	current_health = min(current_health, max_health)
 
 	health_changed.emit(current_health, max_health)
-	
+
 func take_damage(amount: float) -> void:
 	if invulnerable:
 		return

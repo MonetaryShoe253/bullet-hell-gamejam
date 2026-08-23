@@ -1,11 +1,14 @@
-[gd_resource type="Resource" script_class="DamageWaveAbility" format=3]
+[gd_resource type="Resource" script_class="DamageWaveAbility" format=3 uid="uid://bqkuj4plfyjfm"]
 
 [ext_resource type="Script" uid="uid://cghv0jgqsjnpb" path="res://scripts/progression/abilities/damage_wave_ability.gd" id="1_dwave"]
+[ext_resource type="Texture2D" uid="uid://do6yb7axnubwf" path="res://assets/shop/abilities/chirp.png" id="1_f67wx"]
+[ext_resource type="PackedScene" uid="uid://ccrikqg764q0y" path="res://scenes/abilities/damage_wave/damage_wave.tscn" id="3_x0pn3"]
 
 [resource]
 script = ExtResource("1_dwave")
 ability_name = "Damage Wave"
 description = "A short, wide burst of damage right in front of you - the closer enemies are, the harder it hits."
+icon = ExtResource("1_f67wx")
 price = 100
 cooldown = 3.0
 metadata/_custom_type_script = "uid://cghv0jgqsjnpb"

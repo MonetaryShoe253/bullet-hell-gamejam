@@ -1,11 +1,14 @@
-[gd_resource type="Resource" script_class="BulletStormAbility" format=3]
+[gd_resource type="Resource" script_class="BulletStormAbility" format=3 uid="uid://d3vkvwb2jb26d"]
 
 [ext_resource type="Script" uid="uid://b2v6yyh1ciw5p" path="res://scripts/progression/abilities/bullet_storm_ability.gd" id="1_bstrm"]
+[ext_resource type="Texture2D" uid="uid://btape335dbmda" path="res://assets/shop/abilities/chick.png" id="1_wuhdu"]
+[ext_resource type="PackedScene" uid="uid://d0tu6eohh56ju" path="res://scenes/projectiles/playerbullet/playerbullet.tscn" id="2_d15g4"]
 
 [resource]
 script = ExtResource("1_bstrm")
 ability_name = "Bullet Storm"
 description = "Unleash a ring of bullets in every direction."
+icon = ExtResource("1_wuhdu")
 price = 90
 cooldown = 4.0
 metadata/_custom_type_script = "uid://b2v6yyh1ciw5p"

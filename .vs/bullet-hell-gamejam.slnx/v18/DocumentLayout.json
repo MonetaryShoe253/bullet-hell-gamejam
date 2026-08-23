@@ -1,0 +1,71 @@
+{
+  "Version": 1,
+  "WorkspaceRootPath": "C:\\Users\\atj99\\Godot\\Projects\\bullet-hell-gamejam\\",
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\atj99\\Godot\\Projects\\bullet-hell-gamejam\\scenes\\player\\player.gd||{8B382828-6202-11D1-8870-0000F87579D2}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:scenes\\player\\player.gd||{8B382828-6202-11D1-8870-0000F87579D2}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\atj99\\Godot\\Projects\\bullet-hell-gamejam\\scenes\\components\\stats\\stats_component.gd||{8B382828-6202-11D1-8870-0000F87579D2}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:scenes\\components\\stats\\stats_component.gd||{8B382828-6202-11D1-8870-0000F87579D2}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\atj99\\Godot\\Projects\\bullet-hell-gamejam\\.vs\\ProjectSettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:.vs\\ProjectSettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}"
+    }
+  ],
+  "DocumentGroupContainers": [
+    {
+      "Orientation": 0,
+      "VerticalTabListWidth": 256,
+      "DocumentGroups": [
+        {
+          "DockedWidth": 200,
+          "SelectedChildIndex": 2,
+          "Children": [
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "stats_component.gd",
+              "DocumentMoniker": "C:\\Users\\atj99\\Godot\\Projects\\bullet-hell-gamejam\\scenes\\components\\stats\\stats_component.gd",
+              "RelativeDocumentMoniker": "scenes\\components\\stats\\stats_component.gd",
+              "ToolTip": "C:\\Users\\atj99\\Godot\\Projects\\bullet-hell-gamejam\\scenes\\components\\stats\\stats_component.gd",
+              "RelativeToolTip": "scenes\\components\\stats\\stats_component.gd",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABwAAAATAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001001|",
+              "WhenOpened": "2026-08-21T09:23:55.022Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "ProjectSettings.json",
+              "DocumentMoniker": "C:\\Users\\atj99\\Godot\\Projects\\bullet-hell-gamejam\\.vs\\ProjectSettings.json",
+              "RelativeDocumentMoniker": ".vs\\ProjectSettings.json",
+              "ToolTip": "C:\\Users\\atj99\\Godot\\Projects\\bullet-hell-gamejam\\.vs\\ProjectSettings.json",
+              "RelativeToolTip": ".vs\\ProjectSettings.json",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001642|",
+              "WhenOpened": "2026-08-21T09:22:48.473Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "player.gd",
+              "DocumentMoniker": "C:\\Users\\atj99\\Godot\\Projects\\bullet-hell-gamejam\\scenes\\player\\player.gd",
+              "RelativeDocumentMoniker": "scenes\\player\\player.gd",
+              "ToolTip": "C:\\Users\\atj99\\Godot\\Projects\\bullet-hell-gamejam\\scenes\\player\\player.gd",
+              "RelativeToolTip": "scenes\\player\\player.gd",
+              "ViewState": "AgIAAE4AAAAAAAAAAAArwGMAAAASAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001001|",
+              "WhenOpened": "2026-08-21T09:21:43.928Z",
+              "EditorCaption": ""
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

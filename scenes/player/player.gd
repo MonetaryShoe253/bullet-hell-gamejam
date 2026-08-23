@@ -64,6 +64,9 @@ const GameOverScene := preload("res://scenes/ui/game_over.tscn")
 
 
 func _ready() -> void:
+	# StatsComponent calculates the player's max HP; HealthComponent owns the
+	# actual health state. Sync them once on startup.
+	health_component.set_max_health(stats.get_max_health(), true)
 	health_bar.max_value = health_component.max_health
 	health_bar.value = health_component.current_health
 
@@ -92,27 +95,9 @@ func _on_equipment_changed() -> void:
 	)
 	
 func _on_stats_changed() -> void:
-	var old_max_health := health_component.max_health
-	var new_max_health := stats.get_max_health()
-
-	var health_difference := new_max_health - old_max_health
-
-	health_component.max_health = new_max_health
-
-	# If max HP increased, give the player that extra HP too.
-	if health_difference > 0:
-		health_component.current_health += health_difference
-
-	# Make sure current HP can never exceed max.
-	health_component.current_health = min(
-		health_component.current_health,
-		health_component.max_health
-	)
-
-	health_component.health_changed.emit(
-		health_component.current_health,
-		health_component.max_health
-	)
+	# Player stats determine the desired max HP. HealthComponent remains generic
+	# so enemies can use it without needing a StatsComponent.
+	health_component.set_max_health(stats.get_max_health(), true)
 
 
 func _on_died() -> void:
