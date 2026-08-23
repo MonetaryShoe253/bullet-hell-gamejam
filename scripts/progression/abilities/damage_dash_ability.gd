@@ -18,7 +18,7 @@ func activate(caster: Node2D) -> void:
 
 	# Don't activate while another forced ability dash is active
 	# or while the player is normal-dashing.
-	if player.is_dashing or player.ability_dash_active:
+	if player.is_dashing or player.forced_movement_active:
 		return
 
 	var controller := DamageDashController.new()

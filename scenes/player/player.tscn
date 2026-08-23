@@ -11,6 +11,7 @@
 [ext_resource type="Script" uid="uid://d7b6xlys2gmy" path="res://scenes/components/abilities/abilities_component.gd" id="7_fm80t"]
 [ext_resource type="Script" uid="uid://c24n76nrnb3o1" path="res://scripts/progression/abilities/abilities.gd" id="8_gx1jg"]
 [ext_resource type="Resource" uid="uid://cgldn40evkied" path="res://resources/abilities/damage_dash.tres" id="9_uf5tr"]
+[ext_resource type="Resource" uid="uid://c3vnegn3ubcjc" path="res://resources/abilities/orbiting_blades.tres" id="10_uf5tr"]
 [ext_resource type="PackedScene" uid="uid://cxel0xtrtcdel" path="res://scenes/UI/ability_bar.tscn" id="13_gx1jg"]
 [ext_resource type="PackedScene" uid="uid://cs1x3ttl4v0sx" path="res://scenes/abilities/second_life.tscn" id="14_lgqa7"]
 [ext_resource type="Script" uid="uid://duetqoik5vdep" path="res://scenes/components/abilities/passive_ability_component.gd" id="14_pasvc"]
@@ -72,7 +73,7 @@ max_health = 25.0
 
 [node name="AbilityComponent" type="Node" parent="Components" unique_id=1262351499]
 script = ExtResource("7_fm80t")
-slots = Array[ExtResource("8_gx1jg")]([ExtResource("9_uf5tr")])
+slots = Array[ExtResource("8_gx1jg")]([ExtResource("9_uf5tr"), ExtResource("10_uf5tr")])
 
 [node name="PassiveAbilityComponent" type="Node" parent="Components" unique_id=1262351500]
 script = ExtResource("14_pasvc")

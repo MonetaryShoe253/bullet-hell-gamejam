@@ -1,12 +1,13 @@
 [gd_resource type="Resource" script_class="OrbitingBladesAbility" format=3 uid="uid://c3vnegn3ubcjc"]
 
-[ext_resource type="Script" uid="uid://b0wu87ho3uiq6" path="res://scripts/progression/abilities/orbiting_blades.gd" id="1_3b5rv"]
 [ext_resource type="Texture2D" uid="uid://b8g5mjrfw0did" path="res://assets/shop/abilities/three_eggs.png" id="1_jn7gy"]
+[ext_resource type="Script" uid="uid://b0wu87ho3uiq6" path="res://scripts/progression/abilities/orbiting_blades_ability.gd" id="2_jn7gy"]
 
 [resource]
-script = ExtResource("1_3b5rv")
+script = ExtResource("2_jn7gy")
 damage = 8.0
 ability_name = "Orbiting Blades"
 description = "Summons blades that orbit the player and damage nearby enemies."
 icon = ExtResource("1_jn7gy")
+cooldown = 7.0
 metadata/_custom_type_script = "uid://b0wu87ho3uiq6"

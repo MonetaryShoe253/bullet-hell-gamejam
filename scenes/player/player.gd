@@ -13,8 +13,8 @@ var can_dash: bool = true
 var dash_direction: Vector2
 var dash_cooldown_remaining: float = 0.0
 
-var ability_dash_active: bool = false
-var ability_dash_velocity: Vector2 = Vector2.ZERO
+var forced_movement_active: bool = false
+var forced_movement_velocity: Vector2 = Vector2.ZERO
 
 @onready var hurt_box: HurtboxComponent = $Components/HurtBox
 @onready var sprite: AnimatedSprite2D = $Sprite2D
@@ -124,8 +124,8 @@ func _physics_process(delta: float) -> void:
 	if is_dashing:
 		velocity = dash_direction * dash_speed
 
-	elif ability_dash_active:
-		velocity = ability_dash_velocity
+	elif forced_movement_active:
+		velocity = forced_movement_velocity
 
 	else:
 		var direction := Input.get_vector(
@@ -172,7 +172,7 @@ func _physics_process(delta: float) -> void:
 		time_since_last_shot = 0.0
 
 func start_dash() -> void:
-	if not can_dash or is_dashing or ability_dash_active:
+	if not can_dash or is_dashing or forced_movement_active:
 		return
 
 	can_dash = false
@@ -242,19 +242,18 @@ func _update_animation() -> void:
 func apply_upgrade(upgrade: ShopUpgrade) -> void:
 	stats.apply_shop_upgrade(upgrade)
 	
-func start_ability_dash(
+func start_forced_movement(
 	direction: Vector2,
 	speed: float
 ) -> bool:
-	if is_dashing or ability_dash_active:
+	if is_dashing or forced_movement_active:
 		return false
 
-	ability_dash_active = true
-	ability_dash_velocity = direction * speed
+	forced_movement_active = true
+	forced_movement_velocity = direction * speed
 
 	return true
 
-
-func stop_ability_dash() -> void:
-	ability_dash_active = false
-	ability_dash_velocity = Vector2.ZERO
+func stop_forced_movement() -> void:
+	forced_movement_active = false
+	forced_movement_velocity = Vector2.ZERO

@@ -1,0 +1,16 @@
+[gd_scene format=3 uid="uid://bwmwjv5f5ppcg"]
+
+[ext_resource type="Script" uid="uid://c8uohep63b2x8" path="res://scenes/abilities/orbiting_blades/orbiting_blade.gd" id="1_4jruv"]
+[ext_resource type="Texture2D" uid="uid://ck8se3dxe5urh" path="res://assets/Bullets/eggBlade.png" id="1_q1f3u"]
+
+[node name="OrbitingBlade" type="Node2D" unique_id=304641406]
+script = ExtResource("1_4jruv")
+
+[node name="Glow" type="Sprite2D" parent="." unique_id=2129314706]
+modulate = Color(1, 1, 1, 0.27450982)
+scale = Vector2(0.3, 0.3)
+texture = ExtResource("1_q1f3u")
+
+[node name="Sprite2D" type="Sprite2D" parent="." unique_id=1677986456]
+scale = Vector2(0.3, 0.3)
+texture = ExtResource("1_q1f3u")

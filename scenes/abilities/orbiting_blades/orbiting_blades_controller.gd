@@ -1,6 +1,11 @@
 class_name OrbitingBladesController
 extends Node2D
 
+
+const BLADE_SCENE := preload(
+	"res://scenes/abilities/orbiting_blades/orbiting_blade.tscn"
+)
+
 var player: Player
 
 var duration: float
@@ -10,15 +15,22 @@ var rotation_speed: float
 var damage: float
 var hit_radius: float
 var hit_cooldown: float
+var blade_spin_speed: float
+
 
 var elapsed: float = 0.0
 var orbit_angle: float = 0.0
 
-var blades: Array[Node2D] = []
+# Used for the spawn animation.
+var current_orbit_radius: float = 0.0
+
+
+var blades: Array[OrbitingBlade] = []
 
 # Tracks when each enemy can be hit again.
 var enemy_hit_times: Dictionary = {}
-	
+
+		
 func setup(
 	target_player: Player,
 	new_duration: float,
@@ -27,7 +39,8 @@ func setup(
 	new_rotation_speed: float,
 	new_damage: float,
 	new_hit_radius: float,
-	new_hit_cooldown: float
+	new_hit_cooldown: float,
+	new_blade_spin_speed: float
 ) -> void:
 	player = target_player
 
@@ -38,15 +51,18 @@ func setup(
 	damage = new_damage
 	hit_radius = new_hit_radius
 	hit_cooldown = new_hit_cooldown
+	blade_spin_speed = new_blade_spin_speed
 
 	global_position = player.global_position
 
 	_create_blades()
 
+	_animate_blades_out()
+
 
 func _physics_process(delta: float) -> void:
 	if player == null or not is_instance_valid(player):
-		queue_free()
+		_cleanup()
 		return
 
 	elapsed += delta
@@ -55,8 +71,10 @@ func _physics_process(delta: float) -> void:
 		_finish()
 		return
 
+	# Follow the player.
 	global_position = player.global_position
 
+	# Rotate the entire formation.
 	orbit_angle += rotation_speed * delta
 
 	_update_blade_positions()
@@ -65,67 +83,78 @@ func _physics_process(delta: float) -> void:
 
 	_check_enemy_hits()
 	
+
+# ---------------------------------------------------------------------------
+# Blade Creation
+# ---------------------------------------------------------------------------
+
 func _create_blades() -> void:
 	for i in range(blade_count):
-		var blade := _create_blade_visual()
+		var blade := BLADE_SCENE.instantiate() as OrbitingBlade
+
+		if blade == null:
+			continue
 
 		add_child(blade)
+
+		blade.spin_speed = blade_spin_speed
+
+		# Start slightly smaller for the spawn effect.
+		blade.scale = Vector2(0.4, 0.4)
+
 		blades.append(blade)
 
 	_update_blade_positions()
-	
-func _create_blade_visual() -> Node2D:
-	var blade := Node2D.new()
 
-	# Main blade shape
-	var polygon := Polygon2D.new()
 
-	polygon.polygon = PackedVector2Array([
-		Vector2(0, -16),
-		Vector2(5, -5),
-		Vector2(4, 12),
-		Vector2(0, 18),
-		Vector2(-4, 12),
-		Vector2(-5, -5)
-	])
+# ---------------------------------------------------------------------------
+# Spawn Animation
+# ---------------------------------------------------------------------------
 
-	polygon.color = Color(
-		0.75,
-		0.85,
-		1.0,
-		0.95
+func _animate_blades_out() -> void:
+	current_orbit_radius = 8.0
+
+	var tween := create_tween()
+
+	tween.set_parallel(true)
+
+	tween.tween_property(
+		self,
+		"current_orbit_radius",
+		orbit_radius,
+		0.25
+	).set_trans(
+		Tween.TRANS_BACK
+	).set_ease(
+		Tween.EASE_OUT
 	)
 
-	blade.add_child(polygon)
+	for blade in blades:
+		tween.tween_property(
+			blade,
+			"scale",
+			Vector2.ONE,
+			0.18
+		).set_trans(
+			Tween.TRANS_BACK
+		).set_ease(
+			Tween.EASE_OUT
+		)
 
 
-	# Small glowing centre
-	var core := Polygon2D.new()
+# ---------------------------------------------------------------------------
+# Orbit
+# ---------------------------------------------------------------------------
 
-	core.polygon = PackedVector2Array([
-		Vector2(-4, -4),
-		Vector2(4, -4),
-		Vector2(4, 4),
-		Vector2(-4, 4)
-	])
-
-	core.color = Color(
-		0.4,
-		0.65,
-		1.0,
-		0.9
-	)
-
-	blade.add_child(core)
-
-	return blade
-	
 func _update_blade_positions() -> void:
 	if blades.is_empty():
 		return
 
 	for i in range(blades.size()):
 		var blade := blades[i]
+
+		if not is_instance_valid(blade):
+			continue
 
 		var angle_offset := (
 			TAU
@@ -140,13 +169,21 @@ func _update_blade_positions() -> void:
 			sin(angle)
 		)
 
-		blade.position = direction * orbit_radius
+		blade.position = (
+			direction
+			* current_orbit_radius
+		)
 
-		# Point the blade along its orbit.
-		blade.rotation = angle + PI / 2.0
-		
+
+# ---------------------------------------------------------------------------
+# Damage
+# ---------------------------------------------------------------------------
+
 func _check_enemy_hits() -> void:
 	for blade in blades:
+		if not is_instance_valid(blade):
+			continue
+
 		var blade_position := blade.global_position
 
 		for enemy in get_tree().get_nodes_in_group("enemy"):
@@ -171,7 +208,8 @@ func _check_enemy_hits() -> void:
 			hurt_box.take_damage(damage)
 
 			enemy_hit_times[enemy] = hit_cooldown
-			
+
+
 func _update_hit_cooldowns(delta: float) -> void:
 	var finished: Array = []
 
@@ -187,14 +225,23 @@ func _update_hit_cooldowns(delta: float) -> void:
 
 	for enemy in finished:
 		enemy_hit_times.erase(enemy)
-		
+
+
+# ---------------------------------------------------------------------------
+# Finish
+# ---------------------------------------------------------------------------
+
 func _finish() -> void:
 	set_physics_process(false)
 
 	var tween := create_tween()
+
 	tween.set_parallel(true)
 
 	for blade in blades:
+		if not is_instance_valid(blade):
+			continue
+
 		tween.tween_property(
 			blade,
 			"modulate:a",
@@ -209,4 +256,16 @@ func _finish() -> void:
 			0.2
 		)
 
-	tween.chain().tween_callback(queue_free)
+	await tween.finished
+
+	_cleanup()
+
+
+func _cleanup() -> void:
+	for blade in blades:
+		if is_instance_valid(blade):
+			blade.cleanup()
+
+	blades.clear()
+
+	queue_free()

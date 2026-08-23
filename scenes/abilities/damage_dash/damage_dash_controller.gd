@@ -41,7 +41,7 @@ func setup(
 	).normalized()
 
 	# Ask Player to begin forced movement.
-	var started := player.start_ability_dash(
+	var started := player.start_forced_movement(
 		direction,
 		new_speed
 	)
@@ -109,7 +109,7 @@ func _finish_dash() -> void:
 
 	# Stop Player movement immediately.
 	if is_instance_valid(player):
-		player.stop_ability_dash()
+		player.stop_forced_movement()
 
 	if dash_effects != null:
 		dash_effects.end_damage_dash()
