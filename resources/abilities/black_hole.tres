@@ -6,7 +6,7 @@
 [resource]
 script = ExtResource("1_qky4d")
 radius = 50.0
-pull_strength = 75.0
+pull_strength = 65.0
 explosion_damage = 10.0
 ability_name = "Black Hole"
 description = "Pulls enemies into a singularity, then explodes."

@@ -10,10 +10,12 @@ extends Ability
 
 
 func activate(player: Node2D) -> void:
-	var target_position := player.get_global_mouse_position()
+	var black_hole := BlackHoleController.new()
 
-	player.create_black_hole(
-		target_position,
+	player.get_tree().current_scene.add_child(black_hole)
+
+	black_hole.setup(
+		player.get_global_mouse_position(),
 		duration,
 		radius,
 		pull_strength,
