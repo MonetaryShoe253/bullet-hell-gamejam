@@ -251,38 +251,20 @@ func _show_abilities() -> void:
 func _rebuild_ability_list() -> void:
 	_clear_list()
 
-	var shown_active: Array[Ability] = []
-	for i in ability_component.slots.size():
-		var ability: Ability = ability_component.slots[i]
-		if is_instance_valid(ability) and not ability in shown_active:
-			shown_active.append(ability)
-			_add_ability_button(ability, false, i)
-
+	# The left column is the backpack/owned list only. Equipped abilities are
+	# represented by the centre loadout slots and must not be duplicated here.
 	for ability: Ability in inventory.abilities:
 		if not is_instance_valid(ability):
 			continue
-		if ability in shown_active:
-			continue
-		shown_active.append(ability)
 		_add_ability_button(ability, false, -1)
-
-	var shown_passive: Array[PassiveAbility] = []
-	for i in passive_component.slots.size():
-		var passive: PassiveAbility = passive_component.slots[i]
-		if is_instance_valid(passive) and not passive in shown_passive:
-			shown_passive.append(passive)
-			_add_passive_button(passive, i)
 
 	for passive: PassiveAbility in inventory.passive_abilities:
 		if not is_instance_valid(passive):
 			continue
-		if passive in shown_passive:
-			continue
-		shown_passive.append(passive)
 		_add_passive_button(passive, -1)
 
 	if item_list.get_child_count() == 0:
-		_add_empty_message("No abilities owned yet.")
+		_add_empty_message("No abilities in your backpack.")
 
 func _add_ability_button(ability: Ability, _passive: bool, slot_index: int) -> void:
 	var button := Button.new()
@@ -469,7 +451,7 @@ func _refresh_stats() -> void:
 
 
 func _refresh_money() -> void:
-	coin_label.text = "●  %s\nPLUCK COINS" % _format_number(GameState.money)
+	coin_label.text = "●  %s\nCLUCK COINS" % _format_number(GameState.money)
 
 
 func _on_action_pressed() -> void:

@@ -42,17 +42,17 @@ corner_radius_top_right = 5
 corner_radius_bottom_right = 5
 corner_radius_bottom_left = 5
 
-[sub_resource type="StyleBoxFlat" id="TabActive"]
-bg_color = Color(0.58, 0.22, 0.025, 1)
+[sub_resource type="StyleBoxFlat" id="InnerPanel"]
+bg_color = Color(0.025, 0.025, 0.025, 0.94)
 border_width_left = 2
 border_width_top = 2
 border_width_right = 2
 border_width_bottom = 2
-border_color = Color(1, 0.52, 0.08, 1)
-corner_radius_top_left = 5
-corner_radius_top_right = 5
-corner_radius_bottom_right = 5
-corner_radius_bottom_left = 5
+border_color = Color(0.31, 0.17, 0.06, 1)
+corner_radius_top_left = 7
+corner_radius_top_right = 7
+corner_radius_bottom_right = 7
+corner_radius_bottom_left = 7
 
 [sub_resource type="StyleBoxFlat" id="Button"]
 bg_color = Color(0.11, 0.085, 0.065, 1)
@@ -66,29 +66,17 @@ corner_radius_top_right = 5
 corner_radius_bottom_right = 5
 corner_radius_bottom_left = 5
 
-[sub_resource type="StyleBoxFlat" id="InnerPanel"]
-bg_color = Color(0.025, 0.025, 0.025, 0.94)
+[sub_resource type="StyleBoxFlat" id="TabActive"]
+bg_color = Color(0.58, 0.22, 0.025, 1)
 border_width_left = 2
 border_width_top = 2
 border_width_right = 2
 border_width_bottom = 2
-border_color = Color(0.31, 0.17, 0.06, 1)
-corner_radius_top_left = 7
-corner_radius_top_right = 7
-corner_radius_bottom_right = 7
-corner_radius_bottom_left = 7
-
-[sub_resource type="StyleBoxFlat" id="Selected"]
-bg_color = Color(0.22, 0.09, 0.018, 1)
-border_width_left = 3
-border_width_top = 3
-border_width_right = 3
-border_width_bottom = 3
-border_color = Color(1, 0.48, 0.04, 1)
-corner_radius_top_left = 6
-corner_radius_top_right = 6
-corner_radius_bottom_right = 6
-corner_radius_bottom_left = 6
+border_color = Color(1, 0.52, 0.08, 1)
+corner_radius_top_left = 5
+corner_radius_top_right = 5
+corner_radius_bottom_right = 5
+corner_radius_bottom_left = 5
 
 [sub_resource type="StyleBoxFlat" id="Equip"]
 bg_color = Color(0.2, 0.45, 0.035, 1)
@@ -102,7 +90,7 @@ corner_radius_top_right = 6
 corner_radius_bottom_right = 6
 corner_radius_bottom_left = 6
 
-[node name="InventoryUI" type="Control"]
+[node name="InventoryUI" type="Control" unique_id=335640897]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -112,7 +100,7 @@ grow_vertical = 2
 mouse_filter = 1
 script = ExtResource("1_script")
 
-[node name="Dimmer" type="ColorRect" parent="."]
+[node name="Dimmer" type="ColorRect" parent="." unique_id=967862676]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -122,9 +110,9 @@ grow_vertical = 2
 mouse_filter = 2
 color = Color(0.015, 0.008, 0.012, 0.58)
 
-[node name="Panel" type="PanelContainer" parent="."]
+[node name="Panel" type="PanelContainer" parent="." unique_id=1357718696]
 layout_mode = 1
-anchors_preset = 15
+anchors_preset = -1
 anchor_left = 0.025
 anchor_top = 0.04
 anchor_right = 0.975
@@ -133,15 +121,15 @@ grow_horizontal = 2
 grow_vertical = 2
 theme_override_styles/panel = SubResource("MainPanel")
 
-[node name="VBox" type="VBoxContainer" parent="Panel"]
+[node name="VBox" type="VBoxContainer" parent="Panel" unique_id=1597551432]
 layout_mode = 2
 theme_override_constants/separation = 12
 
-[node name="Header" type="HBoxContainer" parent="Panel/VBox"]
+[node name="Header" type="HBoxContainer" parent="Panel/VBox" unique_id=196887651]
 custom_minimum_size = Vector2(0, 68)
 layout_mode = 2
 
-[node name="Title" type="Label" parent="Panel/VBox/Header"]
+[node name="Title" type="Label" parent="Panel/VBox/Header" unique_id=1126813004]
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_colors/font_color = Color(1, 0.78, 0.42, 1)
@@ -149,16 +137,17 @@ theme_override_font_sizes/font_size = 38
 text = "INVENTORY"
 vertical_alignment = 1
 
-[node name="CoinLabel" type="Label" parent="Panel/VBox/Header"]
+[node name="CoinLabel" type="Label" parent="Panel/VBox/Header" unique_id=1355171726]
 custom_minimum_size = Vector2(190, 0)
 layout_mode = 2
 theme_override_colors/font_color = Color(1, 0.75, 0.22, 1)
 theme_override_font_sizes/font_size = 20
-text = "●  0\nPLUCK COINS"
+text = "●  0
+CLUCK COINS"
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="CloseButton" type="Button" parent="Panel/VBox/Header"]
+[node name="CloseButton" type="Button" parent="Panel/VBox/Header" unique_id=952732491]
 custom_minimum_size = Vector2(64, 58)
 layout_mode = 2
 theme_override_font_sizes/font_size = 30
@@ -166,243 +155,279 @@ theme_override_styles/normal = SubResource("Close")
 theme_override_styles/hover = SubResource("ButtonHover")
 text = "×"
 
-[node name="Content" type="HBoxContainer" parent="Panel/VBox"]
+[node name="Content" type="HBoxContainer" parent="Panel/VBox" unique_id=967482589]
 layout_mode = 2
 size_flags_vertical = 3
 theme_override_constants/separation = 12
 
-[node name="AvailablePanel" type="PanelContainer" parent="Panel/VBox/Content"]
+[node name="AvailablePanel" type="PanelContainer" parent="Panel/VBox/Content" unique_id=1102501176]
 custom_minimum_size = Vector2(470, 0)
 layout_mode = 2
 theme_override_styles/panel = SubResource("InnerPanel")
 
-[node name="VBox" type="VBoxContainer" parent="Panel/VBox/Content/AvailablePanel"]
+[node name="VBox" type="VBoxContainer" parent="Panel/VBox/Content/AvailablePanel" unique_id=1436899647]
 layout_mode = 2
 theme_override_constants/separation = 9
 
-[node name="Title" type="Label" parent="Panel/VBox/Content/AvailablePanel/VBox"]
+[node name="Title" type="Label" parent="Panel/VBox/Content/AvailablePanel/VBox" unique_id=659933895]
 layout_mode = 2
 theme_override_colors/font_color = Color(1, 0.62, 0.12, 1)
 theme_override_font_sizes/font_size = 22
 text = "YOUR INVENTORY"
 
-[node name="Hint" type="Label" parent="Panel/VBox/Content/AvailablePanel/VBox"]
+[node name="Hint" type="Label" parent="Panel/VBox/Content/AvailablePanel/VBox" unique_id=11589841]
 layout_mode = 2
 text = "Choose something collected during this run."
 autowrap_mode = 2
 
-[node name="Filters" type="HBoxContainer" parent="Panel/VBox/Content/AvailablePanel/VBox"]
+[node name="Filters" type="HBoxContainer" parent="Panel/VBox/Content/AvailablePanel/VBox" unique_id=670604972]
 layout_mode = 2
 theme_override_constants/separation = 5
 
-[node name="Weapons" type="Button" parent="Panel/VBox/Content/AvailablePanel/VBox/Filters"]
+[node name="Weapons" type="Button" parent="Panel/VBox/Content/AvailablePanel/VBox/Filters" unique_id=1281655711]
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_styles/normal = SubResource("Button")
 theme_override_styles/hover = SubResource("ButtonHover")
+theme_override_styles/disabled = SubResource("TabActive")
 text = "WEAPONS"
-theme_override_styles/disabled = SubResource("TabActive")
 
-[node name="Armour" type="Button" parent="Panel/VBox/Content/AvailablePanel/VBox/Filters"]
+[node name="Armour" type="Button" parent="Panel/VBox/Content/AvailablePanel/VBox/Filters" unique_id=1813709937]
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_styles/normal = SubResource("Button")
 theme_override_styles/hover = SubResource("ButtonHover")
+theme_override_styles/disabled = SubResource("TabActive")
 text = "ARMOUR"
-theme_override_styles/disabled = SubResource("TabActive")
 
-[node name="Accessories" type="Button" parent="Panel/VBox/Content/AvailablePanel/VBox/Filters"]
+[node name="Accessories" type="Button" parent="Panel/VBox/Content/AvailablePanel/VBox/Filters" unique_id=949274217]
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_styles/normal = SubResource("Button")
 theme_override_styles/hover = SubResource("ButtonHover")
+theme_override_styles/disabled = SubResource("TabActive")
 text = "ACCESSORY"
-theme_override_styles/disabled = SubResource("TabActive")
 
-[node name="Abilities" type="Button" parent="Panel/VBox/Content/AvailablePanel/VBox/Filters"]
+[node name="Abilities" type="Button" parent="Panel/VBox/Content/AvailablePanel/VBox/Filters" unique_id=1396126365]
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_styles/normal = SubResource("Button")
 theme_override_styles/hover = SubResource("ButtonHover")
-text = "ABILITIES"
 theme_override_styles/disabled = SubResource("TabActive")
+text = "ABILITIES"
 
-[node name="Heading" type="Label" parent="Panel/VBox/Content/AvailablePanel/VBox"]
+[node name="Heading" type="Label" parent="Panel/VBox/Content/AvailablePanel/VBox" unique_id=556764586]
 layout_mode = 2
 theme_override_colors/font_color = Color(1, 0.62, 0.12, 1)
 text = "AVAILABLE WEAPONS"
 
-[node name="ItemScroll" type="ScrollContainer" parent="Panel/VBox/Content/AvailablePanel/VBox"]
+[node name="ItemScroll" type="ScrollContainer" parent="Panel/VBox/Content/AvailablePanel/VBox" unique_id=191585850]
 layout_mode = 2
 size_flags_vertical = 3
 horizontal_scroll_mode = 0
-[node name="ItemList" type="VBoxContainer" parent="Panel/VBox/Content/AvailablePanel/VBox/ItemScroll"]
+
+[node name="ItemList" type="VBoxContainer" parent="Panel/VBox/Content/AvailablePanel/VBox/ItemScroll" unique_id=965520366]
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_constants/separation = 8
 
-[node name="CenterPanel" type="PanelContainer" parent="Panel/VBox/Content"]
+[node name="CenterPanel" type="PanelContainer" parent="Panel/VBox/Content" unique_id=456355454]
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_styles/panel = SubResource("InnerPanel")
-[node name="VBox" type="VBoxContainer" parent="Panel/VBox/Content/CenterPanel"]
+
+[node name="VBox" type="VBoxContainer" parent="Panel/VBox/Content/CenterPanel" unique_id=551054359]
 layout_mode = 2
 theme_override_constants/separation = 10
-[node name="Title" type="Label" parent="Panel/VBox/Content/CenterPanel/VBox"]
+
+[node name="Title" type="Label" parent="Panel/VBox/Content/CenterPanel/VBox" unique_id=738183079]
 layout_mode = 2
 theme_override_colors/font_color = Color(1, 0.62, 0.12, 1)
 theme_override_font_sizes/font_size = 22
 text = "CURRENT LOADOUT"
 horizontal_alignment = 1
-[node name="GearGrid" type="GridContainer" parent="Panel/VBox/Content/CenterPanel/VBox"]
+
+[node name="GearGrid" type="GridContainer" parent="Panel/VBox/Content/CenterPanel/VBox" unique_id=272707318]
 layout_mode = 2
 columns = 3
-[node name="WeaponSlot" type="Button" parent="Panel/VBox/Content/CenterPanel/VBox/GearGrid"]
+
+[node name="WeaponSlot" type="Button" parent="Panel/VBox/Content/CenterPanel/VBox/GearGrid" unique_id=2020741984]
 custom_minimum_size = Vector2(0, 118)
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_styles/normal = SubResource("Button")
 theme_override_styles/hover = SubResource("ButtonHover")
-text = "WEAPON\nEmpty"
+text = "WEAPON
+Empty"
 
-[node name="ArmourSlot" type="Button" parent="Panel/VBox/Content/CenterPanel/VBox/GearGrid"]
+[node name="ArmourSlot" type="Button" parent="Panel/VBox/Content/CenterPanel/VBox/GearGrid" unique_id=97117282]
 custom_minimum_size = Vector2(0, 118)
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_styles/normal = SubResource("Button")
 theme_override_styles/hover = SubResource("ButtonHover")
-text = "ARMOUR\nEmpty"
+text = "ARMOUR
+Empty"
 
-[node name="AccessorySlot" type="Button" parent="Panel/VBox/Content/CenterPanel/VBox/GearGrid"]
+[node name="AccessorySlot" type="Button" parent="Panel/VBox/Content/CenterPanel/VBox/GearGrid" unique_id=183931171]
 custom_minimum_size = Vector2(0, 118)
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_styles/normal = SubResource("Button")
 theme_override_styles/hover = SubResource("ButtonHover")
-text = "ACCESSORY\nEmpty"
+text = "ACCESSORY
+Empty"
 
-[node name="AbilityTitle" type="Label" parent="Panel/VBox/Content/CenterPanel/VBox"]
+[node name="AbilityTitle" type="Label" parent="Panel/VBox/Content/CenterPanel/VBox" unique_id=30272234]
 layout_mode = 2
 theme_override_colors/font_color = Color(1, 0.62, 0.12, 1)
 theme_override_font_sizes/font_size = 20
 text = "ABILITIES"
 horizontal_alignment = 1
-[node name="AbilitiesRow" type="HBoxContainer" parent="Panel/VBox/Content/CenterPanel/VBox"]
+
+[node name="AbilitiesRow" type="HBoxContainer" parent="Panel/VBox/Content/CenterPanel/VBox" unique_id=668834892]
 custom_minimum_size = Vector2(0, 118)
 layout_mode = 2
 theme_override_constants/separation = 8
-[node name="Q" type="Button" parent="Panel/VBox/Content/CenterPanel/VBox/AbilitiesRow"]
+
+[node name="Q" type="Button" parent="Panel/VBox/Content/CenterPanel/VBox/AbilitiesRow" unique_id=573257217]
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_styles/normal = SubResource("Button")
 theme_override_styles/hover = SubResource("ButtonHover")
-text = "Q\nEmpty"
+text = "Q
+Empty"
 
-[node name="E" type="Button" parent="Panel/VBox/Content/CenterPanel/VBox/AbilitiesRow"]
+[node name="E" type="Button" parent="Panel/VBox/Content/CenterPanel/VBox/AbilitiesRow" unique_id=1040267101]
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_styles/normal = SubResource("Button")
 theme_override_styles/hover = SubResource("ButtonHover")
-text = "E\nEmpty"
+text = "E
+Empty"
 
-[node name="Passive1" type="Button" parent="Panel/VBox/Content/CenterPanel/VBox/AbilitiesRow"]
+[node name="Passive1" type="Button" parent="Panel/VBox/Content/CenterPanel/VBox/AbilitiesRow" unique_id=1949330889]
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_styles/normal = SubResource("Button")
 theme_override_styles/hover = SubResource("ButtonHover")
-text = "PASSIVE 1\nEmpty"
+text = "PASSIVE 1
+Empty"
 
-[node name="Passive2" type="Button" parent="Panel/VBox/Content/CenterPanel/VBox/AbilitiesRow"]
+[node name="Passive2" type="Button" parent="Panel/VBox/Content/CenterPanel/VBox/AbilitiesRow" unique_id=1612602132]
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_styles/normal = SubResource("Button")
 theme_override_styles/hover = SubResource("ButtonHover")
-text = "PASSIVE 2\nEmpty"
+text = "PASSIVE 2
+Empty"
 
-[node name="Spacer" type="Control" parent="Panel/VBox/Content/CenterPanel/VBox"]
+[node name="Spacer" type="Control" parent="Panel/VBox/Content/CenterPanel/VBox" unique_id=873198194]
 layout_mode = 2
 size_flags_vertical = 3
 
-[node name="DetailsPanel" type="PanelContainer" parent="Panel/VBox/Content"]
+[node name="DetailsPanel" type="PanelContainer" parent="Panel/VBox/Content" unique_id=368983622]
 custom_minimum_size = Vector2(420, 0)
 layout_mode = 2
 theme_override_styles/panel = SubResource("InnerPanel")
-[node name="VBox" type="VBoxContainer" parent="Panel/VBox/Content/DetailsPanel"]
+
+[node name="VBox" type="VBoxContainer" parent="Panel/VBox/Content/DetailsPanel" unique_id=4948944]
 layout_mode = 2
 theme_override_constants/separation = 10
-[node name="Heading" type="Label" parent="Panel/VBox/Content/DetailsPanel/VBox"]
+
+[node name="Heading" type="Label" parent="Panel/VBox/Content/DetailsPanel/VBox" unique_id=1826049213]
 layout_mode = 2
 theme_override_colors/font_color = Color(1, 0.62, 0.12, 1)
 theme_override_font_sizes/font_size = 21
 text = "SELECTED"
-[node name="Icon" type="TextureRect" parent="Panel/VBox/Content/DetailsPanel/VBox"]
+
+[node name="Icon" type="TextureRect" parent="Panel/VBox/Content/DetailsPanel/VBox" unique_id=905826533]
 custom_minimum_size = Vector2(0, 110)
 layout_mode = 2
 expand_mode = 3
 stretch_mode = 5
-[node name="ItemName" type="Label" parent="Panel/VBox/Content/DetailsPanel/VBox"]
+
+[node name="ItemName" type="Label" parent="Panel/VBox/Content/DetailsPanel/VBox" unique_id=1727813483]
 layout_mode = 2
 theme_override_font_sizes/font_size = 27
 text = "NOTHING SELECTED"
-[node name="Type" type="Label" parent="Panel/VBox/Content/DetailsPanel/VBox"]
+
+[node name="Type" type="Label" parent="Panel/VBox/Content/DetailsPanel/VBox" unique_id=220204613]
 layout_mode = 2
 theme_override_colors/font_color = Color(1, 0.62, 0.12, 1)
-[node name="Description" type="Label" parent="Panel/VBox/Content/DetailsPanel/VBox"]
+
+[node name="Description" type="Label" parent="Panel/VBox/Content/DetailsPanel/VBox" unique_id=1302424597]
 layout_mode = 2
-autowrap_mode = 2
 text = "Choose an item or ability from your inventory, or an equipped slot."
-[node name="Separator" type="HSeparator" parent="Panel/VBox/Content/DetailsPanel/VBox"]
+autowrap_mode = 2
+
+[node name="Separator" type="HSeparator" parent="Panel/VBox/Content/DetailsPanel/VBox" unique_id=299544168]
 layout_mode = 2
-[node name="Stats" type="VBoxContainer" parent="Panel/VBox/Content/DetailsPanel/VBox"]
+
+[node name="Stats" type="VBoxContainer" parent="Panel/VBox/Content/DetailsPanel/VBox" unique_id=6423776]
 layout_mode = 2
-[node name="Damage" type="Label" parent="Panel/VBox/Content/DetailsPanel/VBox/Stats"]
+
+[node name="Damage" type="Label" parent="Panel/VBox/Content/DetailsPanel/VBox/Stats" unique_id=145061923]
 layout_mode = 2
-[node name="FireRate" type="Label" parent="Panel/VBox/Content/DetailsPanel/VBox/Stats"]
+
+[node name="FireRate" type="Label" parent="Panel/VBox/Content/DetailsPanel/VBox/Stats" unique_id=1857056378]
 layout_mode = 2
-[node name="Health" type="Label" parent="Panel/VBox/Content/DetailsPanel/VBox/Stats"]
+
+[node name="Health" type="Label" parent="Panel/VBox/Content/DetailsPanel/VBox/Stats" unique_id=916106262]
 layout_mode = 2
-[node name="Speed" type="Label" parent="Panel/VBox/Content/DetailsPanel/VBox/Stats"]
+
+[node name="Speed" type="Label" parent="Panel/VBox/Content/DetailsPanel/VBox/Stats" unique_id=135668151]
 layout_mode = 2
-[node name="TraitTitle" type="Label" parent="Panel/VBox/Content/DetailsPanel/VBox"]
+
+[node name="TraitTitle" type="Label" parent="Panel/VBox/Content/DetailsPanel/VBox" unique_id=1574835908]
 layout_mode = 2
 theme_override_colors/font_color = Color(1, 0.62, 0.12, 1)
-[node name="Effect" type="Label" parent="Panel/VBox/Content/DetailsPanel/VBox"]
+
+[node name="Effect" type="Label" parent="Panel/VBox/Content/DetailsPanel/VBox" unique_id=627052795]
 layout_mode = 2
 size_flags_vertical = 3
 autowrap_mode = 2
-[node name="EquipButton" type="Button" parent="Panel/VBox/Content/DetailsPanel/VBox"]
+
+[node name="EquipButton" type="Button" parent="Panel/VBox/Content/DetailsPanel/VBox" unique_id=1593874906]
 custom_minimum_size = Vector2(0, 64)
 layout_mode = 2
 theme_override_font_sizes/font_size = 22
 theme_override_styles/normal = SubResource("Equip")
 theme_override_styles/hover = SubResource("ButtonHover")
-text = "SELECT SOMETHING"
 disabled = true
+text = "SELECT SOMETHING"
 
-[node name="StatsBar" type="PanelContainer" parent="Panel/VBox"]
+[node name="StatsBar" type="PanelContainer" parent="Panel/VBox" unique_id=674953899]
 custom_minimum_size = Vector2(0, 82)
 layout_mode = 2
 theme_override_styles/panel = SubResource("InnerPanel")
-[node name="HBox" type="HBoxContainer" parent="Panel/VBox/StatsBar"]
+
+[node name="HBox" type="HBoxContainer" parent="Panel/VBox/StatsBar" unique_id=1226173095]
 layout_mode = 2
-alignment = 1
 theme_override_constants/separation = 20
-[node name="Title" type="Label" parent="Panel/VBox/StatsBar/HBox"]
+alignment = 1
+
+[node name="Title" type="Label" parent="Panel/VBox/StatsBar/HBox" unique_id=425875966]
 layout_mode = 2
 theme_override_colors/font_color = Color(1, 0.62, 0.12, 1)
 text = "PLAYER STATS"
-[node name="HP" type="Label" parent="Panel/VBox/StatsBar/HBox"]
+
+[node name="HP" type="Label" parent="Panel/VBox/StatsBar/HBox" unique_id=120089799]
 layout_mode = 2
 horizontal_alignment = 1
-[node name="Damage" type="Label" parent="Panel/VBox/StatsBar/HBox"]
+
+[node name="Damage" type="Label" parent="Panel/VBox/StatsBar/HBox" unique_id=1293523876]
 layout_mode = 2
 horizontal_alignment = 1
-[node name="Speed" type="Label" parent="Panel/VBox/StatsBar/HBox"]
+
+[node name="Speed" type="Label" parent="Panel/VBox/StatsBar/HBox" unique_id=1140165102]
 layout_mode = 2
 horizontal_alignment = 1
-[node name="FireRate" type="Label" parent="Panel/VBox/StatsBar/HBox"]
+
+[node name="FireRate" type="Label" parent="Panel/VBox/StatsBar/HBox" unique_id=1059038979]
 layout_mode = 2
 horizontal_alignment = 1
-[node name="Dash" type="Label" parent="Panel/VBox/StatsBar/HBox"]
+
+[node name="Dash" type="Label" parent="Panel/VBox/StatsBar/HBox" unique_id=1584942366]
 layout_mode = 2
 horizontal_alignment = 1

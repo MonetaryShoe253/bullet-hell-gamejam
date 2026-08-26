@@ -330,7 +330,7 @@ func _on_equip_pressed() -> void:
 
 	var cost: int = item["cost"]
 	if GameState.money < cost:
-		_show_message("NOT ENOUGH PLUCK COINS", "You need %d Pluck Coins to equip %s." % [cost, item["name"]])
+		_show_message("NOT ENOUGH CLUCK COINS", "You need %d Cluck Coins to equip %s." % [cost, item["name"]])
 		return
 
 	# This assumes GameState.money is writable, matching the existing menu's
@@ -378,7 +378,7 @@ func _on_trinket_pressed() -> void:
 
 
 func _on_money_changed(total: int) -> void:
-	coin_label.text = "●  %s\nPLUCK COINS" % _format_number(total)
+	coin_label.text = "●  %s\nCLUCK COINS" % _format_number(total)
 
 
 func _show_message(title_text: String, body: String) -> void:

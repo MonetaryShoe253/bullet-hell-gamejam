@@ -174,7 +174,7 @@ func _player_owns_passive(passive: PassiveAbility) -> bool:
 # ---------------------------------------------------------------------------
 
 func _update_ui() -> void:
-	money_label.text = "●  %s\nPLUCK COINS" % _format_number(GameState.money)
+	money_label.text = "●  %s\nCLUCK COINS" % _format_number(GameState.money)
 	refresh_button.text = "●  %s" % refresh_price
 	refresh_button.disabled = GameState.money < refresh_price
 
