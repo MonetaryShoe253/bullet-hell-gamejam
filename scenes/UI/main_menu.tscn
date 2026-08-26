@@ -1,9 +1,18 @@
-[gd_scene load_steps=7 format=3]
+[gd_scene format=3 uid="uid://c1ufp8ayhbms1"]
 
-[ext_resource type="Script" path="res://scenes/UI/main_menu.gd" id="1_script"]
-[ext_resource type="Texture2D" path="res://assets/Player/mascot_hero.png" id="2_hero"]
+[ext_resource type="Script" uid="uid://db0olx7a6vu44" path="res://scenes/UI/main_menu.gd" id="1_script"]
+[ext_resource type="Texture2D" uid="uid://dfyhv1xwigv2f" path="res://assets/UI/background.png" id="2_background"]
+[ext_resource type="Texture2D" uid="uid://qqfo7v41jf36" path="res://assets/Player/mascot_hero.png" id="3_mascot"]
+[ext_resource type="Texture2D" uid="uid://dw3j134bee40p" path="res://assets/enemies/pizza.png" id="4_pizza"]
+[ext_resource type="Texture2D" uid="uid://ejkxrexhlnlc" path="res://assets/enemies/burger.png" id="5_burger"]
+[ext_resource type="Texture2D" uid="uid://bejh7gvmu83fc" path="res://assets/enemies/taco.png" id="6_taco"]
+[ext_resource type="Texture2D" uid="uid://jtfxwipqeon8" path="res://assets/enemies/enemy_sauceblob.png" id="7_pepper"]
 
 [sub_resource type="StyleBoxFlat" id="Panel"]
+content_margin_left = 14.0
+content_margin_top = 12.0
+content_margin_right = 14.0
+content_margin_bottom = 12.0
 bg_color = Color(0.055, 0.025, 0.018, 0.96)
 border_width_left = 2
 border_width_top = 2
@@ -14,358 +23,383 @@ corner_radius_top_left = 10
 corner_radius_top_right = 10
 corner_radius_bottom_right = 10
 corner_radius_bottom_left = 10
-content_margin_left = 14.0
-content_margin_top = 12.0
-content_margin_right = 14.0
-content_margin_bottom = 12.0
 
-[sub_resource type="StyleBoxFlat" id="Slot"]
-bg_color = Color(0.035, 0.018, 0.014, 1)
-border_width_left = 1
-border_width_top = 1
-border_width_right = 1
-border_width_bottom = 1
-border_color = Color(0.55, 0.20, 0.035, 1)
-corner_radius_top_left = 7
-corner_radius_top_right = 7
-corner_radius_bottom_right = 7
-corner_radius_bottom_left = 7
-
-[sub_resource type="StyleBoxFlat" id="Start"]
-bg_color = Color(0.95, 0.25, 0.015, 1)
-border_width_left = 3
-border_width_top = 3
-border_width_right = 3
-border_width_bottom = 3
-border_color = Color(1, 0.70, 0.10, 1)
-corner_radius_top_left = 8
-corner_radius_top_right = 8
-corner_radius_bottom_right = 8
-corner_radius_bottom_left = 8
-
-[sub_resource type="StyleBoxFlat" id="Button"]
-bg_color = Color(0.10, 0.045, 0.025, 1)
-border_width_left = 1
-border_width_top = 1
-border_width_right = 1
-border_width_bottom = 1
-border_color = Color(0.48, 0.18, 0.035, 1)
-corner_radius_top_left = 6
-corner_radius_top_right = 6
-corner_radius_bottom_right = 6
-corner_radius_bottom_left = 6
-
-[sub_resource type="StyleBoxFlat" id="Footer"]
-bg_color = Color(0.035, 0.018, 0.014, 0.95)
-border_width_top = 1
-border_color = Color(0.50, 0.18, 0.03, 1)
-content_margin_top = 10.0
-
-[node name="MainMenu" type="CanvasLayer"]
+[node name="MainMenu" type="CanvasLayer" unique_id=212617294]
 script = ExtResource("1_script")
 
-[node name="Root" type="ColorRect" parent="."]
-offset_right = 1920.0
-offset_bottom = 1080.0
-color = Color(0.045, 0.015, 0.012, 1)
+[node name="Root" type="Panel" parent="." unique_id=478763069]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = SubResource("Panel")
 
-[node name="Margin" type="MarginContainer" parent="Root"]
+[node name="Background" type="TextureRect" parent="Root" unique_id=1766370850]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
-offset_left = 32.0
-offset_top = 24.0
-offset_right = -32.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+texture = ExtResource("2_background")
+expand_mode = 1
+stretch_mode = 6
+
+[node name="Shade" type="ColorRect" parent="Root" unique_id=1108140502]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(0.035, 0.008, 0.004, 0.36)
+
+[node name="Margin" type="MarginContainer" parent="Root" unique_id=1758781227]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 28.0
+offset_top = 26.0
+offset_right = -28.0
 offset_bottom = -24.0
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="VBox" type="VBoxContainer" parent="Root/Margin"]
+[node name="VBox" type="VBoxContainer" parent="Root/Margin" unique_id=1743377877]
 layout_mode = 2
-theme_override_constants/separation = 14
+theme_override_constants/separation = 12
 
-[node name="Header" type="HBoxContainer" parent="Root/Margin/VBox"]
-custom_minimum_size = Vector2(0, 82)
+[node name="Header" type="HBoxContainer" parent="Root/Margin/VBox" unique_id=953057979]
+custom_minimum_size = Vector2(0, 94)
 layout_mode = 2
 
-[node name="Title" type="VBoxContainer" parent="Root/Margin/VBox/Header"]
+[node name="TitleBox" type="VBoxContainer" parent="Root/Margin/VBox/Header" unique_id=666638032]
 layout_mode = 2
 size_flags_horizontal = 3
 
-[node name="Game" type="Label" parent="Root/Margin/VBox/Header/Title"]
+[node name="Title" type="Label" parent="Root/Margin/VBox/Header/TitleBox" unique_id=2067473162]
 layout_mode = 2
-theme_override_colors/font_color = Color(1, 0.53, 0.06, 1)
+theme_override_colors/font_color = Color(1, 0.62, 0.08, 1)
 theme_override_font_sizes/font_size = 38
 text = "WING RUSH"
 
-[node name="Subtitle" type="Label" parent="Root/Margin/VBox/Header/Title"]
+[node name="Subtitle" type="Label" parent="Root/Margin/VBox/Header/TitleBox" unique_id=685260806]
 layout_mode = 2
-theme_override_colors/font_color = Color(0.88, 0.70, 0.48, 1)
-theme_override_font_sizes/font_size = 18
+theme_override_colors/font_color = Color(1, 0.74, 0.38, 1)
+theme_override_font_sizes/font_size = 17
 text = "CHOOSE YOUR STARTING BUILD, THEN DESCEND"
 
-[node name="SettingsButton" type="Button" parent="Root/Margin/VBox/Header"]
-custom_minimum_size = Vector2(160, 56)
+[node name="SettingsButton" type="Button" parent="Root/Margin/VBox/Header" unique_id=1940106788]
+custom_minimum_size = Vector2(150, 58)
 layout_mode = 2
-theme_override_font_sizes/font_size = 19
-theme_override_styles/normal = SubResource("Button")
+theme_override_styles/normal = SubResource("Panel")
+theme_override_styles/hover = SubResource("Panel")
 text = "SETTINGS"
 
-[node name="Main" type="HBoxContainer" parent="Root/Margin/VBox"]
+[node name="Main" type="HBoxContainer" parent="Root/Margin/VBox" unique_id=1377557181]
 layout_mode = 2
 size_flags_vertical = 3
 theme_override_constants/separation = 14
 
-[node name="GearPanel" type="PanelContainer" parent="Root/Margin/VBox/Main"]
+[node name="GearPanel" type="PanelContainer" parent="Root/Margin/VBox/Main" unique_id=966556766]
 custom_minimum_size = Vector2(430, 0)
 layout_mode = 2
+size_flags_horizontal = 3
 theme_override_styles/panel = SubResource("Panel")
 
-[node name="VBox" type="VBoxContainer" parent="Root/Margin/VBox/Main/GearPanel"]
+[node name="VBox" type="VBoxContainer" parent="Root/Margin/VBox/Main/GearPanel" unique_id=165885323]
 layout_mode = 2
 theme_override_constants/separation = 10
 
-[node name="Heading" type="Label" parent="Root/Margin/VBox/Main/GearPanel/VBox"]
+[node name="Title" type="Label" parent="Root/Margin/VBox/Main/GearPanel/VBox" unique_id=943699244]
 layout_mode = 2
-theme_override_colors/font_color = Color(1, 0.58, 0.08, 1)
-theme_override_font_sizes/font_size = 24
-text = "UNLOCKED GEAR"
+theme_override_colors/font_color = Color(1, 0.62, 0.08, 1)
+theme_override_font_sizes/font_size = 23
+text = "UNLOCKED BUILD"
 
-[node name="Hint" type="Label" parent="Root/Margin/VBox/Main/GearPanel/VBox"]
+[node name="Help" type="Label" parent="Root/Margin/VBox/Main/GearPanel/VBox" unique_id=876565622]
 layout_mode = 2
-text = "Free starting equipment unlocked from previous runs."
+text = "Choose unlocked starting gear or abilities."
 autowrap_mode = 2
 
-[node name="Filters" type="HBoxContainer" parent="Root/Margin/VBox/Main/GearPanel/VBox"]
+[node name="Filters" type="HBoxContainer" parent="Root/Margin/VBox/Main/GearPanel/VBox" unique_id=163717582]
 layout_mode = 2
+theme_override_constants/separation = 4
 
-[node name="Weapons" type="Button" parent="Root/Margin/VBox/Main/GearPanel/VBox/Filters"]
+[node name="Weapons" type="Button" parent="Root/Margin/VBox/Main/GearPanel/VBox/Filters" unique_id=1821822950]
 layout_mode = 2
 size_flags_horizontal = 3
 text = "WEAPONS"
 
-[node name="Armour" type="Button" parent="Root/Margin/VBox/Main/GearPanel/VBox/Filters"]
+[node name="Armour" type="Button" parent="Root/Margin/VBox/Main/GearPanel/VBox/Filters" unique_id=1357548247]
 layout_mode = 2
 size_flags_horizontal = 3
 text = "ARMOUR"
 
-[node name="Accessories" type="Button" parent="Root/Margin/VBox/Main/GearPanel/VBox/Filters"]
+[node name="Accessories" type="Button" parent="Root/Margin/VBox/Main/GearPanel/VBox/Filters" unique_id=682848205]
 layout_mode = 2
 size_flags_horizontal = 3
 text = "ACCESSORY"
 
-[node name="Scroll" type="ScrollContainer" parent="Root/Margin/VBox/Main/GearPanel/VBox"]
+[node name="Abilities" type="Button" parent="Root/Margin/VBox/Main/GearPanel/VBox/Filters" unique_id=1051023513]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "ABILITIES"
+
+[node name="Scroll" type="ScrollContainer" parent="Root/Margin/VBox/Main/GearPanel/VBox" unique_id=1621193433]
 layout_mode = 2
 size_flags_vertical = 3
 
-[node name="GearList" type="VBoxContainer" parent="Root/Margin/VBox/Main/GearPanel/VBox/Scroll"]
+[node name="GearList" type="VBoxContainer" parent="Root/Margin/VBox/Main/GearPanel/VBox/Scroll" unique_id=204179040]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 6
+
+[node name="Center" type="VBoxContainer" parent="Root/Margin/VBox/Main" unique_id=1151191044]
+custom_minimum_size = Vector2(720, 0)
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_constants/separation = 8
 
-[node name="Center" type="VBoxContainer" parent="Root/Margin/VBox/Main"]
-layout_mode = 2
-size_flags_horizontal = 3
-theme_override_constants/separation = 12
-
-[node name="CharacterPanel" type="PanelContainer" parent="Root/Margin/VBox/Main/Center"]
-custom_minimum_size = Vector2(0, 250)
+[node name="CharacterPanel" type="PanelContainer" parent="Root/Margin/VBox/Main/Center" unique_id=216455531]
+custom_minimum_size = Vector2(0, 240)
 layout_mode = 2
 theme_override_styles/panel = SubResource("Panel")
 
-[node name="VBox" type="VBoxContainer" parent="Root/Margin/VBox/Main/Center/CharacterPanel"]
+[node name="VBox" type="VBoxContainer" parent="Root/Margin/VBox/Main/Center/CharacterPanel" unique_id=1281843636]
 layout_mode = 2
 alignment = 1
 
-[node name="Label" type="Label" parent="Root/Margin/VBox/Main/Center/CharacterPanel/VBox"]
+[node name="Title" type="Label" parent="Root/Margin/VBox/Main/Center/CharacterPanel/VBox" unique_id=446953223]
 layout_mode = 2
-theme_override_colors/font_color = Color(1, 0.60, 0.10, 1)
+theme_override_colors/font_color = Color(1, 0.62, 0.08, 1)
 theme_override_font_sizes/font_size = 22
 text = "YOUR CHICKEN"
 horizontal_alignment = 1
 
-[node name="Character" type="TextureRect" parent="Root/Margin/VBox/Main/Center/CharacterPanel/VBox"]
-custom_minimum_size = Vector2(0, 185)
+[node name="Character" type="TextureRect" parent="Root/Margin/VBox/Main/Center/CharacterPanel/VBox" unique_id=1975891508]
+custom_minimum_size = Vector2(0, 180)
 layout_mode = 2
-texture = ExtResource("2_hero")
-expand_mode = 1
+texture = ExtResource("3_mascot")
+expand_mode = 3
 stretch_mode = 5
 
-[node name="Loadout" type="VBoxContainer" parent="Root/Margin/VBox/Main/Center"]
+[node name="Loadout" type="VBoxContainer" parent="Root/Margin/VBox/Main/Center" unique_id=1350514471]
 layout_mode = 2
 theme_override_constants/separation = 8
 
-[node name="GearSlots" type="HBoxContainer" parent="Root/Margin/VBox/Main/Center/Loadout"]
+[node name="GearSlots" type="HBoxContainer" parent="Root/Margin/VBox/Main/Center/Loadout" unique_id=909142749]
 layout_mode = 2
 theme_override_constants/separation = 8
 
-[node name="Weapon" type="Button" parent="Root/Margin/VBox/Main/Center/Loadout/GearSlots"]
-custom_minimum_size = Vector2(0, 92)
+[node name="Weapon" type="Button" parent="Root/Margin/VBox/Main/Center/Loadout/GearSlots" unique_id=528608600]
+custom_minimum_size = Vector2(0, 86)
 layout_mode = 2
 size_flags_horizontal = 3
-theme_override_styles/normal = SubResource("Slot")
-text = "WEAPON\nEmpty"
+text = "WEAPON
+Empty"
 
-[node name="Armour" type="Button" parent="Root/Margin/VBox/Main/Center/Loadout/GearSlots"]
-custom_minimum_size = Vector2(0, 92)
+[node name="Armour" type="Button" parent="Root/Margin/VBox/Main/Center/Loadout/GearSlots" unique_id=555334649]
+custom_minimum_size = Vector2(0, 86)
 layout_mode = 2
 size_flags_horizontal = 3
-theme_override_styles/normal = SubResource("Slot")
-text = "ARMOUR\nEmpty"
+text = "ARMOUR
+Empty"
 
-[node name="Accessory" type="Button" parent="Root/Margin/VBox/Main/Center/Loadout/GearSlots"]
-custom_minimum_size = Vector2(0, 92)
+[node name="Accessory" type="Button" parent="Root/Margin/VBox/Main/Center/Loadout/GearSlots" unique_id=1306179941]
+custom_minimum_size = Vector2(0, 86)
 layout_mode = 2
 size_flags_horizontal = 3
-theme_override_styles/normal = SubResource("Slot")
-text = "ACCESSORY\nEmpty"
+text = "ACCESSORY
+Empty"
 
-[node name="AbilitySlots" type="HBoxContainer" parent="Root/Margin/VBox/Main/Center/Loadout"]
+[node name="AbilitySlots" type="HBoxContainer" parent="Root/Margin/VBox/Main/Center/Loadout" unique_id=1020912418]
 layout_mode = 2
 theme_override_constants/separation = 8
 
-[node name="Q" type="Button" parent="Root/Margin/VBox/Main/Center/Loadout/AbilitySlots"]
-custom_minimum_size = Vector2(0, 92)
+[node name="Q" type="Button" parent="Root/Margin/VBox/Main/Center/Loadout/AbilitySlots" unique_id=555518334]
+custom_minimum_size = Vector2(0, 82)
 layout_mode = 2
 size_flags_horizontal = 3
-theme_override_styles/normal = SubResource("Slot")
-text = "Q\nEmpty"
+text = "Q
+Empty"
 
-[node name="E" type="Button" parent="Root/Margin/VBox/Main/Center/Loadout/AbilitySlots"]
-custom_minimum_size = Vector2(0, 92)
+[node name="E" type="Button" parent="Root/Margin/VBox/Main/Center/Loadout/AbilitySlots" unique_id=1990420609]
+custom_minimum_size = Vector2(0, 82)
 layout_mode = 2
 size_flags_horizontal = 3
-theme_override_styles/normal = SubResource("Slot")
-text = "E\nEmpty"
+text = "E
+Empty"
 
-[node name="Passive1" type="Button" parent="Root/Margin/VBox/Main/Center/Loadout/AbilitySlots"]
-custom_minimum_size = Vector2(0, 92)
+[node name="Passive1" type="Button" parent="Root/Margin/VBox/Main/Center/Loadout/AbilitySlots" unique_id=2116754284]
+custom_minimum_size = Vector2(0, 82)
 layout_mode = 2
 size_flags_horizontal = 3
-theme_override_styles/normal = SubResource("Slot")
-text = "PASSIVE 1\nEmpty"
+text = "PASSIVE 1
+Empty"
 
-[node name="Passive2" type="Button" parent="Root/Margin/VBox/Main/Center/Loadout/AbilitySlots"]
-custom_minimum_size = Vector2(0, 92)
+[node name="Passive2" type="Button" parent="Root/Margin/VBox/Main/Center/Loadout/AbilitySlots" unique_id=390501078]
+custom_minimum_size = Vector2(0, 82)
 layout_mode = 2
 size_flags_horizontal = 3
-theme_override_styles/normal = SubResource("Slot")
-text = "PASSIVE 2\nEmpty"
+text = "PASSIVE 2
+Empty"
 
-[node name="StartRun" type="Button" parent="Root/Margin/VBox/Main/Center"]
-custom_minimum_size = Vector2(0, 78)
+[node name="StartRun" type="Button" parent="Root/Margin/VBox/Main/Center" unique_id=1946378193]
+custom_minimum_size = Vector2(0, 72)
 layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.96, 0.85, 1)
 theme_override_font_sizes/font_size = 28
-theme_override_styles/normal = SubResource("Start")
+theme_override_styles/normal = SubResource("Panel")
+theme_override_styles/hover = SubResource("Panel")
 text = "START RUN  ▶"
 
-[node name="AbilityPanel" type="PanelContainer" parent="Root/Margin/VBox/Main"]
+[node name="InfoPanel" type="PanelContainer" parent="Root/Margin/VBox/Main" unique_id=774355898]
 custom_minimum_size = Vector2(430, 0)
 layout_mode = 2
+size_flags_horizontal = 3
 theme_override_styles/panel = SubResource("Panel")
 
-[node name="VBox" type="VBoxContainer" parent="Root/Margin/VBox/Main/AbilityPanel"]
+[node name="VBox" type="VBoxContainer" parent="Root/Margin/VBox/Main/InfoPanel" unique_id=805977645]
 layout_mode = 2
-theme_override_constants/separation = 8
+theme_override_constants/separation = 10
 
-[node name="Heading" type="Label" parent="Root/Margin/VBox/Main/AbilityPanel/VBox"]
+[node name="Title" type="Label" parent="Root/Margin/VBox/Main/InfoPanel/VBox" unique_id=1419603885]
 layout_mode = 2
-theme_override_colors/font_color = Color(1, 0.58, 0.08, 1)
-theme_override_font_sizes/font_size = 24
-text = "UNLOCKED ABILITIES"
+theme_override_colors/font_color = Color(1, 0.62, 0.08, 1)
+theme_override_font_sizes/font_size = 23
+text = "SELECTED"
+horizontal_alignment = 1
 
-[node name="Hint" type="Label" parent="Root/Margin/VBox/Main/AbilityPanel/VBox"]
-layout_mode = 2
-text = "Click Q/E or a passive slot, then choose an unlocked ability."
-autowrap_mode = 2
-
-[node name="ActiveLabel" type="Label" parent="Root/Margin/VBox/Main/AbilityPanel/VBox"]
-layout_mode = 2
-theme_override_colors/font_color = Color(0.92, 0.72, 0.42, 1)
-text = "ACTIVE"
-
-[node name="ActiveScroll" type="ScrollContainer" parent="Root/Margin/VBox/Main/AbilityPanel/VBox"]
-layout_mode = 2
-size_flags_vertical = 3
-
-[node name="ActiveList" type="VBoxContainer" parent="Root/Margin/VBox/Main/AbilityPanel/VBox/ActiveScroll"]
-layout_mode = 2
-size_flags_horizontal = 3
-theme_override_constants/separation = 8
-
-[node name="PassiveLabel" type="Label" parent="Root/Margin/VBox/Main/AbilityPanel/VBox"]
-layout_mode = 2
-theme_override_colors/font_color = Color(0.92, 0.72, 0.42, 1)
-text = "PASSIVE"
-
-[node name="PassiveScroll" type="ScrollContainer" parent="Root/Margin/VBox/Main/AbilityPanel/VBox"]
-layout_mode = 2
-size_flags_vertical = 3
-
-[node name="PassiveList" type="VBoxContainer" parent="Root/Margin/VBox/Main/AbilityPanel/VBox/PassiveScroll"]
-layout_mode = 2
-size_flags_horizontal = 3
-theme_override_constants/separation = 8
-
-[node name="BossFooter" type="PanelContainer" parent="Root/Margin/VBox"]
+[node name="Icon" type="TextureRect" parent="Root/Margin/VBox/Main/InfoPanel/VBox" unique_id=1843353862]
 custom_minimum_size = Vector2(0, 150)
 layout_mode = 2
-theme_override_styles/panel = SubResource("Footer")
-
-[node name="BossRow" type="HBoxContainer" parent="Root/Margin/VBox/BossFooter"]
-layout_mode = 2
-alignment = 1
-theme_override_constants/separation = 50
-
-[node name="Pizza" type="VBoxContainer" parent="Root/Margin/VBox/BossFooter/BossRow"]
-custom_minimum_size = Vector2(170, 0)
-layout_mode = 2
-[node name="Icon" type="TextureRect" parent="Root/Margin/VBox/BossFooter/BossRow/Pizza"]
-custom_minimum_size = Vector2(0, 90)
-layout_mode = 2
-expand_mode = 1
+expand_mode = 3
 stretch_mode = 5
-[node name="Name" type="Label" parent="Root/Margin/VBox/BossFooter/BossRow/Pizza"]
+
+[node name="Name" type="Label" parent="Root/Margin/VBox/Main/InfoPanel/VBox" unique_id=115011739]
+layout_mode = 2
+theme_override_font_sizes/font_size = 24
+text = "Select something"
+horizontal_alignment = 1
+autowrap_mode = 2
+
+[node name="Type" type="Label" parent="Root/Margin/VBox/Main/InfoPanel/VBox" unique_id=305879658]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.62, 0.08, 1)
+text = "—"
+horizontal_alignment = 1
+
+[node name="Description" type="Label" parent="Root/Margin/VBox/Main/InfoPanel/VBox" unique_id=2126863115]
+layout_mode = 2
+size_flags_vertical = 3
+text = "Choose an unlocked item or ability on the left, or click an equipped slot in the centre."
+autowrap_mode = 2
+
+[node name="Stats" type="Label" parent="Root/Margin/VBox/Main/InfoPanel/VBox" unique_id=1627433485]
+layout_mode = 2
+autowrap_mode = 2
+
+[node name="Equipped" type="Label" parent="Root/Margin/VBox/Main/InfoPanel/VBox" unique_id=1726003063]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.74, 0.38, 1)
+horizontal_alignment = 1
+
+[node name="Actions" type="VBoxContainer" parent="Root/Margin/VBox/Main/InfoPanel/VBox" unique_id=20605239]
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="Primary" type="Button" parent="Root/Margin/VBox/Main/InfoPanel/VBox/Actions" unique_id=2031716430]
+custom_minimum_size = Vector2(0, 56)
+layout_mode = 2
+theme_override_styles/normal = SubResource("Panel")
+theme_override_styles/hover = SubResource("Panel")
+text = "EQUIP"
+
+[node name="Secondary" type="Button" parent="Root/Margin/VBox/Main/InfoPanel/VBox/Actions" unique_id=27682696]
+custom_minimum_size = Vector2(0, 50)
+layout_mode = 2
+text = "EQUIP E"
+
+[node name="BossFooter" type="VBoxContainer" parent="Root/Margin/VBox" unique_id=1500985880]
+custom_minimum_size = Vector2(0, 92)
+layout_mode = 2
+theme_override_constants/separation = 2
+
+[node name="Title" type="Label" parent="Root/Margin/VBox/BossFooter" unique_id=664638784]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.62, 0.08, 1)
+text = "THE DEEP-FRY GAUNTLET"
+horizontal_alignment = 1
+
+[node name="BossRow" type="HBoxContainer" parent="Root/Margin/VBox/BossFooter" unique_id=466423162]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="Pizza" type="VBoxContainer" parent="Root/Margin/VBox/BossFooter/BossRow" unique_id=392808801]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="Icon" type="TextureRect" parent="Root/Margin/VBox/BossFooter/BossRow/Pizza" unique_id=1809867693]
+custom_minimum_size = Vector2(0, 48)
+layout_mode = 2
+texture = ExtResource("4_pizza")
+expand_mode = 3
+stretch_mode = 5
+
+[node name="Name" type="Label" parent="Root/Margin/VBox/BossFooter/BossRow/Pizza" unique_id=2010649742]
 layout_mode = 2
 text = "??????"
 horizontal_alignment = 1
 
-[node name="Burger" type="VBoxContainer" parent="Root/Margin/VBox/BossFooter/BossRow"]
-custom_minimum_size = Vector2(170, 0)
+[node name="Burger" type="VBoxContainer" parent="Root/Margin/VBox/BossFooter/BossRow" unique_id=1355654125]
 layout_mode = 2
-[node name="Icon" type="TextureRect" parent="Root/Margin/VBox/BossFooter/BossRow/Burger"]
-custom_minimum_size = Vector2(0, 90)
+size_flags_horizontal = 3
+
+[node name="Icon" type="TextureRect" parent="Root/Margin/VBox/BossFooter/BossRow/Burger" unique_id=113143389]
+custom_minimum_size = Vector2(0, 48)
 layout_mode = 2
-expand_mode = 1
+texture = ExtResource("5_burger")
+expand_mode = 3
 stretch_mode = 5
-[node name="Name" type="Label" parent="Root/Margin/VBox/BossFooter/BossRow/Burger"]
+
+[node name="Name" type="Label" parent="Root/Margin/VBox/BossFooter/BossRow/Burger" unique_id=711432478]
 layout_mode = 2
 text = "??????"
 horizontal_alignment = 1
 
-[node name="Taco" type="VBoxContainer" parent="Root/Margin/VBox/BossFooter/BossRow"]
-custom_minimum_size = Vector2(170, 0)
+[node name="Taco" type="VBoxContainer" parent="Root/Margin/VBox/BossFooter/BossRow" unique_id=87694337]
 layout_mode = 2
-[node name="Icon" type="TextureRect" parent="Root/Margin/VBox/BossFooter/BossRow/Taco"]
-custom_minimum_size = Vector2(0, 90)
+size_flags_horizontal = 3
+
+[node name="Icon" type="TextureRect" parent="Root/Margin/VBox/BossFooter/BossRow/Taco" unique_id=360531918]
+custom_minimum_size = Vector2(0, 48)
 layout_mode = 2
-expand_mode = 1
+texture = ExtResource("6_taco")
+expand_mode = 3
 stretch_mode = 5
-[node name="Name" type="Label" parent="Root/Margin/VBox/BossFooter/BossRow/Taco"]
+
+[node name="Name" type="Label" parent="Root/Margin/VBox/BossFooter/BossRow/Taco" unique_id=1236931132]
 layout_mode = 2
 text = "??????"
 horizontal_alignment = 1
 
-[node name="Pepper" type="VBoxContainer" parent="Root/Margin/VBox/BossFooter/BossRow"]
-custom_minimum_size = Vector2(170, 0)
+[node name="Pepper" type="VBoxContainer" parent="Root/Margin/VBox/BossFooter/BossRow" unique_id=652021010]
 layout_mode = 2
-[node name="Icon" type="TextureRect" parent="Root/Margin/VBox/BossFooter/BossRow/Pepper"]
-custom_minimum_size = Vector2(0, 90)
+size_flags_horizontal = 3
+
+[node name="Icon" type="TextureRect" parent="Root/Margin/VBox/BossFooter/BossRow/Pepper" unique_id=971731521]
+custom_minimum_size = Vector2(0, 48)
 layout_mode = 2
-expand_mode = 1
+texture = ExtResource("7_pepper")
+expand_mode = 3
 stretch_mode = 5
-[node name="Name" type="Label" parent="Root/Margin/VBox/BossFooter/BossRow/Pepper"]
+
+[node name="Name" type="Label" parent="Root/Margin/VBox/BossFooter/BossRow/Pepper" unique_id=614163432]
 layout_mode = 2
 text = "??????"
 horizontal_alignment = 1

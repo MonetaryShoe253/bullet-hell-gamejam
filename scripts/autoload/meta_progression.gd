@@ -7,6 +7,8 @@ signal loadout_changed()
 
 var unlocked_content: Array[StringName] = []
 
+var defeated_bosses: Array[StringName] = []
+
 var equipped_weapon_id: StringName = &""
 var equipped_armour_id: StringName = &""
 var equipped_accessory_id: StringName = &""
@@ -47,11 +49,22 @@ func load_progression() -> void:
 	equipped_active_2_id = StringName(loadout.get("active_2", ""))
 	equipped_passive_1_id = StringName(loadout.get("passive_1", ""))
 	equipped_passive_2_id = StringName(loadout.get("passive_2", ""))
+	
+	defeated_bosses.clear()
+	for id in data.get("defeated_bosses", []):
+		defeated_bosses.append(StringName(id))
+	
+func mark_boss_defeated(boss_id: StringName) -> void:
+	if boss_id in defeated_bosses:
+		return
 
-
+	defeated_bosses.append(boss_id)
+	save_progression()
+	
 func save_progression() -> void:
 	var save_data := {
-		"unlocked_content": unlocked_content,
+		"unlocked_content": unlocked_content,		
+		"defeated_bosses": defeated_bosses,
 		"loadout": {
 			"weapon": equipped_weapon_id,
 			"armour": equipped_armour_id,
@@ -91,6 +104,19 @@ func unlock(content: Resource) -> bool:
 	save_progression()
 	return true
 
+func unequip_item(item_type: Item.ItemType) -> void:
+	match item_type:
+		Item.ItemType.WEAPON:
+			equipped_weapon_id = &""
+		Item.ItemType.ARMOUR:
+			equipped_armour_id = &""
+		Item.ItemType.ACCESSORY:
+			equipped_accessory_id = &""
+		_:
+			return
+
+	loadout_changed.emit()
+	save_progression()
 
 func set_equipped_item(item: Item) -> void:
 	if item == null:

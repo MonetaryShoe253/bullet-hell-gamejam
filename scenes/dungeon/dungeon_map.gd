@@ -57,7 +57,7 @@ extends Node2D
 ## the boss-room centre and the boss encounter is started immediately after the
 ## room controllers are built.
 @export_category("Testing")
-@export var test_start_at_boss := false
+@export var test_start_at_boss := true
 
 ## Players and Enemies
 @export var player_scene: PackedScene
@@ -285,9 +285,21 @@ func _on_room_player_entered(rc: RoomController) -> void:
 
 func _on_room_cleared(rc: RoomController) -> void:
 	_paint_gate(rc, false)
+
 	if rc.kind == DungeonGenerator.RoomKind.BOSS:
+		_mark_current_boss_defeated()
 		_spawn_stairs_trigger.call_deferred()
 
+func _mark_current_boss_defeated() -> void:
+	match GameState.level:
+		1:
+			MetaProgression.mark_boss_defeated(&"boss_pizza_defeated")
+		2:
+			MetaProgression.mark_boss_defeated(&"boss_burger_defeated")
+		3:
+			MetaProgression.mark_boss_defeated(&"boss_taco_defeated")
+		4:
+			MetaProgression.mark_boss_defeated(&"boss_pepper_defeated")
 
 ## Overlays (or clears) the gate arch art at a room's doorways. The blocking
 ## collider itself is owned by the RoomController; this only handles what the

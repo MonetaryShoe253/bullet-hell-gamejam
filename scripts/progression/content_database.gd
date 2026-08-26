@@ -34,12 +34,17 @@ const ITEMS: Array[Item] = [
 	preload("res://resources/items/Spatchula.tres"),
 	preload("res://resources/items/Toast.tres"),
 	preload("res://resources/items/Whisk.tres"),
-	# Add your other item resources here.
 ]
 
 const ACTIVE_ABILITIES: Array[Ability] = [
 	preload("res://resources/abilities/damage_dash.tres"),
 	preload("res://resources/abilities/orbiting_blades.tres"),
+]
+
+const PASSIVE_ABILITIES: Array[PassiveAbility] = [
+	preload("res://resources/passive_abilities/force_field.tres"),
+	preload("res://resources/passive_abilities/health_regen_on_kill.tres"),
+	preload("res://resources/passive_abilities/second_life.tres"),
 ]
 
 const UPGRADES: Array[ShopUpgrade] = [
@@ -71,6 +76,8 @@ static func get_all_content() -> Array[Resource]:
 		content.append(item)
 	for ability in ACTIVE_ABILITIES:
 		content.append(ability)
+	for passive in PASSIVE_ABILITIES:
+		content.append(passive)
 	for upgrade in UPGRADES:
 		content.append(upgrade)
 	return content
@@ -92,6 +99,14 @@ static func get_unlocked_active_abilities() -> Array[Ability]:
 	return result
 
 
+static func get_unlocked_passive_abilities() -> Array[PassiveAbility]:
+	var result: Array[PassiveAbility] = []
+	for passive in PASSIVE_ABILITIES:
+		if MetaProgression.is_unlocked(passive):
+			result.append(passive)
+	return result
+
+
 static func find_item(id: StringName) -> Item:
 	for item in ITEMS:
 		if get_content_id(item) == id:
@@ -103,4 +118,11 @@ static func find_active_ability(id: StringName) -> Ability:
 	for ability in ACTIVE_ABILITIES:
 		if get_content_id(ability) == id:
 			return ability
+	return null
+
+
+static func find_passive_ability(id: StringName) -> PassiveAbility:
+	for passive in PASSIVE_ABILITIES:
+		if get_content_id(passive) == id:
+			return passive
 	return null

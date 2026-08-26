@@ -184,7 +184,6 @@ func _rebuild_item_list() -> void:
 		if item.icon:
 			button.icon = item.icon
 			button.expand_icon = true
-			button.icon_max_width = 58
 		button.pressed.connect(func(): _select_item(item))
 		item_list.add_child(button)
 
@@ -288,7 +287,6 @@ func _add_ability_button(ability: Ability, _passive: bool, slot_index: int) -> v
 	if ability.icon:
 		button.icon = ability.icon
 		button.expand_icon = true
-		button.icon_max_width = 54
 	button.pressed.connect(func(): _select_ability(ability))
 	item_list.add_child(button)
 
