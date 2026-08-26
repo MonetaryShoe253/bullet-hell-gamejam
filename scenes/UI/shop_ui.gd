@@ -68,7 +68,7 @@ func _ready() -> void:
 	# a shop is open.
 	process_mode = Node.PROCESS_MODE_WHEN_PAUSED
 
-	close_button.pressed.connect(close)
+	close_button.pressed.connect(_close_shop)
 	refresh_button.pressed.connect(_refresh_stock)
 
 	for i in buy_buttons.size():
@@ -91,25 +91,25 @@ func _generate_offers() -> void:
 	offered_offers.clear()
 	var available: Array[Resource] = []
 
-	# Upgrades and items respect permanent unlock progression, matching the
-	# existing shop implementation.
+	# The shop is run-local and can sell content even if it has not been
+	# permanently unlocked as starting gear. Floor progression only controls
+	# the HIGHEST tier that is allowed to roll.
+	var max_tier: int = MetaProgression.get_reward_tier(GameState.level)
+	
 	for upgrade in upgrade_pool:
-		if MetaProgression.is_unlocked(upgrade):
+		if _get_unlock_tier(upgrade) <= max_tier:
 			available.append(upgrade)
 
 	for item in item_pool:
-		if MetaProgression.is_unlocked(item) and not _player_owns_item(item):
+		if _get_unlock_tier(item) <= max_tier and not _player_owns_item(item):
 			available.append(item)
 
-	# Existing behaviour: active/passive abilities are purchasable in-run
-	# without requiring the MetaProgression unlock gate, but owned abilities
-	# cannot be offered again.
 	for ability in ability_pool:
-		if not _player_owns_ability(ability):
+		if _get_unlock_tier(ability) <= max_tier and not _player_owns_ability(ability):
 			available.append(ability)
 
 	for passive in passive_pool:
-		if not _player_owns_passive(passive):
+		if _get_unlock_tier(passive) <= max_tier and not _player_owns_passive(passive):
 			available.append(passive)
 
 	available.shuffle()
@@ -196,6 +196,7 @@ func _update_ui() -> void:
 func _populate_offer(index: int, offer: Resource) -> void:
 	buy_buttons[index].disabled = false
 	offer_icons[index].texture = null
+	_apply_tier_style(index, _get_unlock_tier(offer))
 
 	if offer is ShopUpgrade:
 		_setup_upgrade_card(index, offer as ShopUpgrade)
@@ -209,7 +210,7 @@ func _populate_offer(index: int, offer: Resource) -> void:
 
 func _setup_upgrade_card(index: int, upgrade: ShopUpgrade) -> void:
 	offer_names[index].text = upgrade.upgrade_name.to_upper()
-	offer_types[index].text = "RUN UPGRADE"
+	offer_types[index].text = "%s RUN UPGRADE" % _tier_name(_get_unlock_tier(upgrade))
 	offer_descriptions[index].text = upgrade.description
 	offer_stats[index].text = "Applies immediately for the rest of this run."
 	buy_buttons[index].text = "●  %s" % _format_number(upgrade.price)
@@ -218,7 +219,7 @@ func _setup_upgrade_card(index: int, upgrade: ShopUpgrade) -> void:
 
 func _setup_item_card(index: int, item: Item) -> void:
 	offer_names[index].text = item.item_name.to_upper()
-	offer_types[index].text = _item_type_name(item.item_type)
+	offer_types[index].text = "%s %s" % [_tier_name(_get_unlock_tier(item)), _item_type_name(item.item_type)]
 	offer_descriptions[index].text = item.description
 	offer_stats[index].text = item.get_stats_text()
 	offer_icons[index].texture = item.icon
@@ -228,7 +229,7 @@ func _setup_item_card(index: int, item: Item) -> void:
 
 func _setup_ability_card(index: int, ability: Ability) -> void:
 	offer_names[index].text = ability.ability_name.to_upper()
-	offer_types[index].text = "ACTIVE ABILITY"
+	offer_types[index].text = "%s ACTIVE ABILITY" % _tier_name(_get_unlock_tier(ability))
 	offer_descriptions[index].text = ability.description
 	offer_stats[index].text = "Cooldown: %.1fs\n\nEquips to the first empty Q / E slot." % ability.cooldown
 	offer_icons[index].texture = ability.icon
@@ -238,7 +239,7 @@ func _setup_ability_card(index: int, ability: Ability) -> void:
 
 func _setup_passive_card(index: int, passive: PassiveAbility) -> void:
 	offer_names[index].text = passive.ability_name.to_upper()
-	offer_types[index].text = "PASSIVE ABILITY"
+	offer_types[index].text = "%s PASSIVE ABILITY" % _tier_name(_get_unlock_tier(passive))
 	offer_descriptions[index].text = passive.description
 	offer_stats[index].text = "Passive effect\n\nEquips to the first empty passive slot."
 	offer_icons[index].texture = passive.icon
@@ -359,8 +360,14 @@ func open(target_player: Player) -> void:
 	show()
 
 
-func close() -> void:
+func _close_shop() -> void:
 	hide()
+	player = null
+
+
+func close() -> void:
+	# Compatibility for any dungeon code that still calls shop_ui.close().
+	_close_shop()
 
 
 func reset_shop() -> void:
@@ -394,10 +401,60 @@ func _refresh_stock() -> void:
 	_update_ui()
 
 
-func _unhandled_input(event: InputEvent) -> void:
+func _input(event: InputEvent) -> void:
 	if visible and event.is_action_pressed("ui_cancel"):
-		close()
+		_close_shop()
 		get_viewport().set_input_as_handled()
+
+
+func _get_unlock_tier(content: Resource) -> int:
+	if content != null and "unlock_tier" in content:
+		return clampi(int(content.get("unlock_tier")), 1, 5)
+	# Resources that have not yet been migrated are treated as Tier 1 so they
+	# remain usable rather than disappearing from the shop.
+	return 1
+
+
+func _tier_color(tier: int) -> Color:
+	match clampi(tier, 1, 5):
+		1:
+			return Color(0.72, 0.72, 0.72, 1.0) # Common
+		2:
+			return Color(0.35, 0.85, 0.35, 1.0) # Uncommon
+		3:
+			return Color(0.25, 0.58, 1.0, 1.0) # Rare
+		4:
+			return Color(0.72, 0.34, 1.0, 1.0) # Epic
+		5:
+			return Color(1.0, 0.49, 0.08, 1.0) # Legendary
+	return Color.WHITE
+
+
+func _tier_name(tier: int) -> String:
+	match clampi(tier, 1, 5):
+		1:
+			return "COMMON"
+		2:
+			return "UNCOMMON"
+		3:
+			return "RARE"
+		4:
+			return "EPIC"
+		5:
+			return "LEGENDARY"
+	return "COMMON"
+
+
+func _apply_tier_style(index: int, tier: int) -> void:
+	var colour := _tier_color(tier)
+	offer_names[index].add_theme_color_override("font_color", colour)
+	offer_types[index].add_theme_color_override("font_color", colour)
+
+	var base_style := offer_cards[index].get_theme_stylebox("panel")
+	if base_style is StyleBoxFlat:
+		var card_style := (base_style as StyleBoxFlat).duplicate() as StyleBoxFlat
+		card_style.border_color = colour.darkened(0.25)
+		offer_cards[index].add_theme_stylebox_override("panel", card_style)
 
 
 func _item_type_name(type: Item.ItemType) -> String:

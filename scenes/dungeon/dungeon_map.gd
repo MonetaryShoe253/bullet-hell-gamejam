@@ -35,7 +35,7 @@ extends Node2D
 @onready var money_label: Label = $HUD/MoneyLabel
 @onready var current_level_label: Label = $HUD/CurrentLevelLabel
 @onready var boss_health_bar: CanvasLayer = $BossHealthBar
-@onready var shop_ui: ShopUI = $ShopUI
+@onready var shop_ui: ShopUI = $ShopUILayer/ShopUI
 @onready var minimap: Control = $HUD/Minimap
 @onready var player_menu: PlayerMenu = %PlayerMenu
 @onready var death_reward_ui: DeathRewardUI = $DeathRewardUI
@@ -58,6 +58,7 @@ extends Node2D
 ## room controllers are built.
 @export_category("Testing")
 @export var test_start_at_boss := false
+@export var test_start_at_shop := true
 
 ## Players and Enemies
 @export var player_scene: PackedScene
@@ -103,8 +104,11 @@ func _ready() -> void:
 
 func _spawn_player() -> void:
 	var spawn_cell: Vector2i = _generator.player_spawn
+
 	if test_start_at_boss and _generator.boss_room.size != Vector2i.ZERO:
 		spawn_cell = _boss_test_spawn_cell()
+	elif test_start_at_shop and _generator.shop_room.size != Vector2i.ZERO:
+		spawn_cell = _shop_test_spawn_cell()
 
 	var spawn_position := tile_layer.map_to_local(spawn_cell)
 
@@ -124,7 +128,31 @@ func _spawn_player() -> void:
 
 	print("Player positioned at: ", spawn_position)
 
+## Debug helper: find a valid floor cell near the centre of the shop.
+func _shop_test_spawn_cell() -> Vector2i:
+	var room: Rect2i = _generator.shop_room
+	var centre: Vector2i = room.position + room.size / 2
+	var cells: Array = _generator.room_cells.get(room, [])
 
+	if cells.is_empty():
+		return centre
+
+	var best: Vector2i = cells[0]
+	var best_distance := 1 << 30
+
+	for candidate: Vector2i in cells:
+		if not _generator.grid.has(candidate):
+			continue
+
+		var delta := candidate - centre
+		var distance := delta.x * delta.x + delta.y * delta.y
+
+		if distance < best_distance:
+			best = candidate
+			best_distance = distance
+
+	return best
+	
 ## Prefer the boss-room centre, but choose the closest captured playable floor
 ## cell defensively in case future boss-room shaping/cover makes the exact centre
 ## unavailable.
@@ -226,6 +254,9 @@ func generate_dungeon() -> void:
 	_spawn_shop_trigger()
 	
 	shop_ui.reset_shop()
+	
+	if test_start_at_shop and player != null and is_instance_valid(player):
+		shop_ui.open(player)
 
 
 	minimap.setup(_generator, _room_controllers, tile_layer, player)
