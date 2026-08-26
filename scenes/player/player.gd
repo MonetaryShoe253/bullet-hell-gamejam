@@ -74,6 +74,7 @@ func _ready() -> void:
 	dash_cooldown_bar.value = 1.0	
 	
 	ability_bars.setup(ability_component)
+	SavedBuildLoader.apply_to_player(self)
 
 	passive_ability_component.equip_all()
 

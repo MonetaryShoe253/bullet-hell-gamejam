@@ -1,118 +1,512 @@
-[gd_scene format=3 uid="uid://1dl1typf2xi7"]
+[gd_scene format=3 uid="uid://due7su4ucmwh0"]
 
 [ext_resource type="Script" uid="uid://dc1n8ud5mpe38" path="res://scenes/UI/inventory_ui.gd" id="1_brv7c"]
 
-[node name="InventoryUI" type="Control" unique_id=890608432]
+[sub_resource type="StyleBoxFlat" id="MainPanel"]
+content_margin_left = 18.0
+content_margin_top = 16.0
+content_margin_right = 18.0
+content_margin_bottom = 16.0
+bg_color = Color(0.035, 0.025, 0.022, 0.97)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+border_color = Color(0.72, 0.34, 0.055, 1)
+corner_radius_top_left = 10
+corner_radius_top_right = 10
+corner_radius_bottom_right = 10
+corner_radius_bottom_left = 10
+
+[sub_resource type="StyleBoxFlat" id="Close"]
+bg_color = Color(0.34, 0.07, 0.025, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.84, 0.28, 0.06, 1)
+corner_radius_top_left = 5
+corner_radius_top_right = 5
+corner_radius_bottom_right = 5
+corner_radius_bottom_left = 5
+
+[sub_resource type="StyleBoxFlat" id="ButtonHover"]
+bg_color = Color(0.22, 0.105, 0.025, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(1, 0.48, 0.055, 1)
+corner_radius_top_left = 5
+corner_radius_top_right = 5
+corner_radius_bottom_right = 5
+corner_radius_bottom_left = 5
+
+[sub_resource type="StyleBoxFlat" id="TabActive"]
+bg_color = Color(0.58, 0.22, 0.025, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(1, 0.52, 0.08, 1)
+corner_radius_top_left = 5
+corner_radius_top_right = 5
+corner_radius_bottom_right = 5
+corner_radius_bottom_left = 5
+
+[sub_resource type="StyleBoxFlat" id="Button"]
+bg_color = Color(0.11, 0.085, 0.065, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.38, 0.22, 0.08, 1)
+corner_radius_top_left = 5
+corner_radius_top_right = 5
+corner_radius_bottom_right = 5
+corner_radius_bottom_left = 5
+
+[sub_resource type="StyleBoxFlat" id="InnerPanel"]
+bg_color = Color(0.025, 0.025, 0.025, 0.94)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.31, 0.17, 0.06, 1)
+corner_radius_top_left = 7
+corner_radius_top_right = 7
+corner_radius_bottom_right = 7
+corner_radius_bottom_left = 7
+
+[sub_resource type="StyleBoxFlat" id="Selected"]
+bg_color = Color(0.22, 0.09, 0.018, 1)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+border_color = Color(1, 0.48, 0.04, 1)
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_right = 6
+corner_radius_bottom_left = 6
+
+[sub_resource type="StyleBoxFlat" id="Equip"]
+bg_color = Color(0.2, 0.45, 0.035, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.56, 0.85, 0.1, 1)
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_right = 6
+corner_radius_bottom_left = 6
+
+[node name="InventoryUI" type="Control" unique_id=1082724291]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+mouse_filter = 1
 script = ExtResource("1_brv7c")
 
-[node name="MarginContainer" type="MarginContainer" parent="." unique_id=158799160]
+[node name="Dimmer" type="ColorRect" parent="." unique_id=1948967055]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-theme_override_constants/margin_left = 30
-theme_override_constants/margin_top = 30
-theme_override_constants/margin_right = 25
-theme_override_constants/margin_bottom = 25
+mouse_filter = 2
+color = Color(0.015, 0.008, 0.012, 0.64)
 
-[node name="MainVBox" type="VBoxContainer" parent="MarginContainer" unique_id=1479340363]
+[node name="Panel" type="PanelContainer" parent="." unique_id=13754209]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -820.0
+offset_top = -455.0
+offset_right = 820.0
+offset_bottom = 455.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = SubResource("MainPanel")
+
+[node name="VBox" type="VBoxContainer" parent="Panel" unique_id=1447472391]
 layout_mode = 2
-theme_override_constants/separation = 20
+theme_override_constants/separation = 12
 
-[node name="Header" type="HBoxContainer" parent="MarginContainer/MainVBox" unique_id=1782008928]
+[node name="Header" type="HBoxContainer" parent="Panel/VBox" unique_id=1919401988]
+custom_minimum_size = Vector2(0, 72)
 layout_mode = 2
+theme_override_constants/separation = 12
 
-[node name="Title" type="Label" parent="MarginContainer/MainVBox/Header" unique_id=788583646]
+[node name="Title" type="Label" parent="Panel/VBox/Header" unique_id=947026848]
 layout_mode = 2
 size_flags_horizontal = 3
-theme_override_font_sizes/font_size = 32
+theme_override_colors/font_color = Color(1, 0.78, 0.42, 1)
+theme_override_font_sizes/font_size = 42
 text = "INVENTORY"
+vertical_alignment = 1
+
+[node name="CoinLabel" type="Label" parent="Panel/VBox/Header" unique_id=1263187000]
+custom_minimum_size = Vector2(190, 0)
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.75, 0.22, 1)
+theme_override_font_sizes/font_size = 22
+text = "●  0
+PLUCK COINS"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="CloseButton" type="Button" parent="Panel/VBox/Header" unique_id=1635478455]
+custom_minimum_size = Vector2(64, 58)
+layout_mode = 2
+theme_override_font_sizes/font_size = 30
+theme_override_styles/normal = SubResource("Close")
+theme_override_styles/hover = SubResource("ButtonHover")
+text = "×"
+
+[node name="TopTabs" type="HBoxContainer" parent="Panel/VBox" unique_id=1844567008]
+custom_minimum_size = Vector2(0, 48)
+layout_mode = 2
+
+[node name="Gear" type="Button" parent="Panel/VBox/TopTabs" unique_id=1372838362]
+custom_minimum_size = Vector2(160, 0)
+layout_mode = 2
+theme_override_font_sizes/font_size = 20
+theme_override_styles/normal = SubResource("TabActive")
+text = "GEAR"
+
+[node name="Abilities" type="Button" parent="Panel/VBox/TopTabs" unique_id=1029620824]
+custom_minimum_size = Vector2(160, 0)
+layout_mode = 2
+theme_override_font_sizes/font_size = 20
+theme_override_styles/normal = SubResource("Button")
+theme_override_styles/hover = SubResource("ButtonHover")
+text = "ABILITIES"
+
+[node name="Stats" type="Button" parent="Panel/VBox/TopTabs" unique_id=380428917]
+custom_minimum_size = Vector2(160, 0)
+layout_mode = 2
+theme_override_font_sizes/font_size = 20
+theme_override_styles/normal = SubResource("Button")
+theme_override_styles/hover = SubResource("ButtonHover")
+text = "STATS"
+
+[node name="Content" type="HBoxContainer" parent="Panel/VBox" unique_id=78834172]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/separation = 12
+
+[node name="AvailablePanel" type="PanelContainer" parent="Panel/VBox/Content" unique_id=1217669619]
+custom_minimum_size = Vector2(510, 0)
+layout_mode = 2
+theme_override_styles/panel = SubResource("InnerPanel")
+
+[node name="HBox" type="HBoxContainer" parent="Panel/VBox/Content/AvailablePanel" unique_id=1960543495]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="CategoryRail" type="VBoxContainer" parent="Panel/VBox/Content/AvailablePanel/HBox" unique_id=635847279]
+custom_minimum_size = Vector2(72, 0)
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="Weapons" type="Button" parent="Panel/VBox/Content/AvailablePanel/HBox/CategoryRail" unique_id=1892975811]
+custom_minimum_size = Vector2(68, 68)
+layout_mode = 2
+tooltip_text = "Weapons"
+theme_override_font_sizes/font_size = 25
+theme_override_styles/normal = SubResource("TabActive")
+text = "⚔"
+
+[node name="Armour" type="Button" parent="Panel/VBox/Content/AvailablePanel/HBox/CategoryRail" unique_id=1308825783]
+custom_minimum_size = Vector2(68, 68)
+layout_mode = 2
+tooltip_text = "Armour"
+theme_override_font_sizes/font_size = 25
+theme_override_styles/normal = SubResource("Button")
+theme_override_styles/hover = SubResource("ButtonHover")
+text = "◆"
+
+[node name="Accessories" type="Button" parent="Panel/VBox/Content/AvailablePanel/HBox/CategoryRail" unique_id=894002423]
+custom_minimum_size = Vector2(68, 68)
+layout_mode = 2
+tooltip_text = "Accessories"
+theme_override_font_sizes/font_size = 25
+theme_override_styles/normal = SubResource("Button")
+theme_override_styles/hover = SubResource("ButtonHover")
+text = "○"
+
+[node name="ListColumn" type="VBoxContainer" parent="Panel/VBox/Content/AvailablePanel/HBox" unique_id=920998315]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 8
+
+[node name="Heading" type="Label" parent="Panel/VBox/Content/AvailablePanel/HBox/ListColumn" unique_id=1013538095]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.62, 0.12, 1)
+theme_override_font_sizes/font_size = 21
+text = "AVAILABLE WEAPONS"
+
+[node name="ItemScroll" type="ScrollContainer" parent="Panel/VBox/Content/AvailablePanel/HBox/ListColumn" unique_id=2135620705]
+layout_mode = 2
+size_flags_vertical = 3
+horizontal_scroll_mode = 0
+
+[node name="ItemList" type="VBoxContainer" parent="Panel/VBox/Content/AvailablePanel/HBox/ListColumn/ItemScroll" unique_id=766968588]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 8
+
+[node name="ItemTemplate1" type="Button" parent="Panel/VBox/Content/AvailablePanel/HBox/ListColumn/ItemScroll/ItemList" unique_id=1018130390]
+custom_minimum_size = Vector2(0, 92)
+layout_mode = 2
+theme_override_font_sizes/font_size = 18
+theme_override_styles/normal = SubResource("Selected")
+text = "CHICKEN CLEAVER
+Damage 3.0   •   Fire Rate +0%"
+alignment = 0
+
+[node name="ItemTemplate2" type="Button" parent="Panel/VBox/Content/AvailablePanel/HBox/ListColumn/ItemScroll/ItemList" unique_id=619697921]
+custom_minimum_size = Vector2(0, 92)
+layout_mode = 2
+theme_override_font_sizes/font_size = 18
+theme_override_styles/normal = SubResource("Button")
+theme_override_styles/hover = SubResource("ButtonHover")
+text = "CROSSBOW
+Damage 2.0   •   Fire Rate -10%"
+alignment = 0
+
+[node name="ItemTemplate3" type="Button" parent="Panel/VBox/Content/AvailablePanel/HBox/ListColumn/ItemScroll/ItemList" unique_id=1283932955]
+custom_minimum_size = Vector2(0, 92)
+layout_mode = 2
+theme_override_font_sizes/font_size = 18
+theme_override_styles/normal = SubResource("Button")
+theme_override_styles/hover = SubResource("ButtonHover")
+text = "EGG LAUNCHER
+Damage 4.0   •   Fire Rate -20%"
+alignment = 0
+
+[node name="CenterPanel" type="PanelContainer" parent="Panel/VBox/Content" unique_id=1699186252]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_styles/panel = SubResource("InnerPanel")
+
+[node name="VBox" type="VBoxContainer" parent="Panel/VBox/Content/CenterPanel" unique_id=654592936]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="Title" type="Label" parent="Panel/VBox/Content/CenterPanel/VBox" unique_id=254243020]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.62, 0.12, 1)
+theme_override_font_sizes/font_size = 22
+text = "EQUIPPED GEAR"
 horizontal_alignment = 1
 
-[node name="EquipedTitle" type="Label" parent="MarginContainer/MainVBox" unique_id=1691397611]
+[node name="GearGrid" type="GridContainer" parent="Panel/VBox/Content/CenterPanel/VBox" unique_id=1133380706]
 layout_mode = 2
-text = "EQUIPPED"
+size_flags_vertical = 3
+columns = 2
 
-[node name="EquipmentSlots" type="HBoxContainer" parent="MarginContainer/MainVBox" unique_id=1402997232]
-layout_mode = 2
-
-[node name="WeaponSlot" type="Button" parent="MarginContainer/MainVBox/EquipmentSlots" unique_id=2018674715]
-unique_name_in_owner = true
-custom_minimum_size = Vector2(180, 100)
+[node name="WeaponSlot" type="Button" parent="Panel/VBox/Content/CenterPanel/VBox/GearGrid" unique_id=836763180]
+custom_minimum_size = Vector2(0, 105)
 layout_mode = 2
 size_flags_horizontal = 3
+theme_override_styles/normal = SubResource("Button")
+theme_override_styles/hover = SubResource("ButtonHover")
 text = "WEAPON
-Empty"
+Chicken Cleaver"
 
-[node name="ArmourSlot" type="Button" parent="MarginContainer/MainVBox/EquipmentSlots" unique_id=369214623]
-unique_name_in_owner = true
-custom_minimum_size = Vector2(180, 100)
+[node name="ArmourSlot" type="Button" parent="Panel/VBox/Content/CenterPanel/VBox/GearGrid" unique_id=50010025]
+custom_minimum_size = Vector2(0, 105)
 layout_mode = 2
 size_flags_horizontal = 3
+theme_override_styles/normal = SubResource("Button")
+theme_override_styles/hover = SubResource("ButtonHover")
 text = "ARMOUR
 Empty"
 
-[node name="AccessorySlot" type="Button" parent="MarginContainer/MainVBox/EquipmentSlots" unique_id=185542845]
-unique_name_in_owner = true
-custom_minimum_size = Vector2(180, 100)
+[node name="AccessorySlot" type="Button" parent="Panel/VBox/Content/CenterPanel/VBox/GearGrid" unique_id=236176547]
+custom_minimum_size = Vector2(0, 105)
 layout_mode = 2
 size_flags_horizontal = 3
+theme_override_styles/normal = SubResource("Button")
+theme_override_styles/hover = SubResource("ButtonHover")
 text = "ACCESSORY
 Empty"
 
-[node name="HSeparator" type="HSeparator" parent="MarginContainer/MainVBox" unique_id=1811316019]
-layout_mode = 2
-
-[node name="Conent" type="HBoxContainer" parent="MarginContainer/MainVBox" unique_id=1760339999]
-layout_mode = 2
-
-[node name="InventorySection" type="VBoxContainer" parent="MarginContainer/MainVBox/Conent" unique_id=349825405]
+[node name="TrinketSlot" type="Button" parent="Panel/VBox/Content/CenterPanel/VBox/GearGrid" unique_id=303723027]
+custom_minimum_size = Vector2(0, 105)
 layout_mode = 2
 size_flags_horizontal = 3
+theme_override_styles/normal = SubResource("Button")
+theme_override_styles/hover = SubResource("ButtonHover")
+text = "TRINKET
+Empty"
 
-[node name="InventoryTitle" type="Label" parent="MarginContainer/MainVBox/Conent/InventorySection" unique_id=135687500]
+[node name="AbilityTitle" type="Label" parent="Panel/VBox/Content/CenterPanel/VBox" unique_id=1930531210]
 layout_mode = 2
-text = "ITEMS"
+theme_override_colors/font_color = Color(1, 0.62, 0.12, 1)
+theme_override_font_sizes/font_size = 20
+text = "ACTIVE ABILITIES"
+horizontal_alignment = 1
 
-[node name="ItemGrid" type="GridContainer" parent="MarginContainer/MainVBox/Conent/InventorySection" unique_id=1736426637]
-unique_name_in_owner = true
+[node name="AbilitiesRow" type="HBoxContainer" parent="Panel/VBox/Content/CenterPanel/VBox" unique_id=243829314]
+custom_minimum_size = Vector2(0, 110)
 layout_mode = 2
-columns = 4
+theme_override_constants/separation = 8
 
-[node name="DetailsPanel" type="PanelContainer" parent="MarginContainer/MainVBox/Conent" unique_id=1347766453]
-unique_name_in_owner = true
-custom_minimum_size = Vector2(300, 200)
+[node name="Q" type="Button" parent="Panel/VBox/Content/CenterPanel/VBox/AbilitiesRow" unique_id=96262895]
 layout_mode = 2
 size_flags_horizontal = 3
+theme_override_styles/normal = SubResource("Button")
+theme_override_styles/hover = SubResource("ButtonHover")
+text = "Q
+Damage Dash"
 
-[node name="DetailsVBox" type="VBoxContainer" parent="MarginContainer/MainVBox/Conent/DetailsPanel" unique_id=426934812]
+[node name="E" type="Button" parent="Panel/VBox/Content/CenterPanel/VBox/AbilitiesRow" unique_id=1648894446]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_styles/normal = SubResource("Button")
+theme_override_styles/hover = SubResource("ButtonHover")
+text = "E
+Orbiting Blades"
+
+[node name="Passive" type="Button" parent="Panel/VBox/Content/CenterPanel/VBox/AbilitiesRow" unique_id=1695474522]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_styles/normal = SubResource("Button")
+theme_override_styles/hover = SubResource("ButtonHover")
+text = "PASSIVE
+Second Life"
+
+[node name="DetailsPanel" type="PanelContainer" parent="Panel/VBox/Content" unique_id=1869682920]
+custom_minimum_size = Vector2(420, 0)
+layout_mode = 2
+theme_override_styles/panel = SubResource("InnerPanel")
+
+[node name="VBox" type="VBoxContainer" parent="Panel/VBox/Content/DetailsPanel" unique_id=414859351]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="Heading" type="Label" parent="Panel/VBox/Content/DetailsPanel/VBox" unique_id=683385305]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.62, 0.12, 1)
+theme_override_font_sizes/font_size = 21
+text = "SELECTED ITEM"
+
+[node name="ItemName" type="Label" parent="Panel/VBox/Content/DetailsPanel/VBox" unique_id=1128950605]
+layout_mode = 2
+theme_override_font_sizes/font_size = 27
+text = "CHICKEN CLEAVER"
+
+[node name="Type" type="Label" parent="Panel/VBox/Content/DetailsPanel/VBox" unique_id=1194158842]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.35, 0.9, 0.25, 1)
+theme_override_font_sizes/font_size = 17
+text = "COMMON WEAPON"
+
+[node name="Description" type="Label" parent="Panel/VBox/Content/DetailsPanel/VBox" unique_id=1701135392]
+layout_mode = 2
+text = "Chop, slice, then cluck."
+autowrap_mode = 2
+
+[node name="Separator" type="HSeparator" parent="Panel/VBox/Content/DetailsPanel/VBox" unique_id=1999766362]
 layout_mode = 2
 
-[node name="ItemName" type="Label" parent="MarginContainer/MainVBox/Conent/DetailsPanel/DetailsVBox" unique_id=1035000766]
-unique_name_in_owner = true
+[node name="Stats" type="VBoxContainer" parent="Panel/VBox/Content/DetailsPanel/VBox" unique_id=22279659]
 layout_mode = 2
-theme_override_font_sizes/font_size = 24
+theme_override_constants/separation = 8
 
-[node name="ItemDescription" type="Label" parent="MarginContainer/MainVBox/Conent/DetailsPanel/DetailsVBox" unique_id=1238050899]
-unique_name_in_owner = true
-custom_minimum_size = Vector2(50, 0)
+[node name="Damage" type="Label" parent="Panel/VBox/Content/DetailsPanel/VBox/Stats" unique_id=1359542428]
 layout_mode = 2
-autowrap_mode = 3
+text = "⚔  DAMAGE                                      3.0"
 
-[node name="ItemStats" type="Label" parent="MarginContainer/MainVBox/Conent/DetailsPanel/DetailsVBox" unique_id=859782663]
-unique_name_in_owner = true
+[node name="FireRate" type="Label" parent="Panel/VBox/Content/DetailsPanel/VBox/Stats" unique_id=299736186]
 layout_mode = 2
+text = "➤  FIRE RATE                                  +0%"
 
-[node name="EquipButton" type="Button" parent="MarginContainer/MainVBox/Conent/DetailsPanel/DetailsVBox" unique_id=1208345966]
-unique_name_in_owner = true
-custom_minimum_size = Vector2(0, 50)
+[node name="Health" type="Label" parent="Panel/VBox/Content/DetailsPanel/VBox/Stats" unique_id=260566419]
 layout_mode = 2
-text = "EQUIP"
+text = "♥  HEALTH                                        +0"
+
+[node name="Speed" type="Label" parent="Panel/VBox/Content/DetailsPanel/VBox/Stats" unique_id=153466887]
+layout_mode = 2
+text = "»  SPEED                                         +0"
+
+[node name="TraitTitle" type="Label" parent="Panel/VBox/Content/DetailsPanel/VBox" unique_id=1467968996]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.62, 0.12, 1)
+text = "EFFECT"
+
+[node name="Effect" type="Label" parent="Panel/VBox/Content/DetailsPanel/VBox" unique_id=1940526574]
+layout_mode = 2
+size_flags_vertical = 3
+text = "None"
+autowrap_mode = 2
+
+[node name="EquipButton" type="Button" parent="Panel/VBox/Content/DetailsPanel/VBox" unique_id=77593553]
+custom_minimum_size = Vector2(0, 64)
+layout_mode = 2
+theme_override_font_sizes/font_size = 23
+theme_override_styles/normal = SubResource("Equip")
+text = "EQUIPPED  ✓"
+
+[node name="StatsBar" type="PanelContainer" parent="Panel/VBox" unique_id=1686849059]
+custom_minimum_size = Vector2(0, 92)
+layout_mode = 2
+theme_override_styles/panel = SubResource("InnerPanel")
+
+[node name="HBox" type="HBoxContainer" parent="Panel/VBox/StatsBar" unique_id=1487666768]
+layout_mode = 2
+theme_override_constants/separation = 20
+alignment = 1
+
+[node name="Title" type="Label" parent="Panel/VBox/StatsBar/HBox" unique_id=53058374]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.62, 0.12, 1)
+theme_override_font_sizes/font_size = 18
+text = "PLAYER STATS"
+
+[node name="HP" type="Label" parent="Panel/VBox/StatsBar/HBox" unique_id=411029776]
+layout_mode = 2
+text = "♥  MAX HP
+100"
+horizontal_alignment = 1
+
+[node name="Damage" type="Label" parent="Panel/VBox/StatsBar/HBox" unique_id=1123359778]
+layout_mode = 2
+text = "⚔  DAMAGE
+5"
+horizontal_alignment = 1
+
+[node name="Speed" type="Label" parent="Panel/VBox/StatsBar/HBox" unique_id=1485750645]
+layout_mode = 2
+text = "»  SPEED
+250"
+horizontal_alignment = 1
+
+[node name="FireRate" type="Label" parent="Panel/VBox/StatsBar/HBox" unique_id=790388583]
+layout_mode = 2
+text = "➤  FIRE RATE
+0.30s"
+horizontal_alignment = 1
+
+[node name="Dash" type="Label" parent="Panel/VBox/StatsBar/HBox" unique_id=328559518]
+layout_mode = 2
+text = "»  DASH CD
+0.75s"
+horizontal_alignment = 1
+
+[node name="Footer" type="Label" parent="Panel/VBox" unique_id=626455276]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.76, 0.68, 0.58, 1)
+text = "Inventory overlay • gameplay remains visible behind this panel"
+horizontal_alignment = 1

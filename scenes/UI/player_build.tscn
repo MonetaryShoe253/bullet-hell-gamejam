@@ -1,0 +1,569 @@
+[gd_scene load_steps=8 format=3]
+
+[ext_resource type="Texture2D" path="res://assets/Player/mascot_hero.png" id="1_mascot"]
+
+[sub_resource type="StyleBoxFlat" id="BG"]
+bg_color = Color(0.035, 0.012, 0.008, 1)
+
+[sub_resource type="StyleBoxFlat" id="Panel"]
+bg_color = Color(0.07, 0.055, 0.05, 0.97)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+border_color = Color(0.72, 0.34, 0.075, 1)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_left = 8
+corner_radius_bottom_right = 8
+content_margin_left = 16.0
+content_margin_top = 12.0
+content_margin_right = 16.0
+content_margin_bottom = 12.0
+
+[sub_resource type="StyleBoxFlat" id="Inner"]
+bg_color = Color(0.035, 0.035, 0.035, 0.96)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.30, 0.25, 0.22, 1)
+corner_radius_top_left = 5
+corner_radius_top_right = 5
+corner_radius_bottom_left = 5
+corner_radius_bottom_right = 5
+
+[sub_resource type="StyleBoxFlat" id="Selected"]
+bg_color = Color(0.20, 0.075, 0.018, 1)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+border_color = Color(1, 0.54, 0.055, 1)
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_left = 6
+corner_radius_bottom_right = 6
+
+[sub_resource type="StyleBoxFlat" id="TabActive"]
+bg_color = Color(0.88, 0.29, 0.015, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(1, 0.64, 0.12, 1)
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_left = 6
+corner_radius_bottom_right = 6
+
+[sub_resource type="StyleBoxFlat" id="Button"]
+bg_color = Color(0.15, 0.06, 0.03, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.72, 0.34, 0.075, 1)
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_left = 6
+corner_radius_bottom_right = 6
+
+[sub_resource type="StyleBoxFlat" id="Equip"]
+bg_color = Color(0.22, 0.50, 0.055, 1)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+border_color = Color(0.60, 0.90, 0.15, 1)
+corner_radius_top_left = 7
+corner_radius_top_right = 7
+corner_radius_bottom_left = 7
+corner_radius_bottom_right = 7
+
+[node name="PlayerBuild" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Background" type="Panel" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = SubResource("BG")
+
+[node name="Header" type="HBoxContainer" parent="."]
+layout_mode = 0
+anchor_right = 1.0
+offset_left = 28.0
+offset_top = 18.0
+offset_right = -28.0
+offset_bottom = 112.0
+theme_override_constants/separation = 18
+
+[node name="BackButton" type="Button" parent="Header"]
+custom_minimum_size = Vector2(170, 68)
+layout_mode = 2
+theme_override_font_sizes/font_size = 25
+theme_override_styles/normal = SubResource("Button")
+text = "<  BACK"
+
+[node name="Logo" type="Label" parent="Header"]
+custom_minimum_size = Vector2(300, 0)
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.56, 0.06, 1)
+theme_override_colors/font_outline_color = Color(0.18, 0.015, 0.005, 1)
+theme_override_constants/outline_size = 8
+theme_override_font_sizes/font_size = 43
+text = "WING RUSH"
+vertical_alignment = 1
+
+[node name="TitleBox" type="VBoxContainer" parent="Header"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="Title" type="Label" parent="Header/TitleBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.92, 0.76, 1)
+theme_override_font_sizes/font_size = 39
+text = "PLAYER BUILD"
+horizontal_alignment = 1
+
+[node name="Subtitle" type="Label" parent="Header/TitleBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.67, 0.18, 1)
+theme_override_font_sizes/font_size = 18
+text = "★  CUSTOMISE YOUR CHICKEN  ★"
+horizontal_alignment = 1
+
+[node name="Coins" type="PanelContainer" parent="Header"]
+custom_minimum_size = Vector2(225, 70)
+layout_mode = 2
+theme_override_styles/panel = SubResource("Panel")
+
+[node name="Label" type="Label" parent="Header/Coins"]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.84, 0.30, 1)
+theme_override_font_sizes/font_size = 22
+text = "●  1,240\nPLUCK COINS"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Main" type="HBoxContainer" parent="."]
+layout_mode = 0
+anchor_right = 1.0
+offset_left = 28.0
+offset_top = 122.0
+offset_right = -28.0
+offset_bottom = 918.0
+theme_override_constants/separation = 18
+
+[node name="AvailablePanel" type="PanelContainer" parent="Main"]
+custom_minimum_size = Vector2(520, 0)
+layout_mode = 2
+theme_override_styles/panel = SubResource("Panel")
+
+[node name="VBox" type="VBoxContainer" parent="Main/AvailablePanel"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="Title" type="Label" parent="Main/AvailablePanel/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.68, 0.16, 1)
+theme_override_font_sizes/font_size = 25
+text = "AVAILABLE EQUIPMENT"
+horizontal_alignment = 1
+
+[node name="CategoryTabs" type="HBoxContainer" parent="Main/AvailablePanel/VBox"]
+layout_mode = 2
+
+[node name="Weapons" type="Button" parent="Main/AvailablePanel/VBox/CategoryTabs"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_styles/normal = SubResource("TabActive")
+text = "WEAPONS"
+[node name="Armour" type="Button" parent="Main/AvailablePanel/VBox/CategoryTabs"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_styles/normal = SubResource("Button")
+text = "ARMOUR"
+[node name="Accessories" type="Button" parent="Main/AvailablePanel/VBox/CategoryTabs"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_styles/normal = SubResource("Button")
+text = "ACCESSORIES"
+
+[node name="FilterRow" type="HBoxContainer" parent="Main/AvailablePanel/VBox"]
+layout_mode = 2
+[node name="Heading" type="Label" parent="Main/AvailablePanel/VBox/FilterRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 18
+text = "AVAILABLE WEAPONS"
+[node name="Rarity" type="OptionButton" parent="Main/AvailablePanel/VBox/FilterRow"]
+custom_minimum_size = Vector2(145, 38)
+layout_mode = 2
+item_count = 1
+selected = 0
+popup/item_0/text = "Rarity"
+popup/item_0/id = 0
+
+[node name="ItemList" type="VBoxContainer" parent="Main/AvailablePanel/VBox"]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/separation = 8
+
+[node name="HotWing" type="Button" parent="Main/AvailablePanel/VBox/ItemList"]
+custom_minimum_size = Vector2(0, 105)
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.90, 0.75, 1)
+theme_override_font_sizes/font_size = 18
+theme_override_styles/normal = SubResource("Selected")
+text = "🔥  HOT WING          RARE\n     +25 Damage   •   +10% Fire Rate"
+alignment = 0
+
+[node name="SpicySkewer" type="Button" parent="Main/AvailablePanel/VBox/ItemList"]
+custom_minimum_size = Vector2(0, 105)
+layout_mode = 2
+theme_override_font_sizes/font_size = 18
+theme_override_styles/normal = SubResource("Inner")
+text = "🌶  SPICY SKEWER       EPIC\n     +40 Damage   •   +15% Crit Chance"
+alignment = 0
+
+[node name="DrumstickMace" type="Button" parent="Main/AvailablePanel/VBox/ItemList"]
+custom_minimum_size = Vector2(0, 105)
+layout_mode = 2
+theme_override_font_sizes/font_size = 18
+theme_override_styles/normal = SubResource("Inner")
+text = "🍗  DRUMSTICK MACE     UNCOMMON\n     +15 Damage   •   +20 Knockback"
+alignment = 0
+
+[node name="FeatherFans" type="Button" parent="Main/AvailablePanel/VBox/ItemList"]
+custom_minimum_size = Vector2(0, 105)
+layout_mode = 2
+theme_override_font_sizes/font_size = 18
+theme_override_styles/normal = SubResource("Inner")
+text = "✦  FEATHER FANS       COMMON\n     +10 Damage   •   +5% Attack Speed"
+alignment = 0
+
+[node name="LockedItem" type="Button" parent="Main/AvailablePanel/VBox/ItemList"]
+custom_minimum_size = Vector2(0, 105)
+layout_mode = 2
+disabled = true
+theme_override_font_sizes/font_size = 18
+text = "🔒  INFERNO BLADE      LEGENDARY\n     Defeat Taco to unlock"
+alignment = 0
+
+[node name="Filters" type="HBoxContainer" parent="Main/AvailablePanel/VBox"]
+layout_mode = 2
+[node name="FilterButton" type="Button" parent="Main/AvailablePanel/VBox/Filters"]
+custom_minimum_size = Vector2(135, 48)
+layout_mode = 2
+theme_override_styles/normal = SubResource("Button")
+text = "FILTERS"
+[node name="RarityDots" type="Label" parent="Main/AvailablePanel/VBox/Filters"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 25
+text = "  ◆  ◆  ◆  ◆  ◆"
+vertical_alignment = 1
+
+[node name="CenterColumn" type="VBoxContainer" parent="Main"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 10
+
+[node name="Tabs" type="HBoxContainer" parent="Main/CenterColumn"]
+custom_minimum_size = Vector2(0, 58)
+layout_mode = 2
+[node name="Loadout" type="Button" parent="Main/CenterColumn/Tabs"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 22
+theme_override_styles/normal = SubResource("TabActive")
+text = "LOADOUT"
+[node name="Abilities" type="Button" parent="Main/CenterColumn/Tabs"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 22
+theme_override_styles/normal = SubResource("Button")
+text = "ABILITIES"
+[node name="Stats" type="Button" parent="Main/CenterColumn/Tabs"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 22
+theme_override_styles/normal = SubResource("Button")
+text = "STATS"
+
+[node name="LoadoutPanel" type="PanelContainer" parent="Main/CenterColumn"]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_styles/panel = SubResource("Panel")
+
+[node name="VBox" type="VBoxContainer" parent="Main/CenterColumn/LoadoutPanel"]
+layout_mode = 2
+
+[node name="Title" type="Label" parent="Main/CenterColumn/LoadoutPanel/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.68, 0.16, 1)
+theme_override_font_sizes/font_size = 24
+text = "YOUR LOADOUT"
+horizontal_alignment = 1
+
+[node name="HeroArea" type="Control" parent="Main/CenterColumn/LoadoutPanel/VBox"]
+custom_minimum_size = Vector2(0, 390)
+layout_mode = 2
+
+[node name="Mascot" type="TextureRect" parent="Main/CenterColumn/LoadoutPanel/VBox/HeroArea"]
+layout_mode = 0
+anchor_left = 0.27
+anchor_top = 0.03
+anchor_right = 0.73
+anchor_bottom = 0.82
+texture = ExtResource("1_mascot")
+expand_mode = 3
+stretch_mode = 5
+
+[node name="WeaponSlot" type="Button" parent="Main/CenterColumn/LoadoutPanel/VBox/HeroArea"]
+layout_mode = 0
+offset_left = 12.0
+offset_top = 34.0
+offset_right = 135.0
+offset_bottom = 155.0
+theme_override_styles/normal = SubResource("Selected")
+text = "WEAPON\n🔥\nHot Wing"
+
+[node name="ArmourSlot" type="Button" parent="Main/CenterColumn/LoadoutPanel/VBox/HeroArea"]
+layout_mode = 0
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -135.0
+offset_top = 34.0
+offset_right = -12.0
+offset_bottom = 155.0
+theme_override_styles/normal = SubResource("Inner")
+text = "ARMOUR\n🛡\nCrispy Coat"
+
+[node name="AccessorySlot" type="Button" parent="Main/CenterColumn/LoadoutPanel/VBox/HeroArea"]
+layout_mode = 0
+offset_left = 12.0
+offset_top = 205.0
+offset_right = 135.0
+offset_bottom = 326.0
+theme_override_styles/normal = SubResource("Inner")
+text = "ACCESSORY\n◆\nLucky Drumstick"
+
+[node name="TrinketSlot" type="Button" parent="Main/CenterColumn/LoadoutPanel/VBox/HeroArea"]
+layout_mode = 0
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -135.0
+offset_top = 205.0
+offset_right = -12.0
+offset_bottom = 326.0
+theme_override_styles/normal = SubResource("Inner")
+text = "TRINKET\n+\nEmpty"
+
+[node name="LevelXP" type="Label" parent="Main/CenterColumn/LoadoutPanel/VBox/HeroArea"]
+layout_mode = 0
+anchor_left = 0.24
+anchor_top = 0.84
+anchor_right = 0.76
+anchor_bottom = 0.98
+theme_override_colors/font_color = Color(1, 0.80, 0.25, 1)
+theme_override_font_sizes/font_size = 19
+text = "LEVEL 12     ███████░░░  1,250 / 2,000 XP"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="AbilitiesTitle" type="Label" parent="Main/CenterColumn/LoadoutPanel/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.68, 0.16, 1)
+theme_override_font_sizes/font_size = 21
+text = "ACTIVE ABILITIES"
+horizontal_alignment = 1
+
+[node name="AbilitiesRow" type="HBoxContainer" parent="Main/CenterColumn/LoadoutPanel/VBox"]
+custom_minimum_size = Vector2(0, 135)
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="Q" type="Button" parent="Main/CenterColumn/LoadoutPanel/VBox/AbilitiesRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_styles/normal = SubResource("Inner")
+text = "Q ABILITY\n🔥\nWING SLASH\nLVL 2"
+[node name="E" type="Button" parent="Main/CenterColumn/LoadoutPanel/VBox/AbilitiesRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_styles/normal = SubResource("Inner")
+text = "E ABILITY\n🌀\nGUST DASH\nLVL 1"
+[node name="Passive" type="Button" parent="Main/CenterColumn/LoadoutPanel/VBox/AbilitiesRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_styles/normal = SubResource("Inner")
+text = "PASSIVE\n🍗\nFRIED LUCK\nLVL 1"
+
+[node name="CoreStats" type="PanelContainer" parent="Main/CenterColumn"]
+custom_minimum_size = Vector2(0, 118)
+layout_mode = 2
+theme_override_styles/panel = SubResource("Panel")
+
+[node name="HBox" type="HBoxContainer" parent="Main/CenterColumn/CoreStats"]
+layout_mode = 2
+
+[node name="HP" type="Label" parent="Main/CenterColumn/CoreStats/HBox"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "♥  320\nMAX HP"
+horizontal_alignment = 1
+vertical_alignment = 1
+[node name="Damage" type="Label" parent="Main/CenterColumn/CoreStats/HBox"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "⚔  25\nDAMAGE"
+horizontal_alignment = 1
+vertical_alignment = 1
+[node name="Speed" type="Label" parent="Main/CenterColumn/CoreStats/HBox"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "♟  250\nSPEED"
+horizontal_alignment = 1
+vertical_alignment = 1
+[node name="FireRate" type="Label" parent="Main/CenterColumn/CoreStats/HBox"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "➤  0.30s\nFIRE RATE"
+horizontal_alignment = 1
+vertical_alignment = 1
+[node name="Dash" type="Label" parent="Main/CenterColumn/CoreStats/HBox"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "»  1.20s\nDASH CD"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="DetailsPanel" type="PanelContainer" parent="Main"]
+custom_minimum_size = Vector2(500, 0)
+layout_mode = 2
+theme_override_styles/panel = SubResource("Panel")
+
+[node name="VBox" type="VBoxContainer" parent="Main/DetailsPanel"]
+layout_mode = 2
+theme_override_constants/separation = 13
+
+[node name="Title" type="Label" parent="Main/DetailsPanel/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.68, 0.16, 1)
+theme_override_font_sizes/font_size = 25
+text = "ITEM DETAILS"
+horizontal_alignment = 1
+
+[node name="ItemHeader" type="HBoxContainer" parent="Main/DetailsPanel/VBox"]
+custom_minimum_size = Vector2(0, 170)
+layout_mode = 2
+
+[node name="Icon" type="PanelContainer" parent="Main/DetailsPanel/VBox/ItemHeader"]
+custom_minimum_size = Vector2(165, 165)
+layout_mode = 2
+theme_override_styles/panel = SubResource("Selected")
+[node name="Label" type="Label" parent="Main/DetailsPanel/VBox/ItemHeader/Icon"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 62
+text = "🔥"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Text" type="VBoxContainer" parent="Main/DetailsPanel/VBox/ItemHeader"]
+layout_mode = 2
+size_flags_horizontal = 3
+[node name="Name" type="Label" parent="Main/DetailsPanel/VBox/ItemHeader/Text"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 29
+text = "HOT WING"
+[node name="Rarity" type="Label" parent="Main/DetailsPanel/VBox/ItemHeader/Text"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.16, 0.67, 1, 1)
+theme_override_font_sizes/font_size = 19
+text = "RARE WEAPON"
+[node name="Description" type="Label" parent="Main/DetailsPanel/VBox/ItemHeader/Text"]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_font_sizes/font_size = 17
+text = "A scorching blade forged\nin the heart of the fryer."
+vertical_alignment = 1
+
+[node name="Stats" type="VBoxContainer" parent="Main/DetailsPanel/VBox"]
+layout_mode = 2
+theme_override_constants/separation = 10
+[node name="Damage" type="Label" parent="Main/DetailsPanel/VBox/Stats"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 19
+text = "⚔  DAMAGE                                      25"
+[node name="FireRate" type="Label" parent="Main/DetailsPanel/VBox/Stats"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 19
+text = "➤  FIRE RATE                                  0.30s"
+[node name="CritChance" type="Label" parent="Main/DetailsPanel/VBox/Stats"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 19
+text = "◎  CRITICAL CHANCE                              10%"
+[node name="CritDamage" type="Label" parent="Main/DetailsPanel/VBox/Stats"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 19
+text = "✦  CRITICAL DAMAGE                             150%"
+[node name="Knockback" type="Label" parent="Main/DetailsPanel/VBox/Stats"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 19
+text = "↠  KNOCKBACK                                     15"
+[node name="Burn" type="Label" parent="Main/DetailsPanel/VBox/Stats"]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.52, 0.08, 1)
+theme_override_font_sizes/font_size = 19
+text = "♨  BURN CHANCE                                   20%"
+
+[node name="Effect" type="Label" parent="Main/DetailsPanel/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.82, 0.75, 0.67, 1)
+theme_override_font_sizes/font_size = 16
+text = "Chance to ignite enemies for 3s."
+
+[node name="UpgradeTitle" type="Label" parent="Main/DetailsPanel/VBox"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 18
+text = "UPGRADE LEVEL                                      2 / 6"
+
+[node name="UpgradeDots" type="Label" parent="Main/DetailsPanel/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.20, 0.65, 1, 1)
+theme_override_font_sizes/font_size = 25
+text = "◆  ◆  ◇  ◇  ◇  ◇"
+
+[node name="Spacer" type="Control" parent="Main/DetailsPanel/VBox"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="EquipButton" type="Button" parent="Main/DetailsPanel/VBox"]
+custom_minimum_size = Vector2(0, 68)
+layout_mode = 2
+theme_override_font_sizes/font_size = 28
+theme_override_styles/normal = SubResource("Equip")
+text = "EQUIP     ● 500"
+
+[node name="FooterTip" type="Label" parent="."]
+layout_mode = 0
+anchor_left = 0.18
+anchor_right = 0.82
+anchor_bottom = 1.0
+offset_top = -45.0
+offset_bottom = -10.0
+theme_override_colors/font_color = Color(1, 0.72, 0.20, 1)
+theme_override_font_sizes/font_size = 16
+text = "💡 Tip: Mix and match gear and abilities to create your perfect build for the Deep-Fry Gauntlet!"
+horizontal_alignment = 1
