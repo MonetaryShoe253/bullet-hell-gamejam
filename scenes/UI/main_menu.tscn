@@ -166,7 +166,6 @@ theme_override_font_sizes/font_size = 17
 text = "CHOOSE YOUR STARTING BUILD, THEN DESCEND"
 
 [node name="SettingsButton" type="Button" parent="Root/Margin/VBox/Header" unique_id=1940106788]
-visible = false
 custom_minimum_size = Vector2(150, 58)
 layout_mode = 2
 theme_override_styles/normal = SubResource("Panel")
@@ -411,126 +410,126 @@ theme_override_styles/pressed = SubResource("SecondaryPressed")
 theme_override_styles/hover = SubResource("SecondaryHover")
 text = "EQUIP E"
 
-[node name="BossFooter" type="PanelContainer" parent="Root/Margin/VBox" unique_id=216716930]
+[node name="BossFooter" type="PanelContainer" parent="Root/Margin/VBox" unique_id=537675666]
 custom_minimum_size = Vector2(0, 140)
 layout_mode = 2
 theme_override_styles/panel = SubResource("Panel")
 
-[node name="BossVBox" type="VBoxContainer" parent="Root/Margin/VBox/BossFooter" unique_id=1903896315]
+[node name="BossVBox" type="VBoxContainer" parent="Root/Margin/VBox/BossFooter" unique_id=615033863]
 layout_mode = 2
 theme_override_constants/separation = 3
 
-[node name="Title" type="Label" parent="Root/Margin/VBox/BossFooter/BossVBox" unique_id=496413833]
+[node name="Title" type="Label" parent="Root/Margin/VBox/BossFooter/BossVBox" unique_id=1743031806]
 layout_mode = 2
 theme_override_colors/font_color = Color(1, 0.62, 0.08, 1)
 theme_override_font_sizes/font_size = 17
 text = "THE DEEP-FRY GAUNTLET"
 horizontal_alignment = 1
 
-[node name="BossRow" type="HBoxContainer" parent="Root/Margin/VBox/BossFooter/BossVBox" unique_id=21703149]
+[node name="BossRow" type="HBoxContainer" parent="Root/Margin/VBox/BossFooter/BossVBox" unique_id=951574599]
 layout_mode = 2
 size_flags_vertical = 3
 theme_override_constants/separation = 8
 
-[node name="Pizza" type="VBoxContainer" parent="Root/Margin/VBox/BossFooter/BossVBox/BossRow" unique_id=1037401143]
+[node name="Pizza" type="VBoxContainer" parent="Root/Margin/VBox/BossFooter/BossVBox/BossRow" unique_id=1957885657]
 layout_mode = 2
 size_flags_horizontal = 3
 alignment = 1
 
-[node name="Name" type="Label" parent="Root/Margin/VBox/BossFooter/BossVBox/BossRow/Pizza" unique_id=2068180193]
+[node name="Name" type="Label" parent="Root/Margin/VBox/BossFooter/BossVBox/BossRow/Pizza" unique_id=758126943]
 layout_mode = 2
 text = "??????"
 horizontal_alignment = 1
 
-[node name="Icon" type="TextureRect" parent="Root/Margin/VBox/BossFooter/BossVBox/BossRow/Pizza" unique_id=1185600419]
+[node name="Icon" type="TextureRect" parent="Root/Margin/VBox/BossFooter/BossVBox/BossRow/Pizza" unique_id=57866660]
 custom_minimum_size = Vector2(0, 54)
 layout_mode = 2
 texture = ExtResource("4_pizza")
 expand_mode = 3
 stretch_mode = 5
 
-[node name="Status" type="Label" parent="Root/Margin/VBox/BossFooter/BossVBox/BossRow/Pizza" unique_id=11198580]
+[node name="Status" type="Label" parent="Root/Margin/VBox/BossFooter/BossVBox/BossRow/Pizza" unique_id=1010787482]
 layout_mode = 2
 text = "LOCKED"
 horizontal_alignment = 1
 
-[node name="Burger" type="VBoxContainer" parent="Root/Margin/VBox/BossFooter/BossVBox/BossRow" unique_id=736357864]
+[node name="Burger" type="VBoxContainer" parent="Root/Margin/VBox/BossFooter/BossVBox/BossRow" unique_id=1666860363]
 layout_mode = 2
 size_flags_horizontal = 3
 alignment = 1
 
-[node name="Name" type="Label" parent="Root/Margin/VBox/BossFooter/BossVBox/BossRow/Burger" unique_id=1932300830]
+[node name="Name" type="Label" parent="Root/Margin/VBox/BossFooter/BossVBox/BossRow/Burger" unique_id=503683445]
 layout_mode = 2
 text = "??????"
 horizontal_alignment = 1
 
-[node name="Icon" type="TextureRect" parent="Root/Margin/VBox/BossFooter/BossVBox/BossRow/Burger" unique_id=1542128756]
+[node name="Icon" type="TextureRect" parent="Root/Margin/VBox/BossFooter/BossVBox/BossRow/Burger" unique_id=1805139374]
 custom_minimum_size = Vector2(0, 54)
 layout_mode = 2
 texture = ExtResource("5_burger")
 expand_mode = 3
 stretch_mode = 5
 
-[node name="Status" type="Label" parent="Root/Margin/VBox/BossFooter/BossVBox/BossRow/Burger" unique_id=798466925]
+[node name="Status" type="Label" parent="Root/Margin/VBox/BossFooter/BossVBox/BossRow/Burger" unique_id=589230502]
 layout_mode = 2
 text = "LOCKED"
 horizontal_alignment = 1
 
-[node name="Taco" type="VBoxContainer" parent="Root/Margin/VBox/BossFooter/BossVBox/BossRow" unique_id=1712296025]
+[node name="Taco" type="VBoxContainer" parent="Root/Margin/VBox/BossFooter/BossVBox/BossRow" unique_id=964925031]
 layout_mode = 2
 size_flags_horizontal = 3
 alignment = 1
 
-[node name="Name" type="Label" parent="Root/Margin/VBox/BossFooter/BossVBox/BossRow/Taco" unique_id=752718734]
+[node name="Name" type="Label" parent="Root/Margin/VBox/BossFooter/BossVBox/BossRow/Taco" unique_id=1422041475]
 layout_mode = 2
 text = "??????"
 horizontal_alignment = 1
 
-[node name="Icon" type="TextureRect" parent="Root/Margin/VBox/BossFooter/BossVBox/BossRow/Taco" unique_id=1328817277]
+[node name="Icon" type="TextureRect" parent="Root/Margin/VBox/BossFooter/BossVBox/BossRow/Taco" unique_id=2083601258]
 custom_minimum_size = Vector2(0, 54)
 layout_mode = 2
 texture = ExtResource("6_taco")
 expand_mode = 3
 stretch_mode = 5
 
-[node name="Status" type="Label" parent="Root/Margin/VBox/BossFooter/BossVBox/BossRow/Taco" unique_id=1206998088]
+[node name="Status" type="Label" parent="Root/Margin/VBox/BossFooter/BossVBox/BossRow/Taco" unique_id=586693986]
 layout_mode = 2
 text = "LOCKED"
 horizontal_alignment = 1
 
-[node name="Pepper" type="VBoxContainer" parent="Root/Margin/VBox/BossFooter/BossVBox/BossRow" unique_id=52427512]
+[node name="Pepper" type="VBoxContainer" parent="Root/Margin/VBox/BossFooter/BossVBox/BossRow" unique_id=1609332273]
 layout_mode = 2
 size_flags_horizontal = 3
 alignment = 1
 
-[node name="Name" type="Label" parent="Root/Margin/VBox/BossFooter/BossVBox/BossRow/Pepper" unique_id=375044332]
+[node name="Name" type="Label" parent="Root/Margin/VBox/BossFooter/BossVBox/BossRow/Pepper" unique_id=993130792]
 layout_mode = 2
 text = "??????"
 horizontal_alignment = 1
 
-[node name="Icon" type="TextureRect" parent="Root/Margin/VBox/BossFooter/BossVBox/BossRow/Pepper" unique_id=163270935]
+[node name="Icon" type="TextureRect" parent="Root/Margin/VBox/BossFooter/BossVBox/BossRow/Pepper" unique_id=1221482627]
 custom_minimum_size = Vector2(0, 54)
 layout_mode = 2
 texture = ExtResource("7_pepper")
 expand_mode = 3
 stretch_mode = 5
 
-[node name="Status" type="Label" parent="Root/Margin/VBox/BossFooter/BossVBox/BossRow/Pepper" unique_id=239435525]
+[node name="Status" type="Label" parent="Root/Margin/VBox/BossFooter/BossVBox/BossRow/Pepper" unique_id=1532068715]
 layout_mode = 2
 text = "LOCKED"
 horizontal_alignment = 1
 
-[node name="Track" type="HBoxContainer" parent="Root/Margin/VBox/BossFooter/BossVBox" unique_id=1212158542]
+[node name="Track" type="HBoxContainer" parent="Root/Margin/VBox/BossFooter/BossVBox" unique_id=122927274]
 custom_minimum_size = Vector2(0, 22)
 layout_mode = 2
 theme_override_constants/separation = 0
 
-[node name="Col1" type="Control" parent="Root/Margin/VBox/BossFooter/BossVBox/Track" unique_id=2085595041]
+[node name="Col1" type="Control" parent="Root/Margin/VBox/BossFooter/BossVBox/Track" unique_id=1920827976]
 custom_minimum_size = Vector2(0, 22)
 layout_mode = 2
 size_flags_horizontal = 3
 
-[node name="Dot" type="ColorRect" parent="Root/Margin/VBox/BossFooter/BossVBox/Track/Col1" unique_id=1948776269]
+[node name="Dot" type="ColorRect" parent="Root/Margin/VBox/BossFooter/BossVBox/Track/Col1" unique_id=574775784]
 layout_mode = 1
 anchors_preset = 8
 anchor_left = 0.5
@@ -545,7 +544,7 @@ grow_horizontal = 2
 grow_vertical = 2
 color = Color(0.32, 0.32, 0.32, 1)
 
-[node name="LineRight" type="ColorRect" parent="Root/Margin/VBox/BossFooter/BossVBox/Track/Col1" unique_id=917970398]
+[node name="LineRight" type="ColorRect" parent="Root/Margin/VBox/BossFooter/BossVBox/Track/Col1" unique_id=517929682]
 layout_mode = 1
 anchors_preset = -1
 anchor_left = 0.5
@@ -559,12 +558,12 @@ grow_horizontal = 2
 grow_vertical = 2
 color = Color(0.25, 0.25, 0.25, 1)
 
-[node name="Col2" type="Control" parent="Root/Margin/VBox/BossFooter/BossVBox/Track" unique_id=448423885]
+[node name="Col2" type="Control" parent="Root/Margin/VBox/BossFooter/BossVBox/Track" unique_id=1883016936]
 custom_minimum_size = Vector2(0, 22)
 layout_mode = 2
 size_flags_horizontal = 3
 
-[node name="LineLeft" type="ColorRect" parent="Root/Margin/VBox/BossFooter/BossVBox/Track/Col2" unique_id=1237387855]
+[node name="LineLeft" type="ColorRect" parent="Root/Margin/VBox/BossFooter/BossVBox/Track/Col2" unique_id=1691883292]
 layout_mode = 1
 anchors_preset = -1
 anchor_top = 0.5
@@ -577,7 +576,7 @@ grow_horizontal = 2
 grow_vertical = 2
 color = Color(0.25, 0.25, 0.25, 1)
 
-[node name="Dot" type="ColorRect" parent="Root/Margin/VBox/BossFooter/BossVBox/Track/Col2" unique_id=463770439]
+[node name="Dot" type="ColorRect" parent="Root/Margin/VBox/BossFooter/BossVBox/Track/Col2" unique_id=614386957]
 layout_mode = 1
 anchors_preset = 8
 anchor_left = 0.5
@@ -592,7 +591,7 @@ grow_horizontal = 2
 grow_vertical = 2
 color = Color(0.32, 0.32, 0.32, 1)
 
-[node name="LineRight" type="ColorRect" parent="Root/Margin/VBox/BossFooter/BossVBox/Track/Col2" unique_id=490923197]
+[node name="LineRight" type="ColorRect" parent="Root/Margin/VBox/BossFooter/BossVBox/Track/Col2" unique_id=983664297]
 layout_mode = 1
 anchors_preset = -1
 anchor_left = 0.5
@@ -606,12 +605,12 @@ grow_horizontal = 2
 grow_vertical = 2
 color = Color(0.25, 0.25, 0.25, 1)
 
-[node name="Col3" type="Control" parent="Root/Margin/VBox/BossFooter/BossVBox/Track" unique_id=1975253797]
+[node name="Col3" type="Control" parent="Root/Margin/VBox/BossFooter/BossVBox/Track" unique_id=90663875]
 custom_minimum_size = Vector2(0, 22)
 layout_mode = 2
 size_flags_horizontal = 3
 
-[node name="LineLeft" type="ColorRect" parent="Root/Margin/VBox/BossFooter/BossVBox/Track/Col3" unique_id=1104438301]
+[node name="LineLeft" type="ColorRect" parent="Root/Margin/VBox/BossFooter/BossVBox/Track/Col3" unique_id=1511732416]
 layout_mode = 1
 anchors_preset = -1
 anchor_top = 0.5
@@ -624,7 +623,7 @@ grow_horizontal = 2
 grow_vertical = 2
 color = Color(0.25, 0.25, 0.25, 1)
 
-[node name="Dot" type="ColorRect" parent="Root/Margin/VBox/BossFooter/BossVBox/Track/Col3" unique_id=695146444]
+[node name="Dot" type="ColorRect" parent="Root/Margin/VBox/BossFooter/BossVBox/Track/Col3" unique_id=1080590120]
 layout_mode = 1
 anchors_preset = 8
 anchor_left = 0.5
@@ -639,7 +638,7 @@ grow_horizontal = 2
 grow_vertical = 2
 color = Color(0.32, 0.32, 0.32, 1)
 
-[node name="LineRight" type="ColorRect" parent="Root/Margin/VBox/BossFooter/BossVBox/Track/Col3" unique_id=1098427967]
+[node name="LineRight" type="ColorRect" parent="Root/Margin/VBox/BossFooter/BossVBox/Track/Col3" unique_id=733726002]
 layout_mode = 1
 anchors_preset = -1
 anchor_left = 0.5
@@ -653,12 +652,12 @@ grow_horizontal = 2
 grow_vertical = 2
 color = Color(0.25, 0.25, 0.25, 1)
 
-[node name="Col4" type="Control" parent="Root/Margin/VBox/BossFooter/BossVBox/Track" unique_id=1281284404]
+[node name="Col4" type="Control" parent="Root/Margin/VBox/BossFooter/BossVBox/Track" unique_id=743989479]
 custom_minimum_size = Vector2(0, 22)
 layout_mode = 2
 size_flags_horizontal = 3
 
-[node name="LineLeft" type="ColorRect" parent="Root/Margin/VBox/BossFooter/BossVBox/Track/Col4" unique_id=2055926438]
+[node name="LineLeft" type="ColorRect" parent="Root/Margin/VBox/BossFooter/BossVBox/Track/Col4" unique_id=839122810]
 layout_mode = 1
 anchors_preset = -1
 anchor_top = 0.5
@@ -671,7 +670,7 @@ grow_horizontal = 2
 grow_vertical = 2
 color = Color(0.25, 0.25, 0.25, 1)
 
-[node name="Dot" type="ColorRect" parent="Root/Margin/VBox/BossFooter/BossVBox/Track/Col4" unique_id=847944915]
+[node name="Dot" type="ColorRect" parent="Root/Margin/VBox/BossFooter/BossVBox/Track/Col4" unique_id=1717223942]
 layout_mode = 1
 anchors_preset = 8
 anchor_left = 0.5

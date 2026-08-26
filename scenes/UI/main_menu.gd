@@ -76,6 +76,8 @@ const BOSS_LABELS := ["PIZZA", "BURGER", "TACO", "PEPPER"]
 
 
 func _ready() -> void:
+	# Death/reward screens pause gameplay; the menu must always receive input.
+	get_tree().paused = false
 	settings_button.pressed.connect(_open_settings)
 	start_button.pressed.connect(_start_run)
 
