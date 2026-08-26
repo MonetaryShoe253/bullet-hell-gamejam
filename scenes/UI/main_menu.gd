@@ -1,101 +1,179 @@
 extends CanvasLayer
 
 const DUNGEON_SCENE := "res://scenes/dungeon/dungeon.tscn"
-const PLAYER_BUILD_SCENE := "res://scenes/UI/player_build.tscn"
 
-const BOSS_UNLOCK_IDS: Array[StringName] = [
+enum GearFilter { WEAPON, ARMOUR, ACCESSORY }
+
+var gear_filter := GearFilter.WEAPON
+var active_target_slot := 0
+var passive_target_slot := 0
+
+@onready var settings_button: Button = $Root/Margin/VBox/Header/SettingsButton
+@onready var start_button: Button = $Root/Margin/VBox/Main/Center/StartRun
+@onready var character_texture: TextureRect = $Root/Margin/VBox/Main/Center/CharacterPanel/VBox/Character
+
+@onready var weapons_filter: Button = $Root/Margin/VBox/Main/GearPanel/VBox/Filters/Weapons
+@onready var armour_filter: Button = $Root/Margin/VBox/Main/GearPanel/VBox/Filters/Armour
+@onready var accessories_filter: Button = $Root/Margin/VBox/Main/GearPanel/VBox/Filters/Accessories
+@onready var gear_list: VBoxContainer = $Root/Margin/VBox/Main/GearPanel/VBox/Scroll/GearList
+
+@onready var weapon_slot: Button = $Root/Margin/VBox/Main/Center/Loadout/GearSlots/Weapon
+@onready var armour_slot: Button = $Root/Margin/VBox/Main/Center/Loadout/GearSlots/Armour
+@onready var accessory_slot: Button = $Root/Margin/VBox/Main/Center/Loadout/GearSlots/Accessory
+@onready var q_slot: Button = $Root/Margin/VBox/Main/Center/Loadout/AbilitySlots/Q
+@onready var e_slot: Button = $Root/Margin/VBox/Main/Center/Loadout/AbilitySlots/E
+@onready var passive_1_slot: Button = $Root/Margin/VBox/Main/Center/Loadout/AbilitySlots/Passive1
+@onready var passive_2_slot: Button = $Root/Margin/VBox/Main/Center/Loadout/AbilitySlots/Passive2
+
+@onready var active_list: VBoxContainer = $Root/Margin/VBox/Main/AbilityPanel/VBox/ActiveScroll/ActiveList
+@onready var passive_list: VBoxContainer = $Root/Margin/VBox/Main/AbilityPanel/VBox/PassiveScroll/PassiveList
+
+@onready var boss_names: Array[Label] = [
+	$Root/Margin/VBox/BossFooter/BossRow/Pizza/Name,
+	$Root/Margin/VBox/BossFooter/BossRow/Burger/Name,
+	$Root/Margin/VBox/BossFooter/BossRow/Taco/Name,
+	$Root/Margin/VBox/BossFooter/BossRow/Pepper/Name,
+]
+@onready var boss_icons: Array[TextureRect] = [
+	$Root/Margin/VBox/BossFooter/BossRow/Pizza/Icon,
+	$Root/Margin/VBox/BossFooter/BossRow/Burger/Icon,
+	$Root/Margin/VBox/BossFooter/BossRow/Taco/Icon,
+	$Root/Margin/VBox/BossFooter/BossRow/Pepper/Icon,
+]
+
+const BOSS_IDS: Array[StringName] = [
 	&"boss_pizza_defeated", &"boss_burger_defeated", &"boss_taco_defeated", &"boss_pepper_defeated"
 ]
-const BOSS_NAMES := ["PIZZA", "BURGER", "TACO", "PEPPER"]
-
-const COLOR_DEFEATED := Color(0.43, 0.82, 0.15, 1.0)
-const COLOR_NEXT := Color(0.18, 0.61, 0.95, 1.0)
-const COLOR_UNKNOWN := Color(0.34, 0.30, 0.31, 1.0)
-const COLOR_REVEALED := Color(1.0, 0.55, 0.08, 1.0)
-
-@onready var start_run_button: Button = $Panel/Margin/MainLayout/LeftColumn/StartRun
-@onready var continue_button: Button = $Panel/Margin/MainLayout/LeftColumn/ContinueButton
-@onready var manage_build_button: Button = $Panel/Margin/MainLayout/LeftColumn/LoadoutButton
-@onready var abilities_button: Button = $Panel/Margin/MainLayout/LeftColumn/AbilitiesButton
-@onready var stats_button: Button = $Panel/Margin/MainLayout/LeftColumn/StatsButton
-@onready var settings_button: Button = $Panel/Margin/MainLayout/LeftColumn/SettingsButton
-@onready var exit_button: Button = $Panel/Margin/MainLayout/LeftColumn/ExitButton
-
-@onready var left_coin_label: Label = $Panel/Margin/MainLayout/LeftColumn/CoinPanel/CoinVBox/CoinAmount
-@onready var level_label: Label = $Panel/Margin/MainLayout/VBox/LevelLabel
-@onready var center_coin_label: Label = $Panel/Margin/MainLayout/VBox/CenterCoin
-@onready var play_button: Button = $Panel/Margin/MainLayout/VBox/PlayButton
-
-@onready var bottom_loadout: Button = $Panel/Margin/MainLayout/VBox/BottomNav/Loadout
-@onready var bottom_abilities: Button = $Panel/Margin/MainLayout/VBox/BottomNav/Abilities
-@onready var bottom_stats: Button = $Panel/Margin/MainLayout/VBox/BottomNav/Stats
-
-@onready var weapon_label: Label = $Panel/Margin/MainLayout/RightColumn/LoadoutPanel/VBox/Slots/Weapon/Label
-@onready var armour_label: Label = $Panel/Margin/MainLayout/RightColumn/LoadoutPanel/VBox/Slots/Armour/Label
-@onready var accessory_label: Label = $Panel/Margin/MainLayout/RightColumn/LoadoutPanel/VBox/Slots/Accessory/Label
-@onready var loadout_hint: Label = $Panel/Margin/MainLayout/RightColumn/LoadoutPanel/VBox/LoadoutHint
-
-@onready var deepest_label: Label = $Panel/Margin/MainLayout/RightColumn/RunStatsPanel/VBox/Deepest
-@onready var runs_label: Label = $Panel/Margin/MainLayout/RightColumn/RunStatsPanel/VBox/Runs
-@onready var coins_label: Label = $Panel/Margin/MainLayout/RightColumn/RunStatsPanel/VBox/Coins
-@onready var bosses_label: Label = $Panel/Margin/MainLayout/RightColumn/RunStatsPanel/VBox/Bosses
-
-@onready var boss_cards: Array[PanelContainer] = [
-	$Panel/Margin/MainLayout/VBox/BossRow/PizzaCard,
-	$Panel/Margin/MainLayout/VBox/BossRow/BurgerCard,
-	$Panel/Margin/MainLayout/VBox/BossRow/TacoCard,
-	$Panel/Margin/MainLayout/VBox/BossRow/PepperCard,
-]
-@onready var progress_dots: Array[Label] = [
-	$Panel/Margin/MainLayout/VBox/Progress/Dot1,
-	$Panel/Margin/MainLayout/VBox/Progress/Dot2,
-	$Panel/Margin/MainLayout/VBox/Progress/Dot3,
-	$Panel/Margin/MainLayout/VBox/Progress/Dot4,
-]
+const BOSS_LABELS := ["PIZZA", "BURGER", "TACO", "PEPPER"]
 
 func _ready() -> void:
-	# The redesigned home has one Start action and one Player Build destination.
-	continue_button.hide()
-	abilities_button.hide()
-	stats_button.hide()
-	manage_build_button.text = "▣  PLAYER BUILD"
-	bottom_loadout.text = "▣  PLAYER BUILD"
-	bottom_abilities.hide()
-	bottom_stats.hide()
-
-	start_run_button.pressed.connect(_start_run)
-	play_button.pressed.connect(_start_run)
-	manage_build_button.pressed.connect(_open_player_build)
-	bottom_loadout.pressed.connect(_open_player_build)
 	settings_button.pressed.connect(_open_settings)
-	exit_button.pressed.connect(func(): get_tree().quit())
-
-	if not GameState.money_changed.is_connected(_on_money_changed):
-		GameState.money_changed.connect(_on_money_changed)
-	if not GameState.level_changed.is_connected(_on_level_changed):
-		GameState.level_changed.connect(_on_level_changed)
+	start_button.pressed.connect(_start_run)
+	weapons_filter.pressed.connect(func(): _set_gear_filter(GearFilter.WEAPON))
+	armour_filter.pressed.connect(func(): _set_gear_filter(GearFilter.ARMOUR))
+	accessories_filter.pressed.connect(func(): _set_gear_filter(GearFilter.ACCESSORY))
+	q_slot.pressed.connect(func(): active_target_slot = 0)
+	e_slot.pressed.connect(func(): active_target_slot = 1)
+	passive_1_slot.pressed.connect(func(): passive_target_slot = 0)
+	passive_2_slot.pressed.connect(func(): passive_target_slot = 1)
+	if not MetaProgression.loadout_changed.is_connected(_refresh_all):
+		MetaProgression.loadout_changed.connect(_refresh_all)
 	if not MetaProgression.content_unlocked.is_connected(_on_content_unlocked):
 		MetaProgression.content_unlocked.connect(_on_content_unlocked)
-	if MetaProgression.has_signal("loadout_changed") and not MetaProgression.loadout_changed.is_connected(_refresh_build):
-		MetaProgression.loadout_changed.connect(_refresh_build)
+	_refresh_all()
+	start_button.grab_focus()
 
-	refresh_home_screen()
-	play_button.grab_focus()
-
-func refresh_home_screen() -> void:
-	_on_level_changed(GameState.level)
-	_on_money_changed(GameState.money)
-	_refresh_build()
+func _refresh_all() -> void:
+	_refresh_gear_list()
+	_refresh_ability_lists()
+	_refresh_equipped()
 	_refresh_bosses()
-	_refresh_progression_dots()
-	_refresh_run_stats()
+
+func _set_gear_filter(filter: GearFilter) -> void:
+	gear_filter = filter
+	_refresh_gear_list()
+
+func _refresh_gear_list() -> void:
+	_clear(gear_list)
+	weapons_filter.disabled = gear_filter == GearFilter.WEAPON
+	armour_filter.disabled = gear_filter == GearFilter.ARMOUR
+	accessories_filter.disabled = gear_filter == GearFilter.ACCESSORY
+	var item_type := Item.ItemType.WEAPON
+	match gear_filter:
+		GearFilter.ARMOUR: item_type = Item.ItemType.ARMOUR
+		GearFilter.ACCESSORY: item_type = Item.ItemType.ACCESSORY
+	for item: Item in ContentDatabase.get_unlocked_items(item_type):
+		var b := Button.new()
+		b.custom_minimum_size = Vector2(0, 76)
+		b.alignment = HORIZONTAL_ALIGNMENT_LEFT
+		b.text = item.item_name + "\n" + item.get_stats_text()
+		if item.icon:
+			b.icon = item.icon
+			b.expand_icon = true
+			b.icon_max_width = 56
+		b.pressed.connect(func(): MetaProgression.set_equipped_item(item))
+		gear_list.add_child(b)
+	if gear_list.get_child_count() == 0:
+		_add_empty(gear_list, "No starting gear unlocked in this category yet.")
+
+func _refresh_ability_lists() -> void:
+	_clear(active_list)
+	_clear(passive_list)
+	for ability: Ability in ContentDatabase.get_unlocked_active_abilities():
+		var b := Button.new()
+		b.custom_minimum_size = Vector2(0, 76)
+		b.alignment = HORIZONTAL_ALIGNMENT_LEFT
+		b.text = "%s\nCooldown %.1fs" % [ability.ability_name, ability.cooldown]
+		if ability.icon:
+			b.icon = ability.icon
+			b.expand_icon = true
+			b.icon_max_width = 56
+		b.pressed.connect(func(): MetaProgression.set_active_ability(active_target_slot, ability))
+		active_list.add_child(b)
+	for passive: PassiveAbility in ContentDatabase.passive_abilities:
+		if not MetaProgression.is_unlocked(passive):
+			continue
+
+		var b := Button.new()
+		b.custom_minimum_size = Vector2(0, 72)
+		b.alignment = HORIZONTAL_ALIGNMENT_LEFT
+		b.text = passive.ability_name + "\n" + passive.description
+
+		if passive.icon:
+			b.icon = passive.icon
+			b.expand_icon = true
+			b.icon_max_width = 52
+
+		b.pressed.connect(
+			func():
+				MetaProgression.set_passive_ability(passive_target_slot, passive)
+				_refresh_loadout()
+		)
+
+		passive_list.add_child(b)
+	if active_list.get_child_count() == 0:
+		_add_empty(active_list, "No active abilities unlocked yet.")
+	if passive_list.get_child_count() == 0:
+		_add_empty(passive_list, "No passive abilities unlocked yet.")
+
+func _refresh_equipped() -> void:
+	_set_item_slot(weapon_slot, "WEAPON", ContentDatabase.find_item(MetaProgression.equipped_weapon_id))
+	_set_item_slot(armour_slot, "ARMOUR", ContentDatabase.find_item(MetaProgression.equipped_armour_id))
+	_set_item_slot(accessory_slot, "ACCESSORY", ContentDatabase.find_item(MetaProgression.equipped_accessory_id))
+	_set_ability_slot(q_slot, "Q", ContentDatabase.find_active_ability(MetaProgression.equipped_active_1_id))
+	_set_ability_slot(e_slot, "E", ContentDatabase.find_active_ability(MetaProgression.equipped_active_2_id))
+	_set_passive_slot(passive_1_slot, "PASSIVE 1", ContentDatabase.find_passive_ability(MetaProgression.equipped_passive_1_id))
+	_set_passive_slot(passive_2_slot, "PASSIVE 2", ContentDatabase.find_passive_ability(MetaProgression.equipped_passive_2_id))
+
+func _set_item_slot(button: Button, title: String, item: Item) -> void:
+	button.text = "%s\n%s" % [title, item.item_name if item else "Empty"]
+	button.icon = item.icon if item and item.icon else null
+	button.expand_icon = true
+	button.icon_max_width = 48
+
+func _set_ability_slot(button: Button, title: String, ability: Ability) -> void:
+	button.text = "%s\n%s" % [title, ability.ability_name if ability else "Empty"]
+	button.icon = ability.icon if ability and ability.icon else null
+	button.expand_icon = true
+	button.icon_max_width = 48
+
+func _set_passive_slot(button: Button, title: String, passive: PassiveAbility) -> void:
+	button.text = "%s\n%s" % [title, passive.ability_name if passive else "Empty"]
+	button.icon = passive.icon if passive and "icon" in passive and passive.icon else null
+	button.expand_icon = true
+	button.icon_max_width = 48
+
+func _refresh_bosses() -> void:
+	for i in BOSS_IDS.size():
+		var defeated := BOSS_IDS[i] in MetaProgression.unlocked_content
+		boss_names[i].text = BOSS_LABELS[i] if defeated else "??????"
+		boss_icons[i].modulate = Color.WHITE if defeated else Color(0.06, 0.06, 0.06, 1)
 
 func _start_run() -> void:
+	# Coins/gold are run-local: GameState.reset() is the boundary that clears
+	# the previous run before SavedBuildLoader applies this selected loadout.
 	GameState.reset()
 	get_tree().change_scene_to_file(DUNGEON_SCENE)
-
-func _open_player_build() -> void:
-	get_tree().change_scene_to_file(PLAYER_BUILD_SCENE)
 
 func _open_settings() -> void:
 	var dialog := AcceptDialog.new()
@@ -106,102 +184,15 @@ func _open_settings() -> void:
 	dialog.confirmed.connect(dialog.queue_free)
 	dialog.canceled.connect(dialog.queue_free)
 
-func _on_money_changed(total: int) -> void:
-	var formatted := _format_number(total)
-	left_coin_label.text = "●  %s" % formatted
-	center_coin_label.text = "●  %s  PLUCK COINS" % formatted
-
-func _on_level_changed(level: int) -> void:
-	level_label.text = "LEVEL %d" % level
-
-func _refresh_build() -> void:
-	var weapon = ContentDatabase.find_item(MetaProgression.equipped_weapon_id)
-	var armour = ContentDatabase.find_item(MetaProgression.equipped_armour_id)
-	var accessory = ContentDatabase.find_item(MetaProgression.equipped_accessory_id)
-	weapon_label.text = "WEAPON\n%s" % (weapon.item_name if weapon else "Empty")
-	armour_label.text = "ARMOUR\n%s" % (armour.item_name if armour else "Empty")
-	accessory_label.text = "ACCESSORY\n%s" % (accessory.item_name if accessory else "Empty")
-
-	var q = ContentDatabase.find_active_ability(MetaProgression.equipped_active_1_id)
-	var e = ContentDatabase.find_active_ability(MetaProgression.equipped_active_2_id)
-	loadout_hint.text = "Q: %s    •    E: %s" % [q.ability_name if q else "Empty", e.ability_name if e else "Empty"]
-
-func _refresh_run_stats() -> void:
-	deepest_label.text = "Deepest Level                                      %d" % GameState.level
-	runs_label.text = "Total Runs                                          --"
-	coins_label.text = "Current Pluck Coins                         %s" % _format_number(GameState.money)
-	bosses_label.text = "Bosses Defeated                              %d / 4" % _bosses_defeated()
-
-func _boss_is_defeated(index: int) -> bool:
-	return index >= 0 and index < BOSS_UNLOCK_IDS.size() and BOSS_UNLOCK_IDS[index] in MetaProgression.unlocked_content
-
-func _bosses_defeated() -> int:
-	var total := 0
-	for i in BOSS_UNLOCK_IDS.size():
-		if _boss_is_defeated(i): total += 1
-	return total
-
-func _next_boss_index() -> int:
-	for i in BOSS_UNLOCK_IDS.size():
-		if not _boss_is_defeated(i): return i
-	return -1
-
-func _refresh_bosses() -> void:
-	var next_boss := _next_boss_index()
-	for i in boss_cards.size():
-		var card := boss_cards[i]
-		var silhouette: Label = card.get_node("VBox/Portrait/Silhouette")
-		var boss_name: Label = card.get_node("VBox/Name")
-		var status: PanelContainer = card.get_node("VBox/Status")
-		var status_label: Label = card.get_node("VBox/Status/Label")
-		if _boss_is_defeated(i):
-			boss_name.text = BOSS_NAMES[i]
-			silhouette.modulate = COLOR_REVEALED
-			status_label.text = "DEFEATED ✓"
-			status.add_theme_stylebox_override("panel", _status_style(Color(0.12, 0.40, 0.055, 1), COLOR_DEFEATED))
-		elif i == next_boss:
-			boss_name.text = "??????"
-			silhouette.modulate = Color.WHITE
-			status_label.text = "NEXT UP"
-			status.add_theme_stylebox_override("panel", _status_style(Color(0.055, 0.23, 0.42, 1), COLOR_NEXT))
-		else:
-			boss_name.text = "??????"
-			silhouette.modulate = Color(0.48, 0.42, 0.42, 1)
-			status_label.text = "UNKNOWN"
-			status.add_theme_stylebox_override("panel", _status_style(Color(0.18, 0.16, 0.17, 1), COLOR_UNKNOWN))
-
-func _refresh_progression_dots() -> void:
-	var next_boss := _next_boss_index()
-	for i in progress_dots.size():
-		var dot := progress_dots[i]
-		if _boss_is_defeated(i):
-			dot.text = "●"; dot.add_theme_color_override("font_color", COLOR_DEFEATED)
-		elif i == next_boss:
-			dot.text = "●"; dot.add_theme_color_override("font_color", COLOR_NEXT)
-		else:
-			dot.text = "○"; dot.add_theme_color_override("font_color", COLOR_UNKNOWN)
-
 func _on_content_unlocked(_id: StringName) -> void:
-	_refresh_bosses()
-	_refresh_progression_dots()
-	_refresh_run_stats()
+	_refresh_all()
 
-func _status_style(background: Color, border: Color) -> StyleBoxFlat:
-	var style := StyleBoxFlat.new()
-	style.bg_color = background
-	style.border_color = border
-	style.set_border_width_all(2)
-	style.set_corner_radius_all(5)
-	return style
+func _clear(container: Container) -> void:
+	for child in container.get_children():
+		child.queue_free()
 
-func _format_number(value: int) -> String:
-	var text := str(maxi(value, 0))
-	var output := ""
-	var count := 0
-	for index in range(text.length() - 1, -1, -1):
-		if count == 3:
-			output = "," + output
-			count = 0
-		output = text[index] + output
-		count += 1
-	return output
+func _add_empty(container: Container, text: String) -> void:
+	var label := Label.new()
+	label.text = text
+	label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	container.add_child(label)

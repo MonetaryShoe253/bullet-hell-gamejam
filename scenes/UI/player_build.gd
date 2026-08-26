@@ -3,6 +3,89 @@ extends Control
 const MAIN_MENU_SCENE := "res://scenes/UI/main_menu.tscn"
 
 enum BuildView { LOADOUT, ABILITIES, STATS }
+enum EquipmentCategory { WEAPONS, ARMOUR, ACCESSORIES }
+
+const TAB_ACTIVE := Color(1.0, 0.62, 0.12, 1.0)
+const TAB_INACTIVE := Color(0.82, 0.76, 0.70, 1.0)
+const SELECTED_COLOR := Color(1.0, 0.78, 0.30, 1.0)
+const NORMAL_COLOR := Color.WHITE
+
+# Temporary presentation data matching the mockup. This is intentionally kept
+# in one place so it can later be replaced by your actual item resources/data.
+const EQUIPMENT := {
+	"hot_wing": {
+		"name": "HOT WING",
+		"category": EquipmentCategory.WEAPONS,
+		"rarity": "RARE WEAPON",
+		"icon": "🔥",
+		"description": "A scorching blade forged\nin the heart of the fryer.",
+		"summary": "+25 Damage   •   +10% Fire Rate",
+		"damage": "25",
+		"fire_rate": "0.30s",
+		"crit_chance": "10%",
+		"crit_damage": "150%",
+		"knockback": "15",
+		"burn": "20%",
+		"effect": "Chance to ignite enemies for 3s.",
+		"upgrade": "2 / 6",
+		"upgrade_dots": "◆  ◆  ◇  ◇  ◇  ◇",
+		"cost": 500,
+	},
+	"spicy_skewer": {
+		"name": "SPICY SKEWER",
+		"category": EquipmentCategory.WEAPONS,
+		"rarity": "EPIC WEAPON",
+		"icon": "🌶",
+		"description": "A vicious skewer seasoned for\nmaximum critical flavour.",
+		"summary": "+40 Damage   •   +15% Crit Chance",
+		"damage": "40",
+		"fire_rate": "0.40s",
+		"crit_chance": "15%",
+		"crit_damage": "175%",
+		"knockback": "10",
+		"burn": "5%",
+		"effect": "Higher critical chance at the cost of fire rate.",
+		"upgrade": "1 / 6",
+		"upgrade_dots": "◆  ◇  ◇  ◇  ◇  ◇",
+		"cost": 650,
+	},
+	"drumstick_mace": {
+		"name": "DRUMSTICK MACE",
+		"category": EquipmentCategory.WEAPONS,
+		"rarity": "UNCOMMON WEAPON",
+		"icon": "🍗",
+		"description": "Heavy, greasy and surprisingly\neffective at crowd control.",
+		"summary": "+15 Damage   •   +20 Knockback",
+		"damage": "15",
+		"fire_rate": "0.55s",
+		"crit_chance": "5%",
+		"crit_damage": "140%",
+		"knockback": "20",
+		"burn": "0%",
+		"effect": "Strong knockback helps keep enemies away.",
+		"upgrade": "1 / 6",
+		"upgrade_dots": "◆  ◇  ◇  ◇  ◇  ◇",
+		"cost": 300,
+	},
+	"feather_fans": {
+		"name": "FEATHER FANS",
+		"category": EquipmentCategory.WEAPONS,
+		"rarity": "COMMON WEAPON",
+		"icon": "✦",
+		"description": "Rapid feather volleys for chickens\nwho value speed over impact.",
+		"summary": "+10 Damage   •   +5% Attack Speed",
+		"damage": "10",
+		"fire_rate": "0.24s",
+		"crit_chance": "5%",
+		"crit_damage": "125%",
+		"knockback": "5",
+		"burn": "0%",
+		"effect": "Fast attacks make it easier to keep pressure on enemies.",
+		"upgrade": "0 / 6",
+		"upgrade_dots": "◇  ◇  ◇  ◇  ◇  ◇",
+		"cost": 150,
+	},
+}
 
 @onready var back_button: Button = $Header/BackButton
 @onready var coin_label: Label = $Header/Coins/Label
@@ -15,16 +98,23 @@ enum BuildView { LOADOUT, ABILITIES, STATS }
 @onready var armour_tab: Button = $Main/AvailablePanel/VBox/CategoryTabs/Armour
 @onready var accessories_tab: Button = $Main/AvailablePanel/VBox/CategoryTabs/Accessories
 @onready var available_heading: Label = $Main/AvailablePanel/VBox/FilterRow/Heading
-@onready var item_list: Container = $Main/AvailablePanel/VBox/ItemList
+
+@onready var hot_wing_button: Button = $Main/AvailablePanel/VBox/ItemList/HotWing
+@onready var spicy_skewer_button: Button = $Main/AvailablePanel/VBox/ItemList/SpicySkewer
+@onready var drumstick_mace_button: Button = $Main/AvailablePanel/VBox/ItemList/DrumstickMace
+@onready var feather_fans_button: Button = $Main/AvailablePanel/VBox/ItemList/FeatherFans
+@onready var locked_item_button: Button = $Main/AvailablePanel/VBox/ItemList/LockedItem
 
 @onready var weapon_slot: Button = $Main/CenterColumn/LoadoutPanel/VBox/HeroArea/WeaponSlot
 @onready var armour_slot: Button = $Main/CenterColumn/LoadoutPanel/VBox/HeroArea/ArmourSlot
 @onready var accessory_slot: Button = $Main/CenterColumn/LoadoutPanel/VBox/HeroArea/AccessorySlot
+@onready var trinket_slot: Button = $Main/CenterColumn/LoadoutPanel/VBox/HeroArea/TrinketSlot
+
 @onready var q_slot: Button = $Main/CenterColumn/LoadoutPanel/VBox/AbilitiesRow/Q
 @onready var e_slot: Button = $Main/CenterColumn/LoadoutPanel/VBox/AbilitiesRow/E
 @onready var passive_slot: Button = $Main/CenterColumn/LoadoutPanel/VBox/AbilitiesRow/Passive
 
-@onready var detail_icon = $Main/DetailsPanel/VBox/ItemHeader/Icon/Label
+@onready var detail_icon: Label = $Main/DetailsPanel/VBox/ItemHeader/Icon/Label
 @onready var detail_name: Label = $Main/DetailsPanel/VBox/ItemHeader/Text/Name
 @onready var detail_rarity: Label = $Main/DetailsPanel/VBox/ItemHeader/Text/Rarity
 @onready var detail_description: Label = $Main/DetailsPanel/VBox/ItemHeader/Text/Description
@@ -39,241 +129,287 @@ enum BuildView { LOADOUT, ABILITIES, STATS }
 @onready var upgrade_dots: Label = $Main/DetailsPanel/VBox/UpgradeDots
 @onready var equip_button: Button = $Main/DetailsPanel/VBox/EquipButton
 
-var selected_item: Item = null
-var selected_ability: Ability = null
-var target_ability_slot := 0
+@onready var hp_stat: Label = $Main/CenterColumn/CoreStats/HBox/HP
+@onready var damage_stat: Label = $Main/CenterColumn/CoreStats/HBox/Damage
+@onready var speed_stat: Label = $Main/CenterColumn/CoreStats/HBox/Speed
+@onready var fire_rate_stat: Label = $Main/CenterColumn/CoreStats/HBox/FireRate
+@onready var dash_stat: Label = $Main/CenterColumn/CoreStats/HBox/Dash
+
 var current_view := BuildView.LOADOUT
-var current_item_type := Item.ItemType.WEAPON
+var current_category := EquipmentCategory.WEAPONS
+var selected_item_id := "hot_wing"
+
+# Local mockup state. Swap these for your real persistent equipment fields once
+# those are exposed by the game's inventory/meta-progression layer.
+var equipped_weapon_id := "hot_wing"
+var equipped_armour_name := "Crispy Coat"
+var equipped_accessory_name := "Lucky Drumstick"
+var equipped_trinket_name := "Empty"
 
 
 func _ready() -> void:
+	_connect_buttons()
+
+	if not GameState.money_changed.is_connected(_on_money_changed):
+		GameState.money_changed.connect(_on_money_changed)
+
+	_on_money_changed(GameState.money)
+	_select_view(BuildView.LOADOUT)
+	_select_category(EquipmentCategory.WEAPONS)
+	_select_item("hot_wing")
+	_refresh_equipped_slots()
+	_refresh_core_stats()
+	back_button.grab_focus()
+
+
+func _connect_buttons() -> void:
 	back_button.pressed.connect(_on_back_pressed)
-	loadout_tab.pressed.connect(func(): _show_loadout(Item.ItemType.WEAPON))
-	abilities_tab.pressed.connect(_show_abilities)
-	stats_tab.pressed.connect(_show_stats)
 
-	weapons_tab.pressed.connect(func(): _show_loadout(Item.ItemType.WEAPON))
-	armour_tab.pressed.connect(func(): _show_loadout(Item.ItemType.ARMOUR))
-	accessories_tab.pressed.connect(func(): _show_loadout(Item.ItemType.ACCESSORY))
+	loadout_tab.pressed.connect(func(): _select_view(BuildView.LOADOUT))
+	abilities_tab.pressed.connect(func(): _select_view(BuildView.ABILITIES))
+	stats_tab.pressed.connect(func(): _select_view(BuildView.STATS))
 
-	weapon_slot.pressed.connect(func(): _show_loadout(Item.ItemType.WEAPON))
-	armour_slot.pressed.connect(func(): _show_loadout(Item.ItemType.ARMOUR))
-	accessory_slot.pressed.connect(func(): _show_loadout(Item.ItemType.ACCESSORY))
-	q_slot.pressed.connect(func(): _show_abilities(0))
-	e_slot.pressed.connect(func(): _show_abilities(1))
+	weapons_tab.pressed.connect(func(): _select_category(EquipmentCategory.WEAPONS))
+	armour_tab.pressed.connect(func(): _select_category(EquipmentCategory.ARMOUR))
+	accessories_tab.pressed.connect(func(): _select_category(EquipmentCategory.ACCESSORIES))
+
+	hot_wing_button.pressed.connect(func(): _select_item("hot_wing"))
+	spicy_skewer_button.pressed.connect(func(): _select_item("spicy_skewer"))
+	drumstick_mace_button.pressed.connect(func(): _select_item("drumstick_mace"))
+	feather_fans_button.pressed.connect(func(): _select_item("feather_fans"))
+
+	weapon_slot.pressed.connect(func(): _select_category(EquipmentCategory.WEAPONS))
+	armour_slot.pressed.connect(func(): _select_category(EquipmentCategory.ARMOUR))
+	accessory_slot.pressed.connect(func(): _select_category(EquipmentCategory.ACCESSORIES))
+	trinket_slot.pressed.connect(_on_trinket_pressed)
+
+	q_slot.pressed.connect(_on_ability_slot_pressed.bind("Q"))
+	e_slot.pressed.connect(_on_ability_slot_pressed.bind("E"))
+	passive_slot.pressed.connect(_on_ability_slot_pressed.bind("PASSIVE"))
 
 	equip_button.pressed.connect(_on_equip_pressed)
 
-	if not MetaProgression.loadout_changed.is_connected(_refresh_equipped):
-		MetaProgression.loadout_changed.connect(_refresh_equipped)
 
-	_show_loadout(Item.ItemType.WEAPON)
-	_refresh_equipped()
-	_refresh_money()
-
-
-func _show_loadout(type: Item.ItemType) -> void:
-	current_view = BuildView.LOADOUT
-	current_item_type = type
-	selected_ability = null
-	_set_tab_state()
-	available_heading.text = {
-		Item.ItemType.WEAPON: "AVAILABLE WEAPONS",
-		Item.ItemType.ARMOUR: "AVAILABLE ARMOUR",
-		Item.ItemType.ACCESSORY: "AVAILABLE ACCESSORIES",
-	}[type]
-	_rebuild_item_buttons(ContentDatabase.get_unlocked_items(type))
-	_clear_details()
+func _on_back_pressed() -> void:
+	if ResourceLoader.exists(MAIN_MENU_SCENE):
+		get_tree().change_scene_to_file(MAIN_MENU_SCENE)
+	else:
+		get_tree().change_scene_to_file("res://scenes/UI/main_menu_redesign.tscn")
 
 
-func _show_abilities(slot: int = 0) -> void:
-	current_view = BuildView.ABILITIES
-	target_ability_slot = slot
-	selected_item = null
-	_set_tab_state()
-	available_heading.text = "AVAILABLE ABILITIES"
-	_rebuild_ability_buttons(ContentDatabase.get_unlocked_active_abilities())
-	_clear_details()
+func _select_view(view: BuildView) -> void:
+	current_view = view
+
+	loadout_tab.modulate = SELECTED_COLOR if view == BuildView.LOADOUT else NORMAL_COLOR
+	abilities_tab.modulate = SELECTED_COLOR if view == BuildView.ABILITIES else NORMAL_COLOR
+	stats_tab.modulate = SELECTED_COLOR if view == BuildView.STATS else NORMAL_COLOR
+
+	# The approved TSCN currently contains the full Loadout composition. Until
+	# dedicated Abilities/Stats content panels are added, the tabs behave as
+	# focused shortcuts rather than hiding the only working build interface.
+	match view:
+		BuildView.LOADOUT:
+			$FooterTip.text = "💡 Tip: Mix and match gear and abilities to create your perfect build for the Deep-Fry Gauntlet!"
+		BuildView.ABILITIES:
+			$FooterTip.text = "💡 Select Q, E or Passive in the centre to manage that ability slot."
+			q_slot.grab_focus()
+		BuildView.STATS:
+			$FooterTip.text = "💡 Your core combat stats are shown below the loadout."
+			hp_stat.grab_focus()
 
 
-func _show_stats() -> void:
-	current_view = BuildView.STATS
-	_set_tab_state()
-	available_heading.text = "BUILD STATS"
-	_clear_list()
-	_clear_details()
-	detail_name.text = "BUILD STATS"
-	detail_description.text = "Your final combat stats are applied by StatsComponent when the run starts."
-	equip_button.disabled = true
-	equip_button.text = "NO ITEM SELECTED"
+func _select_category(category: EquipmentCategory) -> void:
+	current_category = category
+
+	weapons_tab.modulate = SELECTED_COLOR if category == EquipmentCategory.WEAPONS else NORMAL_COLOR
+	armour_tab.modulate = SELECTED_COLOR if category == EquipmentCategory.ARMOUR else NORMAL_COLOR
+	accessories_tab.modulate = SELECTED_COLOR if category == EquipmentCategory.ACCESSORIES else NORMAL_COLOR
+
+	match category:
+		EquipmentCategory.WEAPONS:
+			available_heading.text = "AVAILABLE WEAPONS"
+			_set_weapon_list_visible(true)
+			if EQUIPMENT[selected_item_id]["category"] != EquipmentCategory.WEAPONS:
+				_select_item("hot_wing")
+		EquipmentCategory.ARMOUR:
+			available_heading.text = "AVAILABLE ARMOUR"
+			_set_weapon_list_visible(false)
+			_show_category_placeholder("ARMOUR", "Armour items will populate here from your inventory data.")
+		EquipmentCategory.ACCESSORIES:
+			available_heading.text = "AVAILABLE ACCESSORIES"
+			_set_weapon_list_visible(false)
+			_show_category_placeholder("ACCESSORIES", "Accessories will populate here from your inventory data.")
 
 
-func _set_tab_state() -> void:
-	loadout_tab.disabled = current_view == BuildView.LOADOUT
-	abilities_tab.disabled = current_view == BuildView.ABILITIES
-	stats_tab.disabled = current_view == BuildView.STATS
-	weapons_tab.visible = current_view == BuildView.LOADOUT
-	armour_tab.visible = current_view == BuildView.LOADOUT
-	accessories_tab.visible = current_view == BuildView.LOADOUT
+func _set_weapon_list_visible(is_visible: bool) -> void:
+	hot_wing_button.visible = is_visible
+	spicy_skewer_button.visible = is_visible
+	drumstick_mace_button.visible = is_visible
+	feather_fans_button.visible = is_visible
+	locked_item_button.visible = is_visible
 
 
-func _clear_list() -> void:
-	for child in item_list.get_children():
-		child.queue_free()
-
-
-func _rebuild_item_buttons(items: Array[Item]) -> void:
-	_clear_list()
-	for item in items:
-		var button := Button.new()
-		button.custom_minimum_size = Vector2(0, 76)
-		button.text = item.item_name + "\n" + item.get_stats_text()
-		if item.icon:
-			button.icon = item.icon
-		button.expand_icon = true
-		button.icon_max_width = 52
-		button.pressed.connect(func(): _select_item(item))
-		item_list.add_child(button)
-
-	if items.is_empty():
-		var label := Label.new()
-		label.text = "No unlocked items in this category yet."
-		label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-		item_list.add_child(label)
-
-
-func _rebuild_ability_buttons(abilities: Array[Ability]) -> void:
-	_clear_list()
-	for ability in abilities:
-		var button := Button.new()
-		button.custom_minimum_size = Vector2(0, 76)
-		button.text = "%s\nCooldown: %.1fs" % [ability.ability_name, ability.cooldown]
-		if "icon" in ability and ability.icon:
-			button.icon = ability.icon
-			button.expand_icon = true
-			button.icon_max_width = 52
-		button.pressed.connect(func(): _select_ability(ability))
-		item_list.add_child(button)
-
-	if abilities.is_empty():
-		var label := Label.new()
-		label.text = "No unlocked active abilities yet."
-		item_list.add_child(label)
-
-
-func _select_item(item: Item) -> void:
-	selected_item = item
-	selected_ability = null
-	detail_name.text = item.item_name
-	detail_rarity.text = "UNLOCKED EQUIPMENT"
-	detail_description.text = item.description
-	if item.icon and detail_icon is TextureRect:
-		detail_icon.texture = item.icon
-	elif detail_icon is Label:
-		detail_icon.text = "◆"
-	_set_item_stats(item.get_stats_text())
-	equip_button.disabled = _item_is_equipped(item)
-	equip_button.text = "EQUIPPED ✓" if equip_button.disabled else "EQUIP"
-
-
-func _select_ability(ability: Ability) -> void:
-	selected_item = null
-	selected_ability = ability
-	detail_name.text = ability.ability_name
-	detail_rarity.text = "ACTIVE ABILITY"
-	detail_description.text = ability.description
-	_set_item_stats("Cooldown: %.1fs" % ability.cooldown)
-	var equipped_id := (
-		MetaProgression.equipped_active_1_id
-		if target_ability_slot == 0
-		else MetaProgression.equipped_active_2_id
-	)
-	equip_button.disabled = ContentDatabase.get_content_id(ability) == equipped_id
-	equip_button.text = (
-		"EQUIPPED TO %s ✓" % ("Q" if target_ability_slot == 0 else "E")
-		if equip_button.disabled
-		else "EQUIP TO %s" % ("Q" if target_ability_slot == 0 else "E")
-	)
-
-
-func _set_item_stats(text: String) -> void:
-	detail_damage.text = text
-	detail_fire_rate.text = ""
-	detail_crit_chance.text = ""
-	detail_crit_damage.text = ""
-	detail_knockback.text = ""
-	detail_burn.text = ""
+func _show_category_placeholder(category_name: String, message: String) -> void:
+	detail_icon.text = "◆"
+	detail_name.text = category_name
+	detail_rarity.text = "SELECT AN ITEM"
+	detail_description.text = message
+	detail_damage.text = "⚔  DAMAGE                                      --"
+	detail_fire_rate.text = "➤  FIRE RATE                                  --"
+	detail_crit_chance.text = "◎  CRITICAL CHANCE                              --"
+	detail_crit_damage.text = "✦  CRITICAL DAMAGE                             --"
+	detail_knockback.text = "↠  KNOCKBACK                                     --"
+	detail_burn.text = "♨  SPECIAL                                        --"
 	detail_effect.text = ""
-	upgrade_title.text = ""
-	upgrade_dots.text = ""
-
-
-func _clear_details() -> void:
-	selected_item = null
-	selected_ability = null
-	detail_name.text = "SELECT SOMETHING"
-	detail_rarity.text = ""
-	detail_description.text = "Choose an unlocked item or ability from the left."
-	_set_item_stats("")
-	equip_button.disabled = true
+	upgrade_title.text = "UPGRADE LEVEL                                      --"
+	upgrade_dots.text = "◇  ◇  ◇  ◇  ◇  ◇"
 	equip_button.text = "SELECT AN ITEM"
+	equip_button.disabled = true
+
+
+func _select_item(item_id: String) -> void:
+	if not EQUIPMENT.has(item_id):
+		return
+
+	selected_item_id = item_id
+	var item: Dictionary = EQUIPMENT[item_id]
+
+	current_category = item["category"]
+	_set_weapon_list_visible(true)
+	available_heading.text = "AVAILABLE WEAPONS"
+	weapons_tab.modulate = SELECTED_COLOR
+	armour_tab.modulate = NORMAL_COLOR
+	accessories_tab.modulate = NORMAL_COLOR
+
+	hot_wing_button.modulate = SELECTED_COLOR if item_id == "hot_wing" else NORMAL_COLOR
+	spicy_skewer_button.modulate = SELECTED_COLOR if item_id == "spicy_skewer" else NORMAL_COLOR
+	drumstick_mace_button.modulate = SELECTED_COLOR if item_id == "drumstick_mace" else NORMAL_COLOR
+	feather_fans_button.modulate = SELECTED_COLOR if item_id == "feather_fans" else NORMAL_COLOR
+
+	_populate_details(item)
+	_refresh_equip_button()
+
+
+func _populate_details(item: Dictionary) -> void:
+	detail_icon.text = item["icon"]
+	detail_name.text = item["name"]
+	detail_rarity.text = item["rarity"]
+	detail_description.text = item["description"]
+	detail_damage.text = "⚔  DAMAGE                                      %s" % item["damage"]
+	detail_fire_rate.text = "➤  FIRE RATE                                  %s" % item["fire_rate"]
+	detail_crit_chance.text = "◎  CRITICAL CHANCE                              %s" % item["crit_chance"]
+	detail_crit_damage.text = "✦  CRITICAL DAMAGE                             %s" % item["crit_damage"]
+	detail_knockback.text = "↠  KNOCKBACK                                     %s" % item["knockback"]
+	detail_burn.text = "♨  BURN CHANCE                                   %s" % item["burn"]
+	detail_effect.text = item["effect"]
+	upgrade_title.text = "UPGRADE LEVEL                                      %s" % item["upgrade"]
+	upgrade_dots.text = item["upgrade_dots"]
+
+
+func _refresh_equip_button() -> void:
+	var item: Dictionary = EQUIPMENT[selected_item_id]
+	var already_equipped := selected_item_id == equipped_weapon_id
+
+	equip_button.disabled = already_equipped
+	if already_equipped:
+		equip_button.text = "EQUIPPED  ✓"
+	else:
+		equip_button.text = "EQUIP     ● %d" % item["cost"]
 
 
 func _on_equip_pressed() -> void:
-	if selected_item:
-		MetaProgression.set_equipped_item(selected_item)
-		_refresh_equipped()
-		_select_item(selected_item)
-	elif selected_ability:
-		MetaProgression.set_active_ability(target_ability_slot, selected_ability)
-		_refresh_equipped()
-		_select_ability(selected_ability)
+	if not EQUIPMENT.has(selected_item_id):
+		return
+
+	var item: Dictionary = EQUIPMENT[selected_item_id]
+	if item["category"] != EquipmentCategory.WEAPONS:
+		return
+
+	if selected_item_id == equipped_weapon_id:
+		return
+
+	var cost: int = item["cost"]
+	if GameState.money < cost:
+		_show_message("NOT ENOUGH PLUCK COINS", "You need %d Pluck Coins to equip %s." % [cost, item["name"]])
+		return
+
+	# This assumes GameState.money is writable, matching the existing menu's
+	# use of GameState as live run state. If your project exposes a spend_money()
+	# method, replace these two lines with that method instead.
+	GameState.money -= cost
+	GameState.money_changed.emit(GameState.money)
+
+	equipped_weapon_id = selected_item_id
+	_refresh_equipped_slots()
+	_refresh_core_stats()
+	_refresh_equip_button()
 
 
-func _item_is_equipped(item: Item) -> bool:
-	var id := ContentDatabase.get_content_id(item)
-	match item.item_type:
-		Item.ItemType.WEAPON:
-			return id == MetaProgression.equipped_weapon_id
-		Item.ItemType.ARMOUR:
-			return id == MetaProgression.equipped_armour_id
-		Item.ItemType.ACCESSORY:
-			return id == MetaProgression.equipped_accessory_id
-	return false
+func _refresh_equipped_slots() -> void:
+	var weapon: Dictionary = EQUIPMENT[equipped_weapon_id]
+	weapon_slot.text = "WEAPON\n%s\n%s" % [weapon["icon"], _title_case(weapon["name"])]
+	armour_slot.text = "ARMOUR\n🛡\n%s" % equipped_armour_name
+	accessory_slot.text = "ACCESSORY\n◆\n%s" % equipped_accessory_name
+	trinket_slot.text = "TRINKET\n+\n%s" % equipped_trinket_name
 
 
-func _refresh_equipped() -> void:
-	weapon_slot.text = _item_slot_text("WEAPON", ContentDatabase.find_item(MetaProgression.equipped_weapon_id))
-	armour_slot.text = _item_slot_text("ARMOUR", ContentDatabase.find_item(MetaProgression.equipped_armour_id))
-	accessory_slot.text = _item_slot_text("ACCESSORY", ContentDatabase.find_item(MetaProgression.equipped_accessory_id))
+func _refresh_core_stats() -> void:
+	var weapon: Dictionary = EQUIPMENT[equipped_weapon_id]
 
-	var q := ContentDatabase.find_active_ability(MetaProgression.equipped_active_1_id)
-	var e := ContentDatabase.find_active_ability(MetaProgression.equipped_active_2_id)
-	q_slot.text = "Q\n%s" % (q.ability_name if q else "Empty")
-	e_slot.text = "E\n%s" % (e.ability_name if e else "Empty")
-	passive_slot.text = "PASSIVE\nSaved passives next"
-
-
-func _item_slot_text(title: String, item: Item) -> String:
-	return "%s\n%s" % [title, item.item_name if item else "Empty"]
+	# Keep the project's known baseline values and preview the selected weapon's
+	# damage/fire-rate values in the build summary.
+	hp_stat.text = "♥  100\nMAX HP"
+	damage_stat.text = "⚔  %s\nDAMAGE" % weapon["damage"]
+	speed_stat.text = "♟  250\nSPEED"
+	fire_rate_stat.text = "➤  %s\nFIRE RATE" % weapon["fire_rate"]
+	dash_stat.text = "»  0.75s\nDASH CD"
 
 
-func _refresh_money() -> void:
-	coin_label.text = "●  %s\nPLUCK COINS" % _format_number(GameState.money)
+func _on_ability_slot_pressed(slot_name: String) -> void:
+	_select_view(BuildView.ABILITIES)
+	_show_message(
+		"%s ABILITY" % slot_name,
+		"This slot is ready to connect to the game's ability inventory/equip data."
+	)
 
 
-func _on_back_pressed() -> void:
-	get_tree().change_scene_to_file(MAIN_MENU_SCENE)
+func _on_trinket_pressed() -> void:
+	_show_message("TRINKET", "The trinket slot is currently empty.")
+
+
+func _on_money_changed(total: int) -> void:
+	coin_label.text = "●  %s\nPLUCK COINS" % _format_number(total)
+
+
+func _show_message(title_text: String, body: String) -> void:
+	var dialog := AcceptDialog.new()
+	dialog.title = title_text
+	dialog.dialog_text = body
+	dialog.unresizable = true
+	add_child(dialog)
+	dialog.popup_centered(Vector2i(560, 200))
+	dialog.confirmed.connect(dialog.queue_free)
+	dialog.canceled.connect(dialog.queue_free)
+
+
+func _title_case(value: String) -> String:
+	var words := value.to_lower().split(" ")
+	var result: Array[String] = []
+	for word in words:
+		result.append(word.capitalize())
+	return " ".join(result)
 
 
 func _format_number(value: int) -> String:
 	var text := str(maxi(value, 0))
 	var output := ""
 	var count := 0
+
 	for index in range(text.length() - 1, -1, -1):
 		if count == 3:
 			output = "," + output
 			count = 0
 		output = text[index] + output
 		count += 1
+
 	return output

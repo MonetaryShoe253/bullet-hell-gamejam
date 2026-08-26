@@ -1,841 +1,371 @@
-[gd_scene format=3 uid="uid://br2jewv6pc2xq"]
+[gd_scene load_steps=7 format=3]
 
-[ext_resource type="Script" path="res://scenes/UI/main_menu.gd" id="1_yonvy"]
-[ext_resource type="Texture2D" uid="uid://qqfo7v41jf36" path="res://assets/Player/mascot_hero.png" id="2_mascot"]
+[ext_resource type="Script" path="res://scenes/UI/main_menu.gd" id="1_script"]
+[ext_resource type="Texture2D" path="res://assets/Player/mascot_hero.png" id="2_hero"]
 
-[sub_resource type="StyleBoxFlat" id="StyleBG"]
-bg_color = Color(0.055, 0.018, 0.012, 1)
-
-[sub_resource type="StyleBoxFlat" id="ButtonPrimary"]
-bg_color = Color(0.95, 0.36, 0.025, 1)
-border_width_left = 3
-border_width_top = 3
-border_width_right = 3
-border_width_bottom = 3
-border_color = Color(1, 0.72, 0.18, 1)
-corner_radius_top_left = 8
-corner_radius_top_right = 8
-corner_radius_bottom_right = 8
-corner_radius_bottom_left = 8
-
-[sub_resource type="StyleBoxFlat" id="ButtonPressed"]
-bg_color = Color(0.75, 0.24, 0.025, 1)
+[sub_resource type="StyleBoxFlat" id="Panel"]
+bg_color = Color(0.055, 0.025, 0.018, 0.96)
 border_width_left = 2
 border_width_top = 2
 border_width_right = 2
 border_width_bottom = 2
-border_color = Color(1, 0.72, 0.18, 1)
-corner_radius_top_left = 6
-corner_radius_top_right = 6
-corner_radius_bottom_right = 6
-corner_radius_bottom_left = 6
-
-[sub_resource type="StyleBoxFlat" id="ButtonPrimaryHover"]
-bg_color = Color(1, 0.48, 0.04, 1)
-border_width_left = 3
-border_width_top = 3
-border_width_right = 3
-border_width_bottom = 3
-border_color = Color(1, 0.85, 0.35, 1)
-corner_radius_top_left = 8
-corner_radius_top_right = 8
-corner_radius_bottom_right = 8
-corner_radius_bottom_left = 8
-
-[sub_resource type="StyleBoxFlat" id="ButtonNormal"]
-content_margin_left = 18.0
-content_margin_right = 18.0
-bg_color = Color(0.13, 0.045, 0.03, 0.98)
-border_width_left = 2
-border_width_top = 2
-border_width_right = 2
-border_width_bottom = 2
-border_color = Color(0.55, 0.2, 0.06, 1)
-corner_radius_top_left = 6
-corner_radius_top_right = 6
-corner_radius_bottom_right = 6
-corner_radius_bottom_left = 6
-
-[sub_resource type="StyleBoxFlat" id="ButtonHover"]
-content_margin_left = 18.0
-content_margin_right = 18.0
-bg_color = Color(0.25, 0.075, 0.035, 1)
-border_width_left = 2
-border_width_top = 2
-border_width_right = 2
-border_width_bottom = 2
-border_color = Color(1, 0.55, 0.1, 1)
-corner_radius_top_left = 6
-corner_radius_top_right = 6
-corner_radius_bottom_right = 6
-corner_radius_bottom_left = 6
-
-[sub_resource type="StyleBoxFlat" id="StylePanelGold"]
-bg_color = Color(0.13, 0.045, 0.025, 0.96)
-border_width_left = 3
-border_width_top = 3
-border_width_right = 3
-border_width_bottom = 3
-border_color = Color(0.92, 0.42, 0.07, 1)
+border_color = Color(0.85, 0.31, 0.035, 1)
 corner_radius_top_left = 10
 corner_radius_top_right = 10
 corner_radius_bottom_right = 10
 corner_radius_bottom_left = 10
+content_margin_left = 14.0
+content_margin_top = 12.0
+content_margin_right = 14.0
+content_margin_bottom = 12.0
 
-[sub_resource type="StyleBoxFlat" id="StylePanel"]
-bg_color = Color(0.105, 0.035, 0.025, 0.94)
-border_width_left = 2
-border_width_top = 2
-border_width_right = 2
-border_width_bottom = 2
-border_color = Color(0.48, 0.18, 0.055, 1)
-corner_radius_top_left = 8
-corner_radius_top_right = 8
-corner_radius_bottom_right = 8
-corner_radius_bottom_left = 8
-
-[sub_resource type="StyleBoxFlat" id="BossCard"]
-bg_color = Color(0.09, 0.025, 0.022, 0.98)
-border_width_left = 2
-border_width_top = 2
-border_width_right = 2
-border_width_bottom = 2
-border_color = Color(0.58, 0.2, 0.055, 1)
+[sub_resource type="StyleBoxFlat" id="Slot"]
+bg_color = Color(0.035, 0.018, 0.014, 1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.55, 0.20, 0.035, 1)
 corner_radius_top_left = 7
 corner_radius_top_right = 7
 corner_radius_bottom_right = 7
 corner_radius_bottom_left = 7
 
-[sub_resource type="StyleBoxFlat" id="StatusRed"]
-bg_color = Color(0.42, 0.055, 0.035, 1)
-border_width_left = 2
-border_width_top = 2
-border_width_right = 2
-border_width_bottom = 2
-border_color = Color(0.78, 0.17, 0.07, 1)
-corner_radius_top_left = 4
-corner_radius_top_right = 4
-corner_radius_bottom_right = 4
-corner_radius_bottom_left = 4
+[sub_resource type="StyleBoxFlat" id="Start"]
+bg_color = Color(0.95, 0.25, 0.015, 1)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+border_color = Color(1, 0.70, 0.10, 1)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
 
-[sub_resource type="StyleBoxFlat" id="SlotStyle"]
-bg_color = Color(0.055, 0.018, 0.018, 1)
-border_width_left = 2
-border_width_top = 2
-border_width_right = 2
-border_width_bottom = 2
-border_color = Color(0.55, 0.2, 0.055, 1)
-corner_radius_top_left = 5
-corner_radius_top_right = 5
-corner_radius_bottom_right = 5
-corner_radius_bottom_left = 5
+[sub_resource type="StyleBoxFlat" id="Button"]
+bg_color = Color(0.10, 0.045, 0.025, 1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.48, 0.18, 0.035, 1)
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_right = 6
+corner_radius_bottom_left = 6
 
-[node name="MainMenu" type="CanvasLayer" unique_id=1156818058]
-script = ExtResource("1_yonvy")
+[sub_resource type="StyleBoxFlat" id="Footer"]
+bg_color = Color(0.035, 0.018, 0.014, 0.95)
+border_width_top = 1
+border_color = Color(0.50, 0.18, 0.03, 1)
+content_margin_top = 10.0
 
-[node name="Panel" type="Panel" parent="." unique_id=273112070]
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-theme_override_styles/panel = SubResource("StyleBG")
+[node name="MainMenu" type="CanvasLayer"]
+script = ExtResource("1_script")
 
-[node name="BackdropGlow" type="ColorRect" parent="Panel" unique_id=403491478]
-layout_mode = 0
-anchor_left = 0.25
-anchor_right = 0.75
-anchor_bottom = 1.0
-mouse_filter = 2
-color = Color(0.2, 0.055, 0.015, 0.18)
+[node name="Root" type="ColorRect" parent="."]
+offset_right = 1920.0
+offset_bottom = 1080.0
+color = Color(0.045, 0.015, 0.012, 1)
 
-[node name="Margin" type="MarginContainer" parent="Panel" unique_id=2018564454]
+[node name="Margin" type="MarginContainer" parent="Root"]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
-offset_left = 34.0
-offset_top = 28.0
-offset_right = -34.0
-offset_bottom = -28.0
+offset_left = 32.0
+offset_top = 24.0
+offset_right = -32.0
+offset_bottom = -24.0
 grow_horizontal = 2
 grow_vertical = 2
-theme_override_constants/margin_left = 10
-theme_override_constants/margin_top = 10
-theme_override_constants/margin_right = 10
-theme_override_constants/margin_bottom = 10
 
-[node name="MainLayout" type="HBoxContainer" parent="Panel/Margin" unique_id=550791016]
+[node name="VBox" type="VBoxContainer" parent="Root/Margin"]
 layout_mode = 2
-theme_override_constants/separation = 24
+theme_override_constants/separation = 14
 
-[node name="LeftColumn" type="VBoxContainer" parent="Panel/Margin/MainLayout" unique_id=1527630237]
-custom_minimum_size = Vector2(310, 0)
+[node name="Header" type="HBoxContainer" parent="Root/Margin/VBox"]
+custom_minimum_size = Vector2(0, 82)
+layout_mode = 2
+
+[node name="Title" type="VBoxContainer" parent="Root/Margin/VBox/Header"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="Game" type="Label" parent="Root/Margin/VBox/Header/Title"]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.53, 0.06, 1)
+theme_override_font_sizes/font_size = 38
+text = "WING RUSH"
+
+[node name="Subtitle" type="Label" parent="Root/Margin/VBox/Header/Title"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.88, 0.70, 0.48, 1)
+theme_override_font_sizes/font_size = 18
+text = "CHOOSE YOUR STARTING BUILD, THEN DESCEND"
+
+[node name="SettingsButton" type="Button" parent="Root/Margin/VBox/Header"]
+custom_minimum_size = Vector2(160, 56)
+layout_mode = 2
+theme_override_font_sizes/font_size = 19
+theme_override_styles/normal = SubResource("Button")
+text = "SETTINGS"
+
+[node name="Main" type="HBoxContainer" parent="Root/Margin/VBox"]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/separation = 14
+
+[node name="GearPanel" type="PanelContainer" parent="Root/Margin/VBox/Main"]
+custom_minimum_size = Vector2(430, 0)
+layout_mode = 2
+theme_override_styles/panel = SubResource("Panel")
+
+[node name="VBox" type="VBoxContainer" parent="Root/Margin/VBox/Main/GearPanel"]
 layout_mode = 2
 theme_override_constants/separation = 10
 
-[node name="LogoBlock" type="VBoxContainer" parent="Panel/Margin/MainLayout/LeftColumn" unique_id=1954062909]
-custom_minimum_size = Vector2(0, 190)
+[node name="Heading" type="Label" parent="Root/Margin/VBox/Main/GearPanel/VBox"]
 layout_mode = 2
-alignment = 1
+theme_override_colors/font_color = Color(1, 0.58, 0.08, 1)
+theme_override_font_sizes/font_size = 24
+text = "UNLOCKED GEAR"
 
-[node name="Wing" type="Label" parent="Panel/Margin/MainLayout/LeftColumn/LogoBlock" unique_id=389446829]
+[node name="Hint" type="Label" parent="Root/Margin/VBox/Main/GearPanel/VBox"]
 layout_mode = 2
-theme_override_colors/font_color = Color(1, 0.72, 0.16, 1)
-theme_override_colors/font_outline_color = Color(0.18, 0.025, 0.01, 1)
-theme_override_constants/outline_size = 8
-theme_override_font_sizes/font_size = 62
-text = "WING"
-horizontal_alignment = 1
+text = "Free starting equipment unlocked from previous runs."
+autowrap_mode = 2
 
-[node name="Rush" type="Label" parent="Panel/Margin/MainLayout/LeftColumn/LogoBlock" unique_id=513585545]
+[node name="Filters" type="HBoxContainer" parent="Root/Margin/VBox/Main/GearPanel/VBox"]
 layout_mode = 2
-theme_override_colors/font_color = Color(1, 0.4, 0.04, 1)
-theme_override_colors/font_outline_color = Color(0.18, 0.025, 0.01, 1)
-theme_override_constants/outline_size = 8
-theme_override_font_sizes/font_size = 62
-text = "RUSH"
-horizontal_alignment = 1
 
-[node name="StartRun" type="Button" parent="Panel/Margin/MainLayout/LeftColumn" unique_id=963899608]
-custom_minimum_size = Vector2(0, 62)
+[node name="Weapons" type="Button" parent="Root/Margin/VBox/Main/GearPanel/VBox/Filters"]
 layout_mode = 2
-theme_override_colors/font_color = Color(1, 0.95, 0.82, 1)
-theme_override_colors/font_outline_color = Color(0.25, 0.06, 0.01, 1)
-theme_override_constants/outline_size = 4
-theme_override_font_sizes/font_size = 25
-theme_override_styles/normal = SubResource("ButtonPrimary")
-theme_override_styles/pressed = SubResource("ButtonPressed")
-theme_override_styles/hover = SubResource("ButtonPrimaryHover")
-text = "▶   START RUN"
+size_flags_horizontal = 3
+text = "WEAPONS"
 
-[node name="ContinueButton" type="Button" parent="Panel/Margin/MainLayout/LeftColumn" unique_id=1620340677]
-custom_minimum_size = Vector2(0, 58)
+[node name="Armour" type="Button" parent="Root/Margin/VBox/Main/GearPanel/VBox/Filters"]
 layout_mode = 2
-theme_override_font_sizes/font_size = 22
-theme_override_styles/normal = SubResource("ButtonNormal")
-theme_override_styles/pressed = SubResource("ButtonPressed")
-theme_override_styles/hover = SubResource("ButtonHover")
-disabled = true
-text = "▶   CONTINUE"
+size_flags_horizontal = 3
+text = "ARMOUR"
 
-[node name="LoadoutButton" type="Button" parent="Panel/Margin/MainLayout/LeftColumn" unique_id=1860752474]
-custom_minimum_size = Vector2(0, 58)
+[node name="Accessories" type="Button" parent="Root/Margin/VBox/Main/GearPanel/VBox/Filters"]
 layout_mode = 2
-theme_override_font_sizes/font_size = 22
-theme_override_styles/normal = SubResource("ButtonNormal")
-theme_override_styles/pressed = SubResource("ButtonPressed")
-theme_override_styles/hover = SubResource("ButtonHover")
-text = "▣   LOADOUT"
+size_flags_horizontal = 3
+text = "ACCESSORY"
 
-[node name="AbilitiesButton" type="Button" parent="Panel/Margin/MainLayout/LeftColumn" unique_id=818968777]
-custom_minimum_size = Vector2(0, 58)
-layout_mode = 2
-theme_override_font_sizes/font_size = 22
-theme_override_styles/normal = SubResource("ButtonNormal")
-theme_override_styles/pressed = SubResource("ButtonPressed")
-theme_override_styles/hover = SubResource("ButtonHover")
-text = "✦   ABILITIES"
-
-[node name="StatsButton" type="Button" parent="Panel/Margin/MainLayout/LeftColumn" unique_id=1858280278]
-custom_minimum_size = Vector2(0, 58)
-layout_mode = 2
-theme_override_font_sizes/font_size = 22
-theme_override_styles/normal = SubResource("ButtonNormal")
-theme_override_styles/pressed = SubResource("ButtonPressed")
-theme_override_styles/hover = SubResource("ButtonHover")
-text = "▥   STATS"
-
-[node name="SettingsButton" type="Button" parent="Panel/Margin/MainLayout/LeftColumn" unique_id=506633764]
-custom_minimum_size = Vector2(0, 58)
-layout_mode = 2
-theme_override_font_sizes/font_size = 22
-theme_override_styles/normal = SubResource("ButtonNormal")
-theme_override_styles/pressed = SubResource("ButtonPressed")
-theme_override_styles/hover = SubResource("ButtonHover")
-text = "⚙   SETTINGS"
-
-[node name="ExitButton" type="Button" parent="Panel/Margin/MainLayout/LeftColumn" unique_id=1143627806]
-custom_minimum_size = Vector2(0, 58)
-layout_mode = 2
-theme_override_font_sizes/font_size = 22
-theme_override_styles/normal = SubResource("ButtonNormal")
-theme_override_styles/pressed = SubResource("ButtonPressed")
-theme_override_styles/hover = SubResource("ButtonHover")
-text = "↩   EXIT GAME"
-
-[node name="LeftSpacer" type="Control" parent="Panel/Margin/MainLayout/LeftColumn" unique_id=1859726115]
+[node name="Scroll" type="ScrollContainer" parent="Root/Margin/VBox/Main/GearPanel/VBox"]
 layout_mode = 2
 size_flags_vertical = 3
 
-[node name="CoinPanel" type="PanelContainer" parent="Panel/Margin/MainLayout/LeftColumn" unique_id=1225441159]
-custom_minimum_size = Vector2(0, 104)
-layout_mode = 2
-theme_override_styles/panel = SubResource("StylePanelGold")
-
-[node name="CoinVBox" type="VBoxContainer" parent="Panel/Margin/MainLayout/LeftColumn/CoinPanel" unique_id=253519606]
-layout_mode = 2
-alignment = 1
-
-[node name="CoinAmount" type="Label" parent="Panel/Margin/MainLayout/LeftColumn/CoinPanel/CoinVBox" unique_id=2028902602]
-layout_mode = 2
-theme_override_colors/font_color = Color(1, 0.84, 0.3, 1)
-theme_override_font_sizes/font_size = 34
-text = "●  0"
-horizontal_alignment = 1
-
-[node name="CoinCaption" type="Label" parent="Panel/Margin/MainLayout/LeftColumn/CoinPanel/CoinVBox" unique_id=459509875]
-layout_mode = 2
-theme_override_colors/font_color = Color(1, 0.55, 0.1, 1)
-theme_override_font_sizes/font_size = 17
-text = "PLUCK COINS"
-horizontal_alignment = 1
-
-[node name="VBox" type="VBoxContainer" parent="Panel/Margin/MainLayout" unique_id=1118958480]
+[node name="GearList" type="VBoxContainer" parent="Root/Margin/VBox/Main/GearPanel/VBox/Scroll"]
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_constants/separation = 8
+
+[node name="Center" type="VBoxContainer" parent="Root/Margin/VBox/Main"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 12
+
+[node name="CharacterPanel" type="PanelContainer" parent="Root/Margin/VBox/Main/Center"]
+custom_minimum_size = Vector2(0, 250)
+layout_mode = 2
+theme_override_styles/panel = SubResource("Panel")
+
+[node name="VBox" type="VBoxContainer" parent="Root/Margin/VBox/Main/Center/CharacterPanel"]
+layout_mode = 2
 alignment = 1
 
-[node name="CharacterTitle" type="Label" parent="Panel/Margin/MainLayout/VBox" unique_id=1633636134]
+[node name="Label" type="Label" parent="Root/Margin/VBox/Main/Center/CharacterPanel/VBox"]
 layout_mode = 2
-theme_override_colors/font_color = Color(1, 0.72, 0.18, 1)
-theme_override_colors/font_outline_color = Color(0.12, 0.02, 0.01, 1)
-theme_override_constants/outline_size = 5
-theme_override_font_sizes/font_size = 25
+theme_override_colors/font_color = Color(1, 0.60, 0.10, 1)
+theme_override_font_sizes/font_size = 22
 text = "YOUR CHICKEN"
 horizontal_alignment = 1
 
-[node name="LevelLabel" type="Label" parent="Panel/Margin/MainLayout/VBox" unique_id=960274594]
+[node name="Character" type="TextureRect" parent="Root/Margin/VBox/Main/Center/CharacterPanel/VBox"]
+custom_minimum_size = Vector2(0, 185)
 layout_mode = 2
-theme_override_font_sizes/font_size = 31
-text = "LEVEL 1"
-horizontal_alignment = 1
-
-[node name="CharacterStage" type="PanelContainer" parent="Panel/Margin/MainLayout/VBox" unique_id=522593717]
-custom_minimum_size = Vector2(0, 255)
-layout_mode = 2
-theme_override_styles/panel = SubResource("StylePanel")
-
-[node name="StageCenter" type="CenterContainer" parent="Panel/Margin/MainLayout/VBox/CharacterStage" unique_id=1065600697]
-layout_mode = 2
-
-[node name="Mascot" type="TextureRect" parent="Panel/Margin/MainLayout/VBox/CharacterStage/StageCenter" unique_id=853475420]
-custom_minimum_size = Vector2(245, 230)
-layout_mode = 2
-texture = ExtResource("2_mascot")
-expand_mode = 3
+texture = ExtResource("2_hero")
+expand_mode = 1
 stretch_mode = 5
 
-[node name="CenterCoin" type="Label" parent="Panel/Margin/MainLayout/VBox" unique_id=1625664183]
+[node name="Loadout" type="VBoxContainer" parent="Root/Margin/VBox/Main/Center"]
 layout_mode = 2
-theme_override_colors/font_color = Color(1, 0.82, 0.24, 1)
+theme_override_constants/separation = 8
+
+[node name="GearSlots" type="HBoxContainer" parent="Root/Margin/VBox/Main/Center/Loadout"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="Weapon" type="Button" parent="Root/Margin/VBox/Main/Center/Loadout/GearSlots"]
+custom_minimum_size = Vector2(0, 92)
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_styles/normal = SubResource("Slot")
+text = "WEAPON\nEmpty"
+
+[node name="Armour" type="Button" parent="Root/Margin/VBox/Main/Center/Loadout/GearSlots"]
+custom_minimum_size = Vector2(0, 92)
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_styles/normal = SubResource("Slot")
+text = "ARMOUR\nEmpty"
+
+[node name="Accessory" type="Button" parent="Root/Margin/VBox/Main/Center/Loadout/GearSlots"]
+custom_minimum_size = Vector2(0, 92)
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_styles/normal = SubResource("Slot")
+text = "ACCESSORY\nEmpty"
+
+[node name="AbilitySlots" type="HBoxContainer" parent="Root/Margin/VBox/Main/Center/Loadout"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="Q" type="Button" parent="Root/Margin/VBox/Main/Center/Loadout/AbilitySlots"]
+custom_minimum_size = Vector2(0, 92)
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_styles/normal = SubResource("Slot")
+text = "Q\nEmpty"
+
+[node name="E" type="Button" parent="Root/Margin/VBox/Main/Center/Loadout/AbilitySlots"]
+custom_minimum_size = Vector2(0, 92)
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_styles/normal = SubResource("Slot")
+text = "E\nEmpty"
+
+[node name="Passive1" type="Button" parent="Root/Margin/VBox/Main/Center/Loadout/AbilitySlots"]
+custom_minimum_size = Vector2(0, 92)
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_styles/normal = SubResource("Slot")
+text = "PASSIVE 1\nEmpty"
+
+[node name="Passive2" type="Button" parent="Root/Margin/VBox/Main/Center/Loadout/AbilitySlots"]
+custom_minimum_size = Vector2(0, 92)
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_styles/normal = SubResource("Slot")
+text = "PASSIVE 2\nEmpty"
+
+[node name="StartRun" type="Button" parent="Root/Margin/VBox/Main/Center"]
+custom_minimum_size = Vector2(0, 78)
+layout_mode = 2
 theme_override_font_sizes/font_size = 28
-text = "●  0  PLUCK COINS"
-horizontal_alignment = 1
+theme_override_styles/normal = SubResource("Start")
+text = "START RUN  ▶"
 
-[node name="PlayButton" type="Button" parent="Panel/Margin/MainLayout/VBox" unique_id=573197761]
-custom_minimum_size = Vector2(0, 72)
+[node name="AbilityPanel" type="PanelContainer" parent="Root/Margin/VBox/Main"]
+custom_minimum_size = Vector2(430, 0)
 layout_mode = 2
-theme_override_colors/font_color = Color(1, 0.96, 0.85, 1)
-theme_override_colors/font_outline_color = Color(0.28, 0.055, 0.005, 1)
-theme_override_constants/outline_size = 5
-theme_override_font_sizes/font_size = 31
-theme_override_styles/normal = SubResource("ButtonPrimary")
-theme_override_styles/pressed = SubResource("ButtonPressed")
-theme_override_styles/hover = SubResource("ButtonPrimaryHover")
-text = "START RUN   ▶"
+theme_override_styles/panel = SubResource("Panel")
 
-[node name="GauntletTitle" type="Label" parent="Panel/Margin/MainLayout/VBox" unique_id=439117432]
+[node name="VBox" type="VBoxContainer" parent="Root/Margin/VBox/Main/AbilityPanel"]
 layout_mode = 2
-theme_override_colors/font_color = Color(1, 0.66, 0.12, 1)
-theme_override_colors/font_outline_color = Color(0.1, 0.015, 0.005, 1)
-theme_override_constants/outline_size = 5
-theme_override_font_sizes/font_size = 25
-text = "—  THE DEEP-FRY GAUNTLET  —"
-horizontal_alignment = 1
+theme_override_constants/separation = 8
 
-[node name="BossRow" type="HBoxContainer" parent="Panel/Margin/MainLayout/VBox" unique_id=20749366]
-custom_minimum_size = Vector2(0, 282)
+[node name="Heading" type="Label" parent="Root/Margin/VBox/Main/AbilityPanel/VBox"]
 layout_mode = 2
-theme_override_constants/separation = 12
-alignment = 1
-
-[node name="PizzaCard" type="PanelContainer" parent="Panel/Margin/MainLayout/VBox/BossRow" unique_id=1701395772]
-custom_minimum_size = Vector2(165, 270)
-layout_mode = 2
-size_flags_horizontal = 3
-theme_override_styles/panel = SubResource("BossCard")
-
-[node name="VBox" type="VBoxContainer" parent="Panel/Margin/MainLayout/VBox/BossRow/PizzaCard" unique_id=1769643745]
-layout_mode = 2
-theme_override_constants/separation = 5
-
-[node name="BossNumber" type="Label" parent="Panel/Margin/MainLayout/VBox/BossRow/PizzaCard/VBox" unique_id=1669105024]
-layout_mode = 2
-theme_override_colors/font_color = Color(1, 0.68, 0.18, 1)
-theme_override_font_sizes/font_size = 17
-text = "BOSS I"
-horizontal_alignment = 1
-
-[node name="Portrait" type="CenterContainer" parent="Panel/Margin/MainLayout/VBox/BossRow/PizzaCard/VBox" unique_id=899362006]
-custom_minimum_size = Vector2(0, 135)
-layout_mode = 2
-
-[node name="Silhouette" type="Label" parent="Panel/Margin/MainLayout/VBox/BossRow/PizzaCard/VBox/Portrait" unique_id=1599990056]
-layout_mode = 2
-theme_override_colors/font_color = Color(0.03, 0.01, 0.01, 1)
-theme_override_colors/font_outline_color = Color(0.45, 0.12, 0.04, 1)
-theme_override_constants/outline_size = 6
-theme_override_font_sizes/font_size = 64
-text = "▲"
-horizontal_alignment = 1
-vertical_alignment = 1
-
-[node name="Name" type="Label" parent="Panel/Margin/MainLayout/VBox/BossRow/PizzaCard/VBox" unique_id=1544612473]
-layout_mode = 2
-theme_override_font_sizes/font_size = 18
-text = "??????"
-horizontal_alignment = 1
-
-[node name="Status" type="PanelContainer" parent="Panel/Margin/MainLayout/VBox/BossRow/PizzaCard/VBox" unique_id=2044526273]
-layout_mode = 2
-theme_override_styles/panel = SubResource("StatusRed")
-
-[node name="Label" type="Label" parent="Panel/Margin/MainLayout/VBox/BossRow/PizzaCard/VBox/Status" unique_id=706308339]
-layout_mode = 2
-theme_override_font_sizes/font_size = 14
-text = "UNDEFEATED"
-horizontal_alignment = 1
-
-[node name="Best" type="Label" parent="Panel/Margin/MainLayout/VBox/BossRow/PizzaCard/VBox" unique_id=1585669812]
-layout_mode = 2
-theme_override_colors/font_color = Color(0.75, 0.68, 0.6, 1)
-text = "Best Time
---:--"
-horizontal_alignment = 1
-
-[node name="BurgerCard" type="PanelContainer" parent="Panel/Margin/MainLayout/VBox/BossRow" unique_id=998200989]
-custom_minimum_size = Vector2(165, 270)
-layout_mode = 2
-size_flags_horizontal = 3
-theme_override_styles/panel = SubResource("BossCard")
-
-[node name="VBox" type="VBoxContainer" parent="Panel/Margin/MainLayout/VBox/BossRow/BurgerCard" unique_id=1789738779]
-layout_mode = 2
-theme_override_constants/separation = 5
-
-[node name="BossNumber" type="Label" parent="Panel/Margin/MainLayout/VBox/BossRow/BurgerCard/VBox" unique_id=1870576032]
-layout_mode = 2
-theme_override_colors/font_color = Color(1, 0.68, 0.18, 1)
-theme_override_font_sizes/font_size = 17
-text = "BOSS II"
-horizontal_alignment = 1
-
-[node name="Portrait" type="CenterContainer" parent="Panel/Margin/MainLayout/VBox/BossRow/BurgerCard/VBox" unique_id=282325213]
-custom_minimum_size = Vector2(0, 135)
-layout_mode = 2
-
-[node name="Silhouette" type="Label" parent="Panel/Margin/MainLayout/VBox/BossRow/BurgerCard/VBox/Portrait" unique_id=1974502231]
-layout_mode = 2
-theme_override_colors/font_color = Color(0.03, 0.01, 0.01, 1)
-theme_override_colors/font_outline_color = Color(0.45, 0.12, 0.04, 1)
-theme_override_constants/outline_size = 6
-theme_override_font_sizes/font_size = 64
-text = "●"
-horizontal_alignment = 1
-vertical_alignment = 1
-
-[node name="Name" type="Label" parent="Panel/Margin/MainLayout/VBox/BossRow/BurgerCard/VBox" unique_id=2064538218]
-layout_mode = 2
-theme_override_font_sizes/font_size = 18
-text = "??????"
-horizontal_alignment = 1
-
-[node name="Status" type="PanelContainer" parent="Panel/Margin/MainLayout/VBox/BossRow/BurgerCard/VBox" unique_id=527474636]
-layout_mode = 2
-theme_override_styles/panel = SubResource("StatusRed")
-
-[node name="Label" type="Label" parent="Panel/Margin/MainLayout/VBox/BossRow/BurgerCard/VBox/Status" unique_id=1312166876]
-layout_mode = 2
-theme_override_font_sizes/font_size = 14
-text = "UNDEFEATED"
-horizontal_alignment = 1
-
-[node name="Best" type="Label" parent="Panel/Margin/MainLayout/VBox/BossRow/BurgerCard/VBox" unique_id=1730632272]
-layout_mode = 2
-theme_override_colors/font_color = Color(0.75, 0.68, 0.6, 1)
-text = "Best Time
---:--"
-horizontal_alignment = 1
-
-[node name="TacoCard" type="PanelContainer" parent="Panel/Margin/MainLayout/VBox/BossRow" unique_id=1195836042]
-custom_minimum_size = Vector2(165, 270)
-layout_mode = 2
-size_flags_horizontal = 3
-theme_override_styles/panel = SubResource("BossCard")
-
-[node name="VBox" type="VBoxContainer" parent="Panel/Margin/MainLayout/VBox/BossRow/TacoCard" unique_id=668657]
-layout_mode = 2
-theme_override_constants/separation = 5
-
-[node name="BossNumber" type="Label" parent="Panel/Margin/MainLayout/VBox/BossRow/TacoCard/VBox" unique_id=298925539]
-layout_mode = 2
-theme_override_colors/font_color = Color(1, 0.68, 0.18, 1)
-theme_override_font_sizes/font_size = 17
-text = "BOSS III"
-horizontal_alignment = 1
-
-[node name="Portrait" type="CenterContainer" parent="Panel/Margin/MainLayout/VBox/BossRow/TacoCard/VBox" unique_id=628034844]
-custom_minimum_size = Vector2(0, 135)
-layout_mode = 2
-
-[node name="Silhouette" type="Label" parent="Panel/Margin/MainLayout/VBox/BossRow/TacoCard/VBox/Portrait" unique_id=1756884026]
-layout_mode = 2
-theme_override_colors/font_color = Color(0.03, 0.01, 0.01, 1)
-theme_override_colors/font_outline_color = Color(0.45, 0.12, 0.04, 1)
-theme_override_constants/outline_size = 6
-theme_override_font_sizes/font_size = 64
-text = "◢"
-horizontal_alignment = 1
-vertical_alignment = 1
-
-[node name="Name" type="Label" parent="Panel/Margin/MainLayout/VBox/BossRow/TacoCard/VBox" unique_id=1437170552]
-layout_mode = 2
-theme_override_font_sizes/font_size = 18
-text = "??????"
-horizontal_alignment = 1
-
-[node name="Status" type="PanelContainer" parent="Panel/Margin/MainLayout/VBox/BossRow/TacoCard/VBox" unique_id=2135249725]
-layout_mode = 2
-theme_override_styles/panel = SubResource("StatusRed")
-
-[node name="Label" type="Label" parent="Panel/Margin/MainLayout/VBox/BossRow/TacoCard/VBox/Status" unique_id=680309403]
-layout_mode = 2
-theme_override_font_sizes/font_size = 14
-text = "UNDEFEATED"
-horizontal_alignment = 1
-
-[node name="Best" type="Label" parent="Panel/Margin/MainLayout/VBox/BossRow/TacoCard/VBox" unique_id=1266572976]
-layout_mode = 2
-theme_override_colors/font_color = Color(0.75, 0.68, 0.6, 1)
-text = "Best Time
---:--"
-horizontal_alignment = 1
-
-[node name="PepperCard" type="PanelContainer" parent="Panel/Margin/MainLayout/VBox/BossRow" unique_id=773322252]
-custom_minimum_size = Vector2(165, 270)
-layout_mode = 2
-size_flags_horizontal = 3
-theme_override_styles/panel = SubResource("BossCard")
-
-[node name="VBox" type="VBoxContainer" parent="Panel/Margin/MainLayout/VBox/BossRow/PepperCard" unique_id=336432045]
-layout_mode = 2
-theme_override_constants/separation = 5
-
-[node name="BossNumber" type="Label" parent="Panel/Margin/MainLayout/VBox/BossRow/PepperCard/VBox" unique_id=41353395]
-layout_mode = 2
-theme_override_colors/font_color = Color(1, 0.68, 0.18, 1)
-theme_override_font_sizes/font_size = 17
-text = "BOSS IV"
-horizontal_alignment = 1
-
-[node name="Portrait" type="CenterContainer" parent="Panel/Margin/MainLayout/VBox/BossRow/PepperCard/VBox" unique_id=990662910]
-custom_minimum_size = Vector2(0, 135)
-layout_mode = 2
-
-[node name="Silhouette" type="Label" parent="Panel/Margin/MainLayout/VBox/BossRow/PepperCard/VBox/Portrait" unique_id=1326511052]
-layout_mode = 2
-theme_override_colors/font_color = Color(0.03, 0.01, 0.01, 1)
-theme_override_colors/font_outline_color = Color(0.45, 0.12, 0.04, 1)
-theme_override_constants/outline_size = 6
-theme_override_font_sizes/font_size = 64
-text = "♠"
-horizontal_alignment = 1
-vertical_alignment = 1
-
-[node name="Name" type="Label" parent="Panel/Margin/MainLayout/VBox/BossRow/PepperCard/VBox" unique_id=1309041911]
-layout_mode = 2
-theme_override_font_sizes/font_size = 18
-text = "??????"
-horizontal_alignment = 1
-
-[node name="Status" type="PanelContainer" parent="Panel/Margin/MainLayout/VBox/BossRow/PepperCard/VBox" unique_id=1923957597]
-layout_mode = 2
-theme_override_styles/panel = SubResource("StatusRed")
-
-[node name="Label" type="Label" parent="Panel/Margin/MainLayout/VBox/BossRow/PepperCard/VBox/Status" unique_id=832088710]
-layout_mode = 2
-theme_override_font_sizes/font_size = 14
-text = "UNDEFEATED"
-horizontal_alignment = 1
-
-[node name="Best" type="Label" parent="Panel/Margin/MainLayout/VBox/BossRow/PepperCard/VBox" unique_id=928698840]
-layout_mode = 2
-theme_override_colors/font_color = Color(0.75, 0.68, 0.6, 1)
-text = "Best Time
---:--"
-horizontal_alignment = 1
-
-[node name="Progress" type="HBoxContainer" parent="Panel/Margin/MainLayout/VBox" unique_id=12556878]
-custom_minimum_size = Vector2(0, 28)
-layout_mode = 2
-theme_override_constants/separation = 0
-alignment = 1
-
-[node name="Dot1" type="Label" parent="Panel/Margin/MainLayout/VBox/Progress" unique_id=1987363120]
-custom_minimum_size = Vector2(34, 0)
-layout_mode = 2
-theme_override_colors/font_color = Color(0.95, 0.48, 0.05, 1)
+theme_override_colors/font_color = Color(1, 0.58, 0.08, 1)
 theme_override_font_sizes/font_size = 24
-text = "●"
-horizontal_alignment = 1
+text = "UNLOCKED ABILITIES"
 
-[node name="Line1" type="HSeparator" parent="Panel/Margin/MainLayout/VBox/Progress" unique_id=920641042]
+[node name="Hint" type="Label" parent="Root/Margin/VBox/Main/AbilityPanel/VBox"]
 layout_mode = 2
-size_flags_horizontal = 3
-theme_override_constants/separation = 4
+text = "Click Q/E or a passive slot, then choose an unlocked ability."
+autowrap_mode = 2
 
-[node name="Dot2" type="Label" parent="Panel/Margin/MainLayout/VBox/Progress" unique_id=2065959663]
-custom_minimum_size = Vector2(34, 0)
+[node name="ActiveLabel" type="Label" parent="Root/Margin/VBox/Main/AbilityPanel/VBox"]
 layout_mode = 2
-theme_override_colors/font_color = Color(0.3, 0.27, 0.28, 1)
-theme_override_font_sizes/font_size = 24
-text = "○"
-horizontal_alignment = 1
+theme_override_colors/font_color = Color(0.92, 0.72, 0.42, 1)
+text = "ACTIVE"
 
-[node name="Line2" type="HSeparator" parent="Panel/Margin/MainLayout/VBox/Progress" unique_id=608798168]
-layout_mode = 2
-size_flags_horizontal = 3
-theme_override_constants/separation = 4
-
-[node name="Dot3" type="Label" parent="Panel/Margin/MainLayout/VBox/Progress" unique_id=2083078419]
-custom_minimum_size = Vector2(34, 0)
-layout_mode = 2
-theme_override_colors/font_color = Color(0.3, 0.27, 0.28, 1)
-theme_override_font_sizes/font_size = 24
-text = "○"
-horizontal_alignment = 1
-
-[node name="Line3" type="HSeparator" parent="Panel/Margin/MainLayout/VBox/Progress" unique_id=1359673834]
-layout_mode = 2
-size_flags_horizontal = 3
-theme_override_constants/separation = 4
-
-[node name="Dot4" type="Label" parent="Panel/Margin/MainLayout/VBox/Progress" unique_id=1295275686]
-custom_minimum_size = Vector2(34, 0)
-layout_mode = 2
-theme_override_colors/font_color = Color(0.3, 0.27, 0.28, 1)
-theme_override_font_sizes/font_size = 24
-text = "○"
-horizontal_alignment = 1
-
-[node name="BottomNav" type="HBoxContainer" parent="Panel/Margin/MainLayout/VBox" unique_id=131657491]
-layout_mode = 2
-theme_override_constants/separation = 12
-
-[node name="Loadout" type="Button" parent="Panel/Margin/MainLayout/VBox/BottomNav" unique_id=1833891426]
-custom_minimum_size = Vector2(0, 54)
-layout_mode = 2
-size_flags_horizontal = 3
-theme_override_font_sizes/font_size = 19
-theme_override_styles/normal = SubResource("ButtonNormal")
-theme_override_styles/hover = SubResource("ButtonHover")
-text = "▣  LOADOUT"
-
-[node name="Abilities" type="Button" parent="Panel/Margin/MainLayout/VBox/BottomNav" unique_id=1367725166]
-custom_minimum_size = Vector2(0, 54)
-layout_mode = 2
-size_flags_horizontal = 3
-theme_override_font_sizes/font_size = 19
-theme_override_styles/normal = SubResource("ButtonNormal")
-theme_override_styles/hover = SubResource("ButtonHover")
-text = "✦  ABILITIES"
-
-[node name="Stats" type="Button" parent="Panel/Margin/MainLayout/VBox/BottomNav" unique_id=288971000]
-custom_minimum_size = Vector2(0, 54)
-layout_mode = 2
-size_flags_horizontal = 3
-theme_override_font_sizes/font_size = 19
-theme_override_styles/normal = SubResource("ButtonNormal")
-theme_override_styles/hover = SubResource("ButtonHover")
-text = "▥  STATS"
-
-[node name="RightColumn" type="VBoxContainer" parent="Panel/Margin/MainLayout" unique_id=1321415910]
-custom_minimum_size = Vector2(405, 0)
-layout_mode = 2
-theme_override_constants/separation = 18
-
-[node name="StatsPanel" type="PanelContainer" parent="Panel/Margin/MainLayout/RightColumn" unique_id=952178094]
-custom_minimum_size = Vector2(0, 245)
-layout_mode = 2
-theme_override_styles/panel = SubResource("StylePanelGold")
-
-[node name="StatsVBox" type="VBoxContainer" parent="Panel/Margin/MainLayout/RightColumn/StatsPanel" unique_id=1133387363]
-layout_mode = 2
-theme_override_constants/separation = 7
-
-[node name="Title" type="Label" parent="Panel/Margin/MainLayout/RightColumn/StatsPanel/StatsVBox" unique_id=1179765370]
-layout_mode = 2
-theme_override_colors/font_color = Color(1, 0.68, 0.16, 1)
-theme_override_font_sizes/font_size = 21
-text = "CHICKEN STATS"
-horizontal_alignment = 1
-
-[node name="Health" type="Label" parent="Panel/Margin/MainLayout/RightColumn/StatsPanel/StatsVBox" unique_id=2084450674]
-layout_mode = 2
-theme_override_font_sizes/font_size = 18
-text = "♥  HEALTH                                      100 / 100"
-
-[node name="Damage" type="Label" parent="Panel/Margin/MainLayout/RightColumn/StatsPanel/StatsVBox" unique_id=1594861600]
-layout_mode = 2
-theme_override_font_sizes/font_size = 18
-text = "⚔  DAMAGE                                             5.0"
-
-[node name="Speed" type="Label" parent="Panel/Margin/MainLayout/RightColumn/StatsPanel/StatsVBox" unique_id=414282631]
-layout_mode = 2
-theme_override_font_sizes/font_size = 18
-text = "»  SPEED                                                250"
-
-[node name="FireRate" type="Label" parent="Panel/Margin/MainLayout/RightColumn/StatsPanel/StatsVBox" unique_id=694527410]
-layout_mode = 2
-theme_override_font_sizes/font_size = 18
-text = "◷  FIRE RATE                                         0.30s"
-
-[node name="Dash" type="Label" parent="Panel/Margin/MainLayout/RightColumn/StatsPanel/StatsVBox" unique_id=1633178976]
-layout_mode = 2
-theme_override_font_sizes/font_size = 18
-text = "↯  DASH COOLDOWN                               0.75s"
-
-[node name="LoadoutPanel" type="PanelContainer" parent="Panel/Margin/MainLayout/RightColumn" unique_id=1737231135]
-custom_minimum_size = Vector2(0, 315)
-layout_mode = 2
-theme_override_styles/panel = SubResource("StylePanelGold")
-
-[node name="VBox" type="VBoxContainer" parent="Panel/Margin/MainLayout/RightColumn/LoadoutPanel" unique_id=1891568912]
-layout_mode = 2
-theme_override_constants/separation = 12
-
-[node name="Title" type="Label" parent="Panel/Margin/MainLayout/RightColumn/LoadoutPanel/VBox" unique_id=258603814]
-layout_mode = 2
-theme_override_colors/font_color = Color(1, 0.68, 0.16, 1)
-theme_override_font_sizes/font_size = 22
-text = "CURRENT LOADOUT"
-horizontal_alignment = 1
-
-[node name="Slots" type="HBoxContainer" parent="Panel/Margin/MainLayout/RightColumn/LoadoutPanel/VBox" unique_id=1206564977]
-layout_mode = 2
-theme_override_constants/separation = 10
-
-[node name="Weapon" type="VBoxContainer" parent="Panel/Margin/MainLayout/RightColumn/LoadoutPanel/VBox/Slots" unique_id=1833159563]
-layout_mode = 2
-size_flags_horizontal = 3
-
-[node name="Label" type="Label" parent="Panel/Margin/MainLayout/RightColumn/LoadoutPanel/VBox/Slots/Weapon" unique_id=47110208]
-layout_mode = 2
-text = "WEAPON"
-horizontal_alignment = 1
-
-[node name="Slot" type="PanelContainer" parent="Panel/Margin/MainLayout/RightColumn/LoadoutPanel/VBox/Slots/Weapon" unique_id=1340302292]
-custom_minimum_size = Vector2(0, 145)
-layout_mode = 2
-theme_override_styles/panel = SubResource("SlotStyle")
-
-[node name="Empty" type="Label" parent="Panel/Margin/MainLayout/RightColumn/LoadoutPanel/VBox/Slots/Weapon/Slot" unique_id=911282929]
-layout_mode = 2
-theme_override_colors/font_color = Color(0.65, 0.48, 0.38, 1)
-theme_override_font_sizes/font_size = 42
-text = "+"
-horizontal_alignment = 1
-vertical_alignment = 1
-
-[node name="Armour" type="VBoxContainer" parent="Panel/Margin/MainLayout/RightColumn/LoadoutPanel/VBox/Slots" unique_id=975258992]
-layout_mode = 2
-size_flags_horizontal = 3
-
-[node name="Label" type="Label" parent="Panel/Margin/MainLayout/RightColumn/LoadoutPanel/VBox/Slots/Armour" unique_id=412725694]
-layout_mode = 2
-text = "ARMOUR"
-horizontal_alignment = 1
-
-[node name="Slot" type="PanelContainer" parent="Panel/Margin/MainLayout/RightColumn/LoadoutPanel/VBox/Slots/Armour" unique_id=1554177775]
-custom_minimum_size = Vector2(0, 145)
-layout_mode = 2
-theme_override_styles/panel = SubResource("SlotStyle")
-
-[node name="Empty" type="Label" parent="Panel/Margin/MainLayout/RightColumn/LoadoutPanel/VBox/Slots/Armour/Slot" unique_id=1913471355]
-layout_mode = 2
-theme_override_colors/font_color = Color(0.65, 0.48, 0.38, 1)
-theme_override_font_sizes/font_size = 42
-text = "+"
-horizontal_alignment = 1
-vertical_alignment = 1
-
-[node name="Accessory" type="VBoxContainer" parent="Panel/Margin/MainLayout/RightColumn/LoadoutPanel/VBox/Slots" unique_id=906514624]
-layout_mode = 2
-size_flags_horizontal = 3
-
-[node name="Label" type="Label" parent="Panel/Margin/MainLayout/RightColumn/LoadoutPanel/VBox/Slots/Accessory" unique_id=699634883]
-layout_mode = 2
-text = "ACCESSORY"
-horizontal_alignment = 1
-
-[node name="Slot" type="PanelContainer" parent="Panel/Margin/MainLayout/RightColumn/LoadoutPanel/VBox/Slots/Accessory" unique_id=755499784]
-custom_minimum_size = Vector2(0, 145)
-layout_mode = 2
-theme_override_styles/panel = SubResource("SlotStyle")
-
-[node name="Empty" type="Label" parent="Panel/Margin/MainLayout/RightColumn/LoadoutPanel/VBox/Slots/Accessory/Slot" unique_id=729104174]
-layout_mode = 2
-theme_override_colors/font_color = Color(0.65, 0.48, 0.38, 1)
-theme_override_font_sizes/font_size = 42
-text = "+"
-horizontal_alignment = 1
-vertical_alignment = 1
-
-[node name="LoadoutHint" type="Label" parent="Panel/Margin/MainLayout/RightColumn/LoadoutPanel/VBox" unique_id=1418936922]
-layout_mode = 2
-theme_override_colors/font_color = Color(0.72, 0.58, 0.48, 1)
-text = "Equipment from your runs appears here."
-horizontal_alignment = 1
-
-[node name="RunStatsPanel" type="PanelContainer" parent="Panel/Margin/MainLayout/RightColumn" unique_id=1122357723]
+[node name="ActiveScroll" type="ScrollContainer" parent="Root/Margin/VBox/Main/AbilityPanel/VBox"]
 layout_mode = 2
 size_flags_vertical = 3
-theme_override_styles/panel = SubResource("StylePanel")
 
-[node name="VBox" type="VBoxContainer" parent="Panel/Margin/MainLayout/RightColumn/RunStatsPanel" unique_id=375263020]
+[node name="ActiveList" type="VBoxContainer" parent="Root/Margin/VBox/Main/AbilityPanel/VBox/ActiveScroll"]
 layout_mode = 2
-theme_override_constants/separation = 12
+size_flags_horizontal = 3
+theme_override_constants/separation = 8
 
-[node name="Title" type="Label" parent="Panel/Margin/MainLayout/RightColumn/RunStatsPanel/VBox" unique_id=672587999]
+[node name="PassiveLabel" type="Label" parent="Root/Margin/VBox/Main/AbilityPanel/VBox"]
 layout_mode = 2
-theme_override_colors/font_color = Color(1, 0.68, 0.16, 1)
-theme_override_font_sizes/font_size = 22
-text = "RUN STATS"
+theme_override_colors/font_color = Color(0.92, 0.72, 0.42, 1)
+text = "PASSIVE"
+
+[node name="PassiveScroll" type="ScrollContainer" parent="Root/Margin/VBox/Main/AbilityPanel/VBox"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="PassiveList" type="VBoxContainer" parent="Root/Margin/VBox/Main/AbilityPanel/VBox/PassiveScroll"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 8
+
+[node name="BossFooter" type="PanelContainer" parent="Root/Margin/VBox"]
+custom_minimum_size = Vector2(0, 150)
+layout_mode = 2
+theme_override_styles/panel = SubResource("Footer")
+
+[node name="BossRow" type="HBoxContainer" parent="Root/Margin/VBox/BossFooter"]
+layout_mode = 2
+alignment = 1
+theme_override_constants/separation = 50
+
+[node name="Pizza" type="VBoxContainer" parent="Root/Margin/VBox/BossFooter/BossRow"]
+custom_minimum_size = Vector2(170, 0)
+layout_mode = 2
+[node name="Icon" type="TextureRect" parent="Root/Margin/VBox/BossFooter/BossRow/Pizza"]
+custom_minimum_size = Vector2(0, 90)
+layout_mode = 2
+expand_mode = 1
+stretch_mode = 5
+[node name="Name" type="Label" parent="Root/Margin/VBox/BossFooter/BossRow/Pizza"]
+layout_mode = 2
+text = "??????"
 horizontal_alignment = 1
 
-[node name="Deepest" type="Label" parent="Panel/Margin/MainLayout/RightColumn/RunStatsPanel/VBox" unique_id=1952809612]
+[node name="Burger" type="VBoxContainer" parent="Root/Margin/VBox/BossFooter/BossRow"]
+custom_minimum_size = Vector2(170, 0)
 layout_mode = 2
-theme_override_font_sizes/font_size = 18
-text = "Deepest Level                                      1"
+[node name="Icon" type="TextureRect" parent="Root/Margin/VBox/BossFooter/BossRow/Burger"]
+custom_minimum_size = Vector2(0, 90)
+layout_mode = 2
+expand_mode = 1
+stretch_mode = 5
+[node name="Name" type="Label" parent="Root/Margin/VBox/BossFooter/BossRow/Burger"]
+layout_mode = 2
+text = "??????"
+horizontal_alignment = 1
 
-[node name="Runs" type="Label" parent="Panel/Margin/MainLayout/RightColumn/RunStatsPanel/VBox" unique_id=590364624]
+[node name="Taco" type="VBoxContainer" parent="Root/Margin/VBox/BossFooter/BossRow"]
+custom_minimum_size = Vector2(170, 0)
 layout_mode = 2
-theme_override_font_sizes/font_size = 18
-text = "Total Runs                                          0"
+[node name="Icon" type="TextureRect" parent="Root/Margin/VBox/BossFooter/BossRow/Taco"]
+custom_minimum_size = Vector2(0, 90)
+layout_mode = 2
+expand_mode = 1
+stretch_mode = 5
+[node name="Name" type="Label" parent="Root/Margin/VBox/BossFooter/BossRow/Taco"]
+layout_mode = 2
+text = "??????"
+horizontal_alignment = 1
 
-[node name="Coins" type="Label" parent="Panel/Margin/MainLayout/RightColumn/RunStatsPanel/VBox" unique_id=808537318]
+[node name="Pepper" type="VBoxContainer" parent="Root/Margin/VBox/BossFooter/BossRow"]
+custom_minimum_size = Vector2(170, 0)
 layout_mode = 2
-theme_override_font_sizes/font_size = 18
-text = "Total Pluck Coins                                0"
-
-[node name="Bosses" type="Label" parent="Panel/Margin/MainLayout/RightColumn/RunStatsPanel/VBox" unique_id=1207954038]
+[node name="Icon" type="TextureRect" parent="Root/Margin/VBox/BossFooter/BossRow/Pepper"]
+custom_minimum_size = Vector2(0, 90)
 layout_mode = 2
-theme_override_font_sizes/font_size = 18
-text = "Bosses Defeated                              0 / 4"
-
-[node name="Time" type="Label" parent="Panel/Margin/MainLayout/RightColumn/RunStatsPanel/VBox" unique_id=1036786537]
+expand_mode = 1
+stretch_mode = 5
+[node name="Name" type="Label" parent="Root/Margin/VBox/BossFooter/BossRow/Pepper"]
 layout_mode = 2
-theme_override_font_sizes/font_size = 18
-text = "Total Play Time                             00:00:00"
+text = "??????"
+horizontal_alignment = 1
