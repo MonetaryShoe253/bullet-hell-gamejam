@@ -34,16 +34,38 @@ var selected_resource: Resource = null
 @onready var secondary_action: Button = $Root/Margin/VBox/Main/InfoPanel/VBox/Actions/Secondary
 
 @onready var boss_names: Array[Label] = [
-	$Root/Margin/VBox/BossFooter/BossRow/Pizza/Name,
-	$Root/Margin/VBox/BossFooter/BossRow/Burger/Name,
-	$Root/Margin/VBox/BossFooter/BossRow/Taco/Name,
-	$Root/Margin/VBox/BossFooter/BossRow/Pepper/Name,
+	$Root/Margin/VBox/BossFooter/BossVBox/BossRow/Pizza/Name,
+	$Root/Margin/VBox/BossFooter/BossVBox/BossRow/Burger/Name,
+	$Root/Margin/VBox/BossFooter/BossVBox/BossRow/Taco/Name,
+	$Root/Margin/VBox/BossFooter/BossVBox/BossRow/Pepper/Name,
 ]
 @onready var boss_icons: Array[TextureRect] = [
-	$Root/Margin/VBox/BossFooter/BossRow/Pizza/Icon,
-	$Root/Margin/VBox/BossFooter/BossRow/Burger/Icon,
-	$Root/Margin/VBox/BossFooter/BossRow/Taco/Icon,
-	$Root/Margin/VBox/BossFooter/BossRow/Pepper/Icon,
+	$Root/Margin/VBox/BossFooter/BossVBox/BossRow/Pizza/Icon,
+	$Root/Margin/VBox/BossFooter/BossVBox/BossRow/Burger/Icon,
+	$Root/Margin/VBox/BossFooter/BossVBox/BossRow/Taco/Icon,
+	$Root/Margin/VBox/BossFooter/BossVBox/BossRow/Pepper/Icon,
+]
+@onready var boss_statuses: Array[Label] = [
+	$Root/Margin/VBox/BossFooter/BossVBox/BossRow/Pizza/Status,
+	$Root/Margin/VBox/BossFooter/BossVBox/BossRow/Burger/Status,
+	$Root/Margin/VBox/BossFooter/BossVBox/BossRow/Taco/Status,
+	$Root/Margin/VBox/BossFooter/BossVBox/BossRow/Pepper/Status,
+]
+@onready var boss_dots: Array[ColorRect] = [
+	$Root/Margin/VBox/BossFooter/BossVBox/Track/Col1/Dot,
+	$Root/Margin/VBox/BossFooter/BossVBox/Track/Col2/Dot,
+	$Root/Margin/VBox/BossFooter/BossVBox/Track/Col3/Dot,
+	$Root/Margin/VBox/BossFooter/BossVBox/Track/Col4/Dot,
+]
+@onready var boss_lines: Array[ColorRect] = [
+	$Root/Margin/VBox/BossFooter/BossVBox/Track/Col1/LineRight,
+	$Root/Margin/VBox/BossFooter/BossVBox/Track/Col2/LineRight,
+	$Root/Margin/VBox/BossFooter/BossVBox/Track/Col3/LineRight,
+]
+@onready var boss_line_continuations: Array[ColorRect] = [
+	$Root/Margin/VBox/BossFooter/BossVBox/Track/Col2/LineLeft,
+	$Root/Margin/VBox/BossFooter/BossVBox/Track/Col3/LineLeft,
+	$Root/Margin/VBox/BossFooter/BossVBox/Track/Col4/LineLeft,
 ]
 
 const BOSS_IDS: Array[StringName] = [
@@ -320,15 +342,42 @@ func _item_type_name(type: Item.ItemType) -> String:
 
 
 func _refresh_bosses() -> void:
+	var first_undefeated := -1
 	for i in BOSS_IDS.size():
-		var defeated := BOSS_IDS[i] in MetaProgression.defeated_bosses
+		if not _boss_is_defeated(BOSS_IDS[i]):
+			first_undefeated = i
+			break
+
+	for i in BOSS_IDS.size():
+		var defeated := _boss_is_defeated(BOSS_IDS[i])
+		var next_up := i == first_undefeated
 
 		boss_names[i].text = BOSS_LABELS[i] if defeated else "??????"
 
 		if defeated:
 			boss_icons[i].modulate = Color.WHITE
+			boss_statuses[i].text = "DEFEATED"
+			boss_statuses[i].modulate = Color(0.35, 0.9, 0.38, 1.0)
+			boss_dots[i].color = Color(0.35, 0.9, 0.38, 1.0)
+		elif next_up:
+			boss_icons[i].modulate = Color(0.08, 0.08, 0.08, 1.0)
+			boss_statuses[i].text = "NEXT UP"
+			boss_statuses[i].modulate = Color(1.0, 0.55, 0.06, 1.0)
+			boss_dots[i].color = Color(1.0, 0.55, 0.06, 1.0)
 		else:
 			boss_icons[i].modulate = Color(0.04, 0.04, 0.04, 1.0)
+			boss_statuses[i].text = "LOCKED"
+			boss_statuses[i].modulate = Color(0.52, 0.52, 0.52, 1.0)
+			boss_dots[i].color = Color(0.32, 0.32, 0.32, 1.0)
+
+	for i in boss_lines.size():
+		var line_color := Color(0.35, 0.9, 0.38, 1.0) if _boss_is_defeated(BOSS_IDS[i]) else Color(0.25, 0.25, 0.25, 1.0)
+		boss_lines[i].color = line_color
+		boss_line_continuations[i].color = line_color
+
+
+func _boss_is_defeated(boss_id: StringName) -> bool:
+	return boss_id in MetaProgression.defeated_bosses
 
 func _on_loadout_changed() -> void:
 	_refresh_equipped()

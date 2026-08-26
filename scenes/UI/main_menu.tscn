@@ -24,6 +24,79 @@ corner_radius_top_right = 10
 corner_radius_bottom_right = 10
 corner_radius_bottom_left = 10
 
+
+[sub_resource type="StyleBoxFlat" id="PrimaryNormal"]
+bg_color = Color(0.92, 0.22, 0.015, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(1, 0.62, 0.08, 1)
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_right = 6
+corner_radius_bottom_left = 6
+
+[sub_resource type="StyleBoxFlat" id="PrimaryHover"]
+bg_color = Color(1, 0.31, 0.025, 1)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+border_color = Color(1, 0.78, 0.24, 1)
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_right = 6
+corner_radius_bottom_left = 6
+
+[sub_resource type="StyleBoxFlat" id="PrimaryPressed"]
+bg_color = Color(0.72, 0.12, 0.005, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(1, 0.5, 0.04, 1)
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_right = 6
+corner_radius_bottom_left = 6
+
+[sub_resource type="StyleBoxFlat" id="SecondaryNormal"]
+bg_color = Color(0.10, 0.035, 0.02, 0.96)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.75, 0.25, 0.03, 1)
+corner_radius_top_left = 5
+corner_radius_top_right = 5
+corner_radius_bottom_right = 5
+corner_radius_bottom_left = 5
+
+[sub_resource type="StyleBoxFlat" id="SecondaryHover"]
+bg_color = Color(0.20, 0.06, 0.025, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(1, 0.55, 0.08, 1)
+corner_radius_top_left = 5
+corner_radius_top_right = 5
+corner_radius_bottom_right = 5
+corner_radius_bottom_left = 5
+
+[sub_resource type="StyleBoxFlat" id="SecondaryPressed"]
+bg_color = Color(0.07, 0.02, 0.012, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.9, 0.34, 0.03, 1)
+corner_radius_top_left = 5
+corner_radius_top_right = 5
+corner_radius_bottom_right = 5
+corner_radius_bottom_left = 5
+
 [node name="MainMenu" type="CanvasLayer" unique_id=212617294]
 script = ExtResource("1_script")
 
@@ -252,11 +325,14 @@ Empty"
 [node name="StartRun" type="Button" parent="Root/Margin/VBox/Main/Center" unique_id=1946378193]
 custom_minimum_size = Vector2(0, 72)
 layout_mode = 2
-theme_override_colors/font_color = Color(1, 0.96, 0.85, 1)
 theme_override_font_sizes/font_size = 28
-theme_override_styles/normal = SubResource("Panel")
-theme_override_styles/hover = SubResource("Panel")
 text = "START RUN  ▶"
+theme_override_colors/font_color = Color(1, 0.96, 0.88, 1)
+theme_override_colors/font_hover_color = Color(1, 1, 1, 1)
+theme_override_colors/font_pressed_color = Color(1, 0.82, 0.62, 1)
+theme_override_styles/normal = SubResource("PrimaryNormal")
+theme_override_styles/hover = SubResource("PrimaryHover")
+theme_override_styles/pressed = SubResource("PrimaryPressed")
 
 [node name="InfoPanel" type="PanelContainer" parent="Root/Margin/VBox/Main" unique_id=774355898]
 custom_minimum_size = Vector2(430, 0)
@@ -316,90 +392,296 @@ theme_override_constants/separation = 6
 [node name="Primary" type="Button" parent="Root/Margin/VBox/Main/InfoPanel/VBox/Actions" unique_id=2031716430]
 custom_minimum_size = Vector2(0, 56)
 layout_mode = 2
-theme_override_styles/normal = SubResource("Panel")
-theme_override_styles/hover = SubResource("Panel")
 text = "EQUIP"
+theme_override_colors/font_color = Color(1, 0.96, 0.88, 1)
+theme_override_colors/font_hover_color = Color(1, 1, 1, 1)
+theme_override_colors/font_pressed_color = Color(1, 0.82, 0.62, 1)
+theme_override_styles/normal = SubResource("PrimaryNormal")
+theme_override_styles/hover = SubResource("PrimaryHover")
+theme_override_styles/pressed = SubResource("PrimaryPressed")
 
 [node name="Secondary" type="Button" parent="Root/Margin/VBox/Main/InfoPanel/VBox/Actions" unique_id=27682696]
 custom_minimum_size = Vector2(0, 50)
 layout_mode = 2
 text = "EQUIP E"
+theme_override_colors/font_color = Color(1, 0.96, 0.88, 1)
+theme_override_colors/font_hover_color = Color(1, 1, 1, 1)
+theme_override_colors/font_pressed_color = Color(1, 0.82, 0.62, 1)
+theme_override_styles/normal = SubResource("SecondaryNormal")
+theme_override_styles/hover = SubResource("SecondaryHover")
+theme_override_styles/pressed = SubResource("SecondaryPressed")
 
-[node name="BossFooter" type="VBoxContainer" parent="Root/Margin/VBox" unique_id=1500985880]
-custom_minimum_size = Vector2(0, 92)
+[node name="BossFooter" type="PanelContainer" parent="Root/Margin/VBox"]
+custom_minimum_size = Vector2(0, 140)
 layout_mode = 2
-theme_override_constants/separation = 2
+theme_override_styles/panel = SubResource("Panel")
 
-[node name="Title" type="Label" parent="Root/Margin/VBox/BossFooter" unique_id=664638784]
+[node name="BossVBox" type="VBoxContainer" parent="Root/Margin/VBox/BossFooter"]
+layout_mode = 2
+theme_override_constants/separation = 3
+
+[node name="Title" type="Label" parent="Root/Margin/VBox/BossFooter/BossVBox"]
 layout_mode = 2
 theme_override_colors/font_color = Color(1, 0.62, 0.08, 1)
+theme_override_font_sizes/font_size = 17
 text = "THE DEEP-FRY GAUNTLET"
 horizontal_alignment = 1
 
-[node name="BossRow" type="HBoxContainer" parent="Root/Margin/VBox/BossFooter" unique_id=466423162]
+[node name="BossRow" type="HBoxContainer" parent="Root/Margin/VBox/BossFooter/BossVBox"]
 layout_mode = 2
-theme_override_constants/separation = 12
+size_flags_vertical = 3
+theme_override_constants/separation = 8
 
-[node name="Pizza" type="VBoxContainer" parent="Root/Margin/VBox/BossFooter/BossRow" unique_id=392808801]
+[node name="Pizza" type="VBoxContainer" parent="Root/Margin/VBox/BossFooter/BossVBox/BossRow"]
 layout_mode = 2
 size_flags_horizontal = 3
+alignment = 1
 
-[node name="Icon" type="TextureRect" parent="Root/Margin/VBox/BossFooter/BossRow/Pizza" unique_id=1809867693]
-custom_minimum_size = Vector2(0, 48)
+[node name="Name" type="Label" parent="Root/Margin/VBox/BossFooter/BossVBox/BossRow/Pizza"]
+layout_mode = 2
+text = "??????"
+horizontal_alignment = 1
+
+[node name="Icon" type="TextureRect" parent="Root/Margin/VBox/BossFooter/BossVBox/BossRow/Pizza"]
+custom_minimum_size = Vector2(0, 54)
 layout_mode = 2
 texture = ExtResource("4_pizza")
 expand_mode = 3
 stretch_mode = 5
 
-[node name="Name" type="Label" parent="Root/Margin/VBox/BossFooter/BossRow/Pizza" unique_id=2010649742]
+[node name="Status" type="Label" parent="Root/Margin/VBox/BossFooter/BossVBox/BossRow/Pizza"]
+layout_mode = 2
+text = "LOCKED"
+horizontal_alignment = 1
+
+[node name="Burger" type="VBoxContainer" parent="Root/Margin/VBox/BossFooter/BossVBox/BossRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+alignment = 1
+
+[node name="Name" type="Label" parent="Root/Margin/VBox/BossFooter/BossVBox/BossRow/Burger"]
 layout_mode = 2
 text = "??????"
 horizontal_alignment = 1
 
-[node name="Burger" type="VBoxContainer" parent="Root/Margin/VBox/BossFooter/BossRow" unique_id=1355654125]
-layout_mode = 2
-size_flags_horizontal = 3
-
-[node name="Icon" type="TextureRect" parent="Root/Margin/VBox/BossFooter/BossRow/Burger" unique_id=113143389]
-custom_minimum_size = Vector2(0, 48)
+[node name="Icon" type="TextureRect" parent="Root/Margin/VBox/BossFooter/BossVBox/BossRow/Burger"]
+custom_minimum_size = Vector2(0, 54)
 layout_mode = 2
 texture = ExtResource("5_burger")
 expand_mode = 3
 stretch_mode = 5
 
-[node name="Name" type="Label" parent="Root/Margin/VBox/BossFooter/BossRow/Burger" unique_id=711432478]
+[node name="Status" type="Label" parent="Root/Margin/VBox/BossFooter/BossVBox/BossRow/Burger"]
+layout_mode = 2
+text = "LOCKED"
+horizontal_alignment = 1
+
+[node name="Taco" type="VBoxContainer" parent="Root/Margin/VBox/BossFooter/BossVBox/BossRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+alignment = 1
+
+[node name="Name" type="Label" parent="Root/Margin/VBox/BossFooter/BossVBox/BossRow/Taco"]
 layout_mode = 2
 text = "??????"
 horizontal_alignment = 1
 
-[node name="Taco" type="VBoxContainer" parent="Root/Margin/VBox/BossFooter/BossRow" unique_id=87694337]
-layout_mode = 2
-size_flags_horizontal = 3
-
-[node name="Icon" type="TextureRect" parent="Root/Margin/VBox/BossFooter/BossRow/Taco" unique_id=360531918]
-custom_minimum_size = Vector2(0, 48)
+[node name="Icon" type="TextureRect" parent="Root/Margin/VBox/BossFooter/BossVBox/BossRow/Taco"]
+custom_minimum_size = Vector2(0, 54)
 layout_mode = 2
 texture = ExtResource("6_taco")
 expand_mode = 3
 stretch_mode = 5
 
-[node name="Name" type="Label" parent="Root/Margin/VBox/BossFooter/BossRow/Taco" unique_id=1236931132]
+[node name="Status" type="Label" parent="Root/Margin/VBox/BossFooter/BossVBox/BossRow/Taco"]
+layout_mode = 2
+text = "LOCKED"
+horizontal_alignment = 1
+
+[node name="Pepper" type="VBoxContainer" parent="Root/Margin/VBox/BossFooter/BossVBox/BossRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+alignment = 1
+
+[node name="Name" type="Label" parent="Root/Margin/VBox/BossFooter/BossVBox/BossRow/Pepper"]
 layout_mode = 2
 text = "??????"
 horizontal_alignment = 1
 
-[node name="Pepper" type="VBoxContainer" parent="Root/Margin/VBox/BossFooter/BossRow" unique_id=652021010]
-layout_mode = 2
-size_flags_horizontal = 3
-
-[node name="Icon" type="TextureRect" parent="Root/Margin/VBox/BossFooter/BossRow/Pepper" unique_id=971731521]
-custom_minimum_size = Vector2(0, 48)
+[node name="Icon" type="TextureRect" parent="Root/Margin/VBox/BossFooter/BossVBox/BossRow/Pepper"]
+custom_minimum_size = Vector2(0, 54)
 layout_mode = 2
 texture = ExtResource("7_pepper")
 expand_mode = 3
 stretch_mode = 5
 
-[node name="Name" type="Label" parent="Root/Margin/VBox/BossFooter/BossRow/Pepper" unique_id=614163432]
+[node name="Status" type="Label" parent="Root/Margin/VBox/BossFooter/BossVBox/BossRow/Pepper"]
 layout_mode = 2
-text = "??????"
+text = "LOCKED"
 horizontal_alignment = 1
+
+[node name="Track" type="HBoxContainer" parent="Root/Margin/VBox/BossFooter/BossVBox"]
+custom_minimum_size = Vector2(0, 22)
+layout_mode = 2
+theme_override_constants/separation = 0
+
+[node name="Col1" type="Control" parent="Root/Margin/VBox/BossFooter/BossVBox/Track"]
+custom_minimum_size = Vector2(0, 22)
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="Dot" type="ColorRect" parent="Root/Margin/VBox/BossFooter/BossVBox/Track/Col1"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -8.0
+offset_top = -8.0
+offset_right = 8.0
+offset_bottom = 8.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.32, 0.32, 0.32, 1)
+
+[node name="LineRight" type="ColorRect" parent="Root/Margin/VBox/BossFooter/BossVBox/Track/Col1"]
+layout_mode = 1
+anchors_preset = 6
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 1.0
+anchor_bottom = 0.5
+offset_left = 8.0
+offset_top = -2.0
+offset_bottom = 2.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.25, 0.25, 0.25, 1)
+
+[node name="Col2" type="Control" parent="Root/Margin/VBox/BossFooter/BossVBox/Track"]
+custom_minimum_size = Vector2(0, 22)
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="LineLeft" type="ColorRect" parent="Root/Margin/VBox/BossFooter/BossVBox/Track/Col2"]
+layout_mode = 1
+anchors_preset = 4
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_top = -2.0
+offset_right = -8.0
+offset_bottom = 2.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.25, 0.25, 0.25, 1)
+
+[node name="Dot" type="ColorRect" parent="Root/Margin/VBox/BossFooter/BossVBox/Track/Col2"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -8.0
+offset_top = -8.0
+offset_right = 8.0
+offset_bottom = 8.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.32, 0.32, 0.32, 1)
+
+[node name="LineRight" type="ColorRect" parent="Root/Margin/VBox/BossFooter/BossVBox/Track/Col2"]
+layout_mode = 1
+anchors_preset = 6
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 1.0
+anchor_bottom = 0.5
+offset_left = 8.0
+offset_top = -2.0
+offset_bottom = 2.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.25, 0.25, 0.25, 1)
+
+[node name="Col3" type="Control" parent="Root/Margin/VBox/BossFooter/BossVBox/Track"]
+custom_minimum_size = Vector2(0, 22)
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="LineLeft" type="ColorRect" parent="Root/Margin/VBox/BossFooter/BossVBox/Track/Col3"]
+layout_mode = 1
+anchors_preset = 4
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_top = -2.0
+offset_right = -8.0
+offset_bottom = 2.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.25, 0.25, 0.25, 1)
+
+[node name="Dot" type="ColorRect" parent="Root/Margin/VBox/BossFooter/BossVBox/Track/Col3"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -8.0
+offset_top = -8.0
+offset_right = 8.0
+offset_bottom = 8.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.32, 0.32, 0.32, 1)
+
+[node name="LineRight" type="ColorRect" parent="Root/Margin/VBox/BossFooter/BossVBox/Track/Col3"]
+layout_mode = 1
+anchors_preset = 6
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 1.0
+anchor_bottom = 0.5
+offset_left = 8.0
+offset_top = -2.0
+offset_bottom = 2.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.25, 0.25, 0.25, 1)
+
+[node name="Col4" type="Control" parent="Root/Margin/VBox/BossFooter/BossVBox/Track"]
+custom_minimum_size = Vector2(0, 22)
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="LineLeft" type="ColorRect" parent="Root/Margin/VBox/BossFooter/BossVBox/Track/Col4"]
+layout_mode = 1
+anchors_preset = 4
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_top = -2.0
+offset_right = -8.0
+offset_bottom = 2.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.25, 0.25, 0.25, 1)
+
+[node name="Dot" type="ColorRect" parent="Root/Margin/VBox/BossFooter/BossVBox/Track/Col4"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -8.0
+offset_top = -8.0
+offset_right = 8.0
+offset_bottom = 8.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.32, 0.32, 0.32, 1)

@@ -1,7 +1,7 @@
 class_name InventoryUI
 extends Control
 
-enum View { GEAR, ABILITIES, STATS }
+enum View { GEAR, ABILITIES }
 
 var player: Player
 var inventory: InventoryComponent
@@ -19,25 +19,23 @@ var target_passive_slot := 0
 @onready var close_button: Button = $Panel/VBox/Header/CloseButton
 @onready var coin_label: Label = $Panel/VBox/Header/CoinLabel
 
-@onready var gear_tab: Button = $Panel/VBox/TopTabs/Gear
-@onready var abilities_tab: Button = $Panel/VBox/TopTabs/Abilities
-@onready var stats_tab: Button = $Panel/VBox/TopTabs/Stats
-
-@onready var weapons_button: Button = $Panel/VBox/Content/AvailablePanel/HBox/CategoryRail/Weapons
-@onready var armour_button: Button = $Panel/VBox/Content/AvailablePanel/HBox/CategoryRail/Armour
-@onready var accessories_button: Button = $Panel/VBox/Content/AvailablePanel/HBox/CategoryRail/Accessories
-@onready var available_heading: Label = $Panel/VBox/Content/AvailablePanel/HBox/ListColumn/Heading
-@onready var item_list: VBoxContainer = $Panel/VBox/Content/AvailablePanel/HBox/ListColumn/ItemScroll/ItemList
+@onready var weapons_button: Button = $Panel/VBox/Content/AvailablePanel/VBox/Filters/Weapons
+@onready var armour_button: Button = $Panel/VBox/Content/AvailablePanel/VBox/Filters/Armour
+@onready var accessories_button: Button = $Panel/VBox/Content/AvailablePanel/VBox/Filters/Accessories
+@onready var abilities_button: Button = $Panel/VBox/Content/AvailablePanel/VBox/Filters/Abilities
+@onready var available_heading: Label = $Panel/VBox/Content/AvailablePanel/VBox/Heading
+@onready var item_list: VBoxContainer = $Panel/VBox/Content/AvailablePanel/VBox/ItemScroll/ItemList
 
 @onready var weapon_slot: Button = $Panel/VBox/Content/CenterPanel/VBox/GearGrid/WeaponSlot
 @onready var armour_slot: Button = $Panel/VBox/Content/CenterPanel/VBox/GearGrid/ArmourSlot
 @onready var accessory_slot: Button = $Panel/VBox/Content/CenterPanel/VBox/GearGrid/AccessorySlot
-@onready var trinket_slot: Button = $Panel/VBox/Content/CenterPanel/VBox/GearGrid/TrinketSlot
 @onready var q_slot: Button = $Panel/VBox/Content/CenterPanel/VBox/AbilitiesRow/Q
 @onready var e_slot: Button = $Panel/VBox/Content/CenterPanel/VBox/AbilitiesRow/E
-@onready var passive_slot: Button = $Panel/VBox/Content/CenterPanel/VBox/AbilitiesRow/Passive
+@onready var passive_1_slot: Button = $Panel/VBox/Content/CenterPanel/VBox/AbilitiesRow/Passive1
+@onready var passive_2_slot: Button = $Panel/VBox/Content/CenterPanel/VBox/AbilitiesRow/Passive2
 
 @onready var details_heading: Label = $Panel/VBox/Content/DetailsPanel/VBox/Heading
+@onready var details_icon: TextureRect = $Panel/VBox/Content/DetailsPanel/VBox/Icon
 @onready var item_name_label: Label = $Panel/VBox/Content/DetailsPanel/VBox/ItemName
 @onready var item_type_label: Label = $Panel/VBox/Content/DetailsPanel/VBox/Type
 @onready var description_label: Label = $Panel/VBox/Content/DetailsPanel/VBox/Description
@@ -49,34 +47,30 @@ var target_passive_slot := 0
 @onready var effect_label: Label = $Panel/VBox/Content/DetailsPanel/VBox/Effect
 @onready var equip_button: Button = $Panel/VBox/Content/DetailsPanel/VBox/EquipButton
 
-@onready var stats_bar: PanelContainer = $Panel/VBox/StatsBar
 @onready var hp_stat: Label = $Panel/VBox/StatsBar/HBox/HP
 @onready var damage_stat: Label = $Panel/VBox/StatsBar/HBox/Damage
 @onready var speed_stat: Label = $Panel/VBox/StatsBar/HBox/Speed
 @onready var fire_rate_stat: Label = $Panel/VBox/StatsBar/HBox/FireRate
 @onready var dash_stat: Label = $Panel/VBox/StatsBar/HBox/Dash
 
-
 func _ready() -> void:
 	process_mode = Node.PROCESS_MODE_WHEN_PAUSED
 
 	close_button.pressed.connect(close)
-	gear_tab.pressed.connect(func(): _show_gear(current_item_type))
-	abilities_tab.pressed.connect(_show_abilities)
-	stats_tab.pressed.connect(_show_stats)
 
 	weapons_button.pressed.connect(func(): _show_gear(Item.ItemType.WEAPON))
 	armour_button.pressed.connect(func(): _show_gear(Item.ItemType.ARMOUR))
 	accessories_button.pressed.connect(func(): _show_gear(Item.ItemType.ACCESSORY))
+	abilities_button.pressed.connect(_show_abilities)
 
 	weapon_slot.pressed.connect(func(): _show_gear(Item.ItemType.WEAPON))
 	armour_slot.pressed.connect(func(): _show_gear(Item.ItemType.ARMOUR))
 	accessory_slot.pressed.connect(func(): _show_gear(Item.ItemType.ACCESSORY))
-	trinket_slot.pressed.connect(func(): _clear_details("TRINKET", "No trinket system is connected yet."))
 
 	q_slot.pressed.connect(func(): _select_active_slot(0))
 	e_slot.pressed.connect(func(): _select_active_slot(1))
-	passive_slot.pressed.connect(func(): _select_passive_slot(0))
+	passive_1_slot.pressed.connect(func(): _select_passive_slot(0))
+	passive_2_slot.pressed.connect(func(): _select_passive_slot(1))
 
 	equip_button.pressed.connect(_on_action_pressed)
 	visibility_changed.connect(_on_visibility_changed)
@@ -145,8 +139,6 @@ func _refresh_all() -> void:
 			_show_gear(current_item_type)
 		View.ABILITIES:
 			_show_abilities()
-		View.STATS:
-			_show_stats()
 
 
 # ---------------------------------------------------------------------------
@@ -197,6 +189,7 @@ func _select_item(item: Item) -> void:
 	selected_passive = null
 
 	details_heading.text = "SELECTED ITEM"
+	details_icon.texture = item.icon
 	item_name_label.text = item.item_name
 	item_type_label.text = _item_type_name(item.item_type)
 	description_label.text = item.description
@@ -258,25 +251,38 @@ func _show_abilities() -> void:
 func _rebuild_ability_list() -> void:
 	_clear_list()
 
+	var shown_active: Array[Ability] = []
 	for i in ability_component.slots.size():
 		var ability: Ability = ability_component.slots[i]
-		if ability:
+		if is_instance_valid(ability) and not ability in shown_active:
+			shown_active.append(ability)
 			_add_ability_button(ability, false, i)
 
-	for ability in inventory.abilities:
+	for ability: Ability in inventory.abilities:
+		if not is_instance_valid(ability):
+			continue
+		if ability in shown_active:
+			continue
+		shown_active.append(ability)
 		_add_ability_button(ability, false, -1)
 
+	var shown_passive: Array[PassiveAbility] = []
 	for i in passive_component.slots.size():
 		var passive: PassiveAbility = passive_component.slots[i]
-		if passive:
+		if is_instance_valid(passive) and not passive in shown_passive:
+			shown_passive.append(passive)
 			_add_passive_button(passive, i)
 
-	for passive in inventory.passive_abilities:
+	for passive: PassiveAbility in inventory.passive_abilities:
+		if not is_instance_valid(passive):
+			continue
+		if passive in shown_passive:
+			continue
+		shown_passive.append(passive)
 		_add_passive_button(passive, -1)
 
 	if item_list.get_child_count() == 0:
 		_add_empty_message("No abilities owned yet.")
-
 
 func _add_ability_button(ability: Ability, _passive: bool, slot_index: int) -> void:
 	var button := Button.new()
@@ -307,6 +313,7 @@ func _select_ability(ability: Ability) -> void:
 	selected_ability = ability
 
 	details_heading.text = "SELECTED ABILITY"
+	details_icon.texture = ability.icon
 	item_name_label.text = ability.ability_name
 	item_type_label.text = "ACTIVE ABILITY"
 	description_label.text = ability.description
@@ -331,6 +338,7 @@ func _select_passive(passive: PassiveAbility) -> void:
 	selected_passive = passive
 
 	details_heading.text = "SELECTED ABILITY"
+	details_icon.texture = passive.icon if "icon" in passive else null
 	item_name_label.text = passive.ability_name
 	item_type_label.text = "PASSIVE ABILITY"
 	description_label.text = passive.description
@@ -417,29 +425,12 @@ func _find_passive_slot(passive: PassiveAbility) -> int:
 # Stats / common UI
 # ---------------------------------------------------------------------------
 
-func _show_stats() -> void:
-	current_view = View.STATS
-	selected_item = null
-	selected_ability = null
-	selected_passive = null
-	_set_tab_state()
-	_clear_list()
-	available_heading.text = "CURRENT BUILD"
-	_add_empty_message("The stat strip below reflects the player's live runtime StatsComponent.")
-	_clear_details("PLAYER STATS", "Equipment changes are applied immediately during the run.")
-	equip_button.visible = false
-
-
 func _set_tab_state() -> void:
-	gear_tab.disabled = current_view == View.GEAR
-	abilities_tab.disabled = current_view == View.ABILITIES
-	stats_tab.disabled = current_view == View.STATS
-
-	var gear_mode := current_view == View.GEAR
-	weapons_button.visible = gear_mode
-	armour_button.visible = gear_mode
-	accessories_button.visible = gear_mode
-	equip_button.visible = current_view != View.STATS
+	weapons_button.disabled = current_view == View.GEAR and current_item_type == Item.ItemType.WEAPON
+	armour_button.disabled = current_view == View.GEAR and current_item_type == Item.ItemType.ARMOUR
+	accessories_button.disabled = current_view == View.GEAR and current_item_type == Item.ItemType.ACCESSORY
+	abilities_button.disabled = current_view == View.ABILITIES
+	equip_button.visible = true
 
 
 func _refresh_equipped() -> void:
@@ -449,15 +440,21 @@ func _refresh_equipped() -> void:
 	weapon_slot.text = _equipment_text("WEAPON", inventory.equipped_weapon)
 	armour_slot.text = _equipment_text("ARMOUR", inventory.equipped_armour)
 	accessory_slot.text = _equipment_text("ACCESSORY", inventory.equipped_accessory)
-	trinket_slot.text = "TRINKET\nEmpty"
 
 	var q: Ability = ability_component.slots[0] if ability_component.slots.size() > 0 else null
 	var e: Ability = ability_component.slots[1] if ability_component.slots.size() > 1 else null
-	var passive: PassiveAbility = passive_component.slots[0] if passive_component.slots.size() > 0 else null
+	var passive_1: PassiveAbility = passive_component.slots[0] if passive_component.slots.size() > 0 else null
+	var passive_2: PassiveAbility = passive_component.slots[1] if passive_component.slots.size() > 1 else null
 
 	q_slot.text = "Q\n%s" % (q.ability_name if q else "Empty")
 	e_slot.text = "E\n%s" % (e.ability_name if e else "Empty")
-	passive_slot.text = "PASSIVE\n%s" % (passive.ability_name if passive else "Empty")
+	passive_1_slot.text = "PASSIVE 1\n%s" % (passive_1.ability_name if passive_1 else "Empty")
+	passive_2_slot.text = "PASSIVE 2\n%s" % (passive_2.ability_name if passive_2 else "Empty")
+	_set_slot_icon(weapon_slot, inventory.equipped_weapon.icon if inventory.equipped_weapon else null)
+	_set_slot_icon(armour_slot, inventory.equipped_armour.icon if inventory.equipped_armour else null)
+	_set_slot_icon(accessory_slot, inventory.equipped_accessory.icon if inventory.equipped_accessory else null)
+	_set_slot_icon(q_slot, q.icon if q else null)
+	_set_slot_icon(e_slot, e.icon if e else null)
 
 
 func _refresh_stats() -> void:
@@ -487,6 +484,7 @@ func _clear_details(title: String, message: String) -> void:
 	selected_ability = null
 	selected_passive = null
 	details_heading.text = title
+	details_icon.texture = null
 	item_name_label.text = "NOTHING SELECTED"
 	item_type_label.text = ""
 	description_label.text = message
@@ -542,6 +540,11 @@ func _item_type_name(type: Item.ItemType) -> String:
 		Item.ItemType.ACCESSORY:
 			return "ACCESSORY"
 	return "ITEM"
+
+
+func _set_slot_icon(button: Button, texture: Texture2D) -> void:
+	button.icon = texture
+	button.expand_icon = true
 
 
 func _format_number(value: int) -> String:
