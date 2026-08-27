@@ -116,21 +116,33 @@ static func get_unlocked_passive_abilities() -> Array[PassiveAbility]:
 
 
 static func find_item(id: StringName) -> Item:
-	for item in ITEMS:
+	if id == &"":
+		return null
+
+	for item: Item in ITEMS:
 		if get_content_id(item) == id:
 			return item
+
 	return null
 
 
 static func find_active_ability(id: StringName) -> Ability:
-	for ability in ACTIVE_ABILITIES:
+	if id == &"":
+		return null
+
+	for ability: Ability in ACTIVE_ABILITIES:
 		if get_content_id(ability) == id:
 			return ability
+
 	return null
 
 
 static func find_passive_ability(id: StringName) -> PassiveAbility:
-	for passive in PASSIVE_ABILITIES:
+	if id == &"":
+		return null
+
+	for passive: PassiveAbility in PASSIVE_ABILITIES:
 		if get_content_id(passive) == id:
 			return passive
+
 	return null

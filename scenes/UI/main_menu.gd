@@ -382,6 +382,10 @@ func _boss_is_defeated(boss_id: StringName) -> bool:
 	return boss_id in MetaProgression.defeated_bosses
 
 func _on_loadout_changed() -> void:
+	if selected_resource != null and not MetaProgression.is_unlocked(selected_resource):
+		selected_resource = null
+
+	_refresh_browser()
 	_refresh_equipped()
 	_refresh_selected()
 

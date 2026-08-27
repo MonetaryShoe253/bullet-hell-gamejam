@@ -6,6 +6,7 @@
 
 [resource]
 script = ExtResource("1_dwave")
+unlock_id = &"Damage Wave"
 ability_name = "Damage Wave"
 description = "A short, wide burst of damage right in front of you - the closer enemies are, the harder it hits."
 icon = ExtResource("1_f67wx")
