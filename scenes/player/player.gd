@@ -45,9 +45,9 @@ const ATTACK_ANIM_BASE_DURATION: float = 7.0 / 12.0
 var projectile_scene: PackedScene = preload("res://scenes/projectiles/playerbullet/playerbullet.tscn")
 var time_since_last_shot: float = 0.0
 
-const DeathRewardScene := preload("res://scenes/ui/death_reward_ui.tscn")
+const DeathRewardScene := preload("res://scenes/UI/death_reward_ui.tscn")
 
-const GameOverScene := preload("res://scenes/ui/game_over.tscn")
+const GameOverScene := preload("res://scenes/UI/game_over.tscn")
 
 @onready var health_component: HealthComponent = $Components/HealthComponent
 @onready var health_bar: ProgressBar = $HealthBar/HealthBar
@@ -79,10 +79,6 @@ func _ready() -> void:
 
 	# Set up the HUD after the final active slots exist.
 	ability_bars.setup(ability_component)
-
-	print("ACTIVE SLOT 0: ", ability_component.slots[0])
-	print("ACTIVE SLOT 1: ", ability_component.slots[1])
-	
 
 
 func _on_health_changed(current_health: float, max_health: float) -> void:
