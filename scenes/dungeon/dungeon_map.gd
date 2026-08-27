@@ -58,7 +58,7 @@ extends Node2D
 ## room controllers are built.
 @export_category("Testing")
 @export var test_start_at_boss := false
-@export var test_start_at_shop := true
+@export var test_start_at_shop := false
 
 ## Players and Enemies
 @export var player_scene: PackedScene

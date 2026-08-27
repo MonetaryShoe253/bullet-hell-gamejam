@@ -57,26 +57,32 @@ const GameOverScene := preload("res://scenes/ui/game_over.tscn")
 
 
 func _ready() -> void:
-	# StatsComponent calculates the player's max HP; HealthComponent owns the
-	# actual health state. Sync them once on startup.
 	health_component.set_max_health(stats.get_max_health(), true)
 	health_bar.max_value = health_component.max_health
 	health_bar.value = health_component.current_health
 
 	health_component.health_changed.connect(_on_health_changed)
 	health_component.died.connect(_on_died)
-	
+
 	stats.stats_changed.connect(_on_stats_changed)
 	inventory.equipment_changed.connect(_on_equipment_changed)
 
 	dash_cooldown_bar.min_value = 0.0
 	dash_cooldown_bar.max_value = 1.0
-	dash_cooldown_bar.value = 1.0	
-	
-	ability_bars.setup(ability_component)
+	dash_cooldown_bar.value = 1.0
+
+	# Apply the main-menu build FIRST.
 	SavedBuildLoader.apply_to_player(self)
 
+	# Apply passive effects after their slots have been loaded.
 	passive_ability_component.equip_all()
+
+	# Set up the HUD after the final active slots exist.
+	ability_bars.setup(ability_component)
+
+	print("ACTIVE SLOT 0: ", ability_component.slots[0])
+	print("ACTIVE SLOT 1: ", ability_component.slots[1])
+	
 
 
 func _on_health_changed(current_health: float, max_health: float) -> void:

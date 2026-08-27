@@ -4,7 +4,7 @@ extends Node
 signal cooldown_updated(index: int, remaining: float, total: float)
 signal ability_used(index: int, ability: Ability)
 
-@export var slots: Array[Ability] = []
+@export var slots: Array[Ability] = [null, null]
 @export var input_actions: Array[String] = ["ability 1", "ability 2"]
 
 var _cooldowns: Array[float] = []

@@ -19,8 +19,8 @@ var equipped_passive_2_id: StringName = &""
 
 
 func _ready() -> void:
-	#load_progression()
-	reset_progression()
+	load_progression()
+	#reset_progression()
 	
 
 # ---------------------------------------------------------------------------
@@ -91,6 +91,9 @@ func save_progression() -> void:
 func is_unlocked(content: Resource) -> bool:
 	if content == null:
 		return false
+
+	if "unlocked_by_default" in content and content.unlocked_by_default:
+		return true
 
 	var id := ContentDatabase.get_content_id(content)
 	if id == &"":

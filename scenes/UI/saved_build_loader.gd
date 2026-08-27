@@ -59,8 +59,6 @@ static func _apply_active_abilities(player: Player) -> void:
 	if second and component.slots.size() > 1:
 		component.equip_at(1, second)
 
-	player.ability_bars.refresh(component)
-
 
 static func _apply_passive_abilities(player: Player) -> void:
 	var component := player.passive_ability_component
