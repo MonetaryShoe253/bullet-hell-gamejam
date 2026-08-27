@@ -18,6 +18,7 @@ var equipped_passive_2_id: StringName = &""
 
 func _ready() -> void:
 	load_progression()
+	reset_progression()
 
 
 func load_progression() -> void:

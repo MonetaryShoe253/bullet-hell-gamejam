@@ -5,9 +5,9 @@
 [ext_resource type="PackedScene" uid="uid://cgkmebodaryei" path="res://scenes/player/player.tscn" id="2_frwky"]
 [ext_resource type="PackedScene" path="res://scenes/UI/boss_health_bar.tscn" id="4_boss_hp"]
 [ext_resource type="Script" uid="uid://clmn8utdyvei6" path="res://scenes/UI/minimap.gd" id="5_minimap"]
-[ext_resource type="PackedScene" uid="uid://cktjjn0cmkhvv" path="res://scenes/UI/shop_ui.tscn" id="5_vhky6"]
-[ext_resource type="PackedScene" uid="uid://daq0vn44ulaa2" path="res://scenes/UI/death_reward_ui.tscn" id="8_h6dl1"]
-[ext_resource type="PackedScene" uid="uid://l8a3ie254bsb" path="res://scenes/UI/player_menu.tscn" id="11_pmenu"]
+[ext_resource type="PackedScene" uid="uid://mwup4wqqbvni" path="res://scenes/UI/shop_ui.tscn" id="5_vhky6"]
+[ext_resource type="PackedScene" path="res://scenes/UI/death_reward_ui.tscn" id="8_h6dl1"]
+[ext_resource type="PackedScene" path="res://scenes/UI/player_menu.tscn" id="11_pmenu"]
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_frwky"]
 texture = ExtResource("2_4f38h")
@@ -181,6 +181,7 @@ offset_top = 10.0
 offset_right = -10.0
 offset_bottom = 190.0
 grow_horizontal = 0
+mouse_filter = 2
 script = ExtResource("5_minimap")
 
 [node name="CurrentLevelLabel" type="Label" parent="HUD" unique_id=1369431961]
@@ -200,15 +201,14 @@ horizontal_alignment = 1
 offset = Vector2(0, 25)
 transform = Transform2D(1, 0, 0, 1, 0, 25)
 
-[node name="ShopUILayer" type="CanvasLayer" parent="."]
-layer = 20
-
-[node name="ShopUI" parent="ShopUILayer" unique_id=1633812390 instance=ExtResource("5_vhky6")]
-visible = false
-
 [node name="PlayerMenu" parent="." unique_id=767680652 instance=ExtResource("11_pmenu")]
 unique_name_in_owner = true
 visible = false
 
 [node name="DeathRewardUI" parent="." unique_id=288556813 instance=ExtResource("8_h6dl1")]
 visible = false
+
+[node name="ShopUILayer" type="CanvasLayer" parent="." unique_id=217289064]
+layer = 20
+
+[node name="ShopUI" parent="ShopUILayer" unique_id=869323745 instance=ExtResource("5_vhky6")]

@@ -68,10 +68,8 @@ func _ready() -> void:
 	print("SHOP READY")
 	# Shop interaction should still work if the surrounding game pauses while
 	# a shop is open.
-	process_mode = Node.PROCESS_MODE_WHEN_PAUSED
+	process_mode = Node.PROCESS_MODE_ALWAYS
 	
-	set_process_input(false)
-
 	close_button.pressed.connect(_close_shop)
 	refresh_button.pressed.connect(_refresh_stock)
 
@@ -413,14 +411,7 @@ func _input(event: InputEvent) -> void:
 	if not visible:
 		return
 
-	if event is InputEventKey and event.pressed:
-		print("SHOP KEY: ", event.as_text())
-
-	if event is InputEventMouseButton and event.pressed:
-		print("SHOP MOUSE CLICK")
-
 	if event.is_action_pressed("ui_cancel"):
-		print("SHOP ESC")
 		_close_shop()
 		get_viewport().set_input_as_handled()
 

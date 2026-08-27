@@ -185,20 +185,24 @@ offset_right = 780.0
 offset_bottom = 440.0
 grow_horizontal = 2
 grow_vertical = 2
+mouse_filter = 2
 theme_override_styles/panel = SubResource("MainPanel")
 
 [node name="VBox" type="VBoxContainer" parent="Panel" unique_id=36893403]
 layout_mode = 2
+mouse_filter = 2
 theme_override_constants/separation = 12
 
 [node name="Header" type="HBoxContainer" parent="Panel/VBox" unique_id=1864291879]
 custom_minimum_size = Vector2(0, 92)
 layout_mode = 2
+mouse_filter = 2
 theme_override_constants/separation = 14
 
 [node name="TitleBlock" type="VBoxContainer" parent="Panel/VBox/Header" unique_id=1013572940]
 layout_mode = 2
 size_flags_horizontal = 3
+mouse_filter = 2
 alignment = 1
 
 [node name="Title" type="Label" parent="Panel/VBox/Header/TitleBlock" unique_id=140125574]
@@ -236,12 +240,14 @@ text = "×"
 [node name="StockRow" type="HBoxContainer" parent="Panel/VBox" unique_id=1723553521]
 custom_minimum_size = Vector2(0, 42)
 layout_mode = 2
+mouse_filter = 2
 theme_override_constants/separation = 10
 alignment = 1
 
 [node name="LeftRule" type="HSeparator" parent="Panel/VBox/StockRow" unique_id=396515208]
 custom_minimum_size = Vector2(300, 0)
 layout_mode = 2
+mouse_filter = 2
 
 [node name="Label" type="Label" parent="Panel/VBox/StockRow" unique_id=1796404685]
 layout_mode = 2
@@ -258,24 +264,29 @@ text = "⌛  02:45"
 [node name="RightRule" type="HSeparator" parent="Panel/VBox/StockRow" unique_id=952028510]
 custom_minimum_size = Vector2(300, 0)
 layout_mode = 2
+mouse_filter = 2
 
 [node name="Offers" type="HBoxContainer" parent="Panel/VBox" unique_id=1196008930]
 layout_mode = 2
 size_flags_vertical = 3
+mouse_filter = 2
 theme_override_constants/separation = 14
 
 [node name="Offer1" type="PanelContainer" parent="Panel/VBox/Offers" unique_id=936311421]
 layout_mode = 2
 size_flags_horizontal = 3
+mouse_filter = 2
 theme_override_styles/panel = SubResource("Card")
 
 [node name="VBox" type="VBoxContainer" parent="Panel/VBox/Offers/Offer1" unique_id=1318732617]
 layout_mode = 2
+mouse_filter = 2
 theme_override_constants/separation = 10
 
 [node name="Icon" type="TextureRect" parent="Panel/VBox/Offers/Offer1/VBox" unique_id=1177565930]
 custom_minimum_size = Vector2(0, 160)
 layout_mode = 2
+mouse_filter = 2
 expand_mode = 1
 stretch_mode = 5
 
@@ -301,6 +312,7 @@ autowrap_mode = 2
 
 [node name="Separator" type="HSeparator" parent="Panel/VBox/Offers/Offer1/VBox" unique_id=1489719813]
 layout_mode = 2
+mouse_filter = 2
 
 [node name="Stats" type="Label" parent="Panel/VBox/Offers/Offer1/VBox" unique_id=1452486446]
 layout_mode = 2
@@ -322,15 +334,18 @@ text = "●  1,750"
 [node name="Offer2" type="PanelContainer" parent="Panel/VBox/Offers" unique_id=1347033950]
 layout_mode = 2
 size_flags_horizontal = 3
+mouse_filter = 2
 theme_override_styles/panel = SubResource("Card")
 
 [node name="VBox" type="VBoxContainer" parent="Panel/VBox/Offers/Offer2" unique_id=320704004]
 layout_mode = 2
+mouse_filter = 2
 theme_override_constants/separation = 10
 
 [node name="Icon" type="TextureRect" parent="Panel/VBox/Offers/Offer2/VBox" unique_id=2040160874]
 custom_minimum_size = Vector2(0, 160)
 layout_mode = 2
+mouse_filter = 2
 expand_mode = 1
 stretch_mode = 5
 
@@ -356,6 +371,7 @@ autowrap_mode = 2
 
 [node name="Separator" type="HSeparator" parent="Panel/VBox/Offers/Offer2/VBox" unique_id=154497117]
 layout_mode = 2
+mouse_filter = 2
 
 [node name="Stats" type="Label" parent="Panel/VBox/Offers/Offer2/VBox" unique_id=776078260]
 layout_mode = 2
@@ -377,15 +393,18 @@ text = "●  950"
 [node name="Offer3" type="PanelContainer" parent="Panel/VBox/Offers" unique_id=1367025983]
 layout_mode = 2
 size_flags_horizontal = 3
+mouse_filter = 2
 theme_override_styles/panel = SubResource("Card")
 
 [node name="VBox" type="VBoxContainer" parent="Panel/VBox/Offers/Offer3" unique_id=577109765]
 layout_mode = 2
+mouse_filter = 2
 theme_override_constants/separation = 10
 
 [node name="Icon" type="TextureRect" parent="Panel/VBox/Offers/Offer3/VBox" unique_id=388590495]
 custom_minimum_size = Vector2(0, 160)
 layout_mode = 2
+mouse_filter = 2
 expand_mode = 1
 stretch_mode = 5
 
@@ -411,6 +430,7 @@ autowrap_mode = 2
 
 [node name="Separator" type="HSeparator" parent="Panel/VBox/Offers/Offer3/VBox" unique_id=1186217422]
 layout_mode = 2
+mouse_filter = 2
 
 [node name="Stats" type="Label" parent="Panel/VBox/Offers/Offer3/VBox" unique_id=56167655]
 layout_mode = 2
@@ -432,15 +452,18 @@ text = "●  650"
 [node name="Footer" type="PanelContainer" parent="Panel/VBox" unique_id=1402302071]
 custom_minimum_size = Vector2(0, 112)
 layout_mode = 2
+mouse_filter = 2
 theme_override_styles/panel = SubResource("FooterPanel")
 
 [node name="HBox" type="HBoxContainer" parent="Panel/VBox/Footer" unique_id=401037969]
 layout_mode = 2
+mouse_filter = 2
 theme_override_constants/separation = 16
 
 [node name="Tip" type="VBoxContainer" parent="Panel/VBox/Footer/HBox" unique_id=282260734]
 layout_mode = 2
 size_flags_horizontal = 3
+mouse_filter = 2
 alignment = 1
 
 [node name="Title" type="Label" parent="Panel/VBox/Footer/HBox/Tip" unique_id=1050835613]
@@ -457,6 +480,7 @@ autowrap_mode = 2
 [node name="RefreshInfo" type="VBoxContainer" parent="Panel/VBox/Footer/HBox" unique_id=1334103067]
 custom_minimum_size = Vector2(300, 0)
 layout_mode = 2
+mouse_filter = 2
 alignment = 1
 
 [node name="Title" type="Label" parent="Panel/VBox/Footer/HBox/RefreshInfo" unique_id=765996365]
