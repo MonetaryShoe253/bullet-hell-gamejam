@@ -37,8 +37,12 @@ const ITEMS: Array[Item] = [
 ]
 
 const ACTIVE_ABILITIES: Array[Ability] = [
+	preload("res://resources/abilities/black_hole.tres"),
+	preload("res://resources/abilities/bullet_storm.tres"),
 	preload("res://resources/abilities/damage_dash.tres"),
+	preload("res://resources/abilities/damage_wave.tres"),
 	preload("res://resources/abilities/orbiting_blades.tres"),
+	preload("res://resources/abilities/shockwave_pulse.tres"),
 ]
 
 const PASSIVE_ABILITIES: Array[PassiveAbility] = [
@@ -59,14 +63,18 @@ const UPGRADES: Array[ShopUpgrade] = [
 static func get_content_id(content: Resource) -> StringName:
 	if content == null:
 		return &""
-	if "unlock_id" in content and String(content.unlock_id) != "":
-		return StringName(content.unlock_id)
-	if content.resource_path != "":
-		return StringName(content.resource_path)
-	if "ability_name" in content:
-		return StringName(content.ability_name)
-	if "item_name" in content:
-		return StringName(content.item_name)
+
+	if "unlock_id" in content:
+		var id := StringName(content.unlock_id)
+
+		if id != &"":
+			return id
+
+	push_warning(
+		"ContentDatabase: Resource has no unlock_id: %s"
+		% content.resource_path
+	)
+
 	return &""
 
 

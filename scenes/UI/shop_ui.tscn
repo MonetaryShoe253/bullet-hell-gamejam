@@ -157,7 +157,6 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-mouse_filter = 1
 script = ExtResource("1_5xvhc")
 item_pool = Array[ExtResource("2_omp8d")]([ExtResource("3_cma1a"), ExtResource("4_ef3xj"), ExtResource("5_qlk0j"), ExtResource("6_wsxnv"), ExtResource("7_186w4"), ExtResource("8_tp4kr"), ExtResource("9_5ln0s"), ExtResource("10_tedwl"), ExtResource("11_jbymo"), ExtResource("12_yh3qn"), ExtResource("13_tpmp1"), ExtResource("14_kxa0q"), ExtResource("15_t2f2c"), ExtResource("16_hfkvp"), ExtResource("17_v8be5"), ExtResource("18_blxua"), ExtResource("19_28y3e"), ExtResource("20_ym4wx"), ExtResource("21_nktqw"), ExtResource("22_0dudi"), ExtResource("23_s3u42"), ExtResource("24_gryrv"), ExtResource("25_s8jma"), ExtResource("26_6g7ym"), ExtResource("27_clk8t"), ExtResource("28_ni7mg"), ExtResource("29_myjaa"), ExtResource("30_gg7nk"), ExtResource("31_clsby"), ExtResource("32_io6ay"), ExtResource("33_oj36i"), ExtResource("34_cnh1j")])
 ability_pool = Array[ExtResource("35_acd5m")]([ExtResource("36_3lcal"), ExtResource("37_my2js"), ExtResource("38_8gav2"), ExtResource("39_fxf2i"), ExtResource("40_mtdup"), ExtResource("41_ospih")])

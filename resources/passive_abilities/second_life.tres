@@ -6,8 +6,10 @@
 
 [resource]
 script = ExtResource("1_slife")
+unlock_id = &"Second Life"
+unlock_tier = 4
 ability_name = "Second Life"
 description = "The next time you would die, revive instead with half your max health back. Consumed on use."
 icon = ExtResource("2_7tojy")
-price = 150
+price = 350
 metadata/_custom_type_script = "uid://b4oy2lqi0n2ie"

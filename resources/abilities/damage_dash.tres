@@ -5,6 +5,8 @@
 
 [resource]
 script = ExtResource("1_ddash")
+unlock_id = &"Damage Dash"
+unlock_tier = 3
 ability_name = "Damage Dash"
 description = "Dash through enemies, damaging them along the way and staying invincible a little longer than usual."
 icon = ExtResource("1_8ev88")

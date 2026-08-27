@@ -5,6 +5,8 @@
 
 [resource]
 script = ExtResource("1_hregen")
+unlock_id = &"Health Regen"
+unlock_tier = 3
 ability_name = "Health Regen"
 description = "Heal a small amount of health whenever you kill an enemy."
 icon = ExtResource("1_ykegq")

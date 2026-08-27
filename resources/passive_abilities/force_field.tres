@@ -6,6 +6,7 @@
 
 [resource]
 script = ExtResource("1_ffld")
+unlock_id = &"Force Field"
 ability_name = "Force Field"
 description = "An aura around you that damages any enemy that touches it, and keeps burning them for as long as they stay in it."
 icon = ExtResource("2_6t4kk")

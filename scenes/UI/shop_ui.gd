@@ -64,9 +64,13 @@ var purchased_offers: Array[bool] = []
 
 
 func _ready() -> void:
+	
+	print("SHOP READY")
 	# Shop interaction should still work if the surrounding game pauses while
 	# a shop is open.
 	process_mode = Node.PROCESS_MODE_WHEN_PAUSED
+	
+	set_process_input(false)
 
 	close_button.pressed.connect(_close_shop)
 	refresh_button.pressed.connect(_refresh_stock)
@@ -359,9 +363,13 @@ func open(target_player: Player) -> void:
 	_update_ui()
 	show()
 
+	set_process_input(true)
+	grab_focus()
+
 
 func _close_shop() -> void:
 	hide()
+	set_process_input(false)
 	player = null
 
 
@@ -402,17 +410,33 @@ func _refresh_stock() -> void:
 
 
 func _input(event: InputEvent) -> void:
-	if visible and event.is_action_pressed("ui_cancel"):
+	if not visible:
+		return
+
+	if event is InputEventKey and event.pressed:
+		print("SHOP KEY: ", event.as_text())
+
+	if event is InputEventMouseButton and event.pressed:
+		print("SHOP MOUSE CLICK")
+
+	if event.is_action_pressed("ui_cancel"):
+		print("SHOP ESC")
 		_close_shop()
 		get_viewport().set_input_as_handled()
 
 
 func _get_unlock_tier(content: Resource) -> int:
-	if content != null and "unlock_tier" in content:
-		return clampi(int(content.get("unlock_tier")), 1, 5)
-	# Resources that have not yet been migrated are treated as Tier 1 so they
-	# remain usable rather than disappearing from the shop.
-	return 1
+	if content == null:
+		return 999
+
+	if not "unlock_tier" in content:
+		push_warning(
+			"ShopUI: Content has no unlock_tier: %s"
+			% content.resource_path
+		)
+		return 999
+
+	return clampi(int(content.unlock_tier), 1, 5)
 
 
 func _tier_color(tier: int) -> Color:

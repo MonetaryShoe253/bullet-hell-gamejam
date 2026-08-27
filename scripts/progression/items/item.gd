@@ -10,7 +10,7 @@ enum ItemType {
 
 @export var unlock_id: StringName
 @export var unlocked_by_default: bool = false
-@export_range(1, 10) var unlock_tier: int = 1
+@export_range(1, 5) var unlock_tier: int = 1
 
 @export_category("Item")
 @export var item_name: String

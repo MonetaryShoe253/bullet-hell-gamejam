@@ -6,6 +6,8 @@
 [resource]
 script = ExtResource("2_jn7gy")
 damage = 8.0
+unlock_id = &"Orbiting Blades"
+unlock_tier = 2
 ability_name = "Orbiting Blades"
 description = "Summons blades that orbit the player and damage nearby enemies."
 icon = ExtResource("1_jn7gy")
