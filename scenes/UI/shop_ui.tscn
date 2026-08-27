@@ -1,105 +1,509 @@
-[gd_scene format=3 uid="uid://cktjjn0cmkhvv"]
+[gd_scene format=3 uid="uid://mwup4wqqbvni"]
 
-[ext_resource type="Script" uid="uid://ndmtkayqc8vc" path="res://scenes/UI/shop_ui.gd" id="1_5tinp"]
-[ext_resource type="Resource" uid="uid://b367fto4rglk4" path="res://resources/items/Barrel Armour.tres" id="3_gsl77"]
-[ext_resource type="Resource" uid="uid://dgsp5ddn1101o" path="res://resources/items/Bucket Helmet.tres" id="4_p3vfx"]
-[ext_resource type="Resource" uid="uid://ct1we2l5t5pk3" path="res://resources/items/Chicken Apron.tres" id="5_wefq6"]
-[ext_resource type="Resource" uid="uid://2qdf2q7bwuu6" path="res://resources/items/Chicken Breast Plate.tres" id="6_dgggy"]
-[ext_resource type="Resource" uid="uid://j2j3d5qgka1y" path="res://resources/items/Chicken Bucket.tres" id="7_lvxca"]
-[ext_resource type="Resource" uid="uid://ds4kowj3hkaox" path="res://resources/items/Chicken Cleaver.tres" id="8_eoc65"]
-[ext_resource type="Script" uid="uid://ceuvhyf720s15" path="res://scripts/progression/items/item.gd" id="8_m2mw0"]
-[ext_resource type="Resource" uid="uid://dv2ppegprd1r1" path="res://resources/items/Chicken Coat.tres" id="9_oesyk"]
-[ext_resource type="Resource" uid="uid://xwhk20xr4cqr" path="res://resources/items/Chicken Shield.tres" id="10_g6rnb"]
-[ext_resource type="Resource" uid="uid://b7wqrtpliut1y" path="res://resources/items/Cob of Corn.tres" id="11_elkfa"]
-[ext_resource type="Resource" uid="uid://dkv3ifq71yrts" path="res://resources/items/Crossbow.tres" id="12_2ka3b"]
-[ext_resource type="Resource" uid="uid://cvf7jr0vt4cv" path="res://resources/items/Egg Amulet.tres" id="13_8kkrh"]
-[ext_resource type="Resource" uid="uid://dpddi833bufyn" path="res://resources/items/Egg Hat.tres" id="14_5xvhc"]
-[ext_resource type="Resource" uid="uid://dmcyikdvpteot" path="res://resources/items/Egg Launcher.tres" id="15_omp8d"]
-[ext_resource type="Resource" uid="uid://desmdrepo3yfp" path="res://resources/items/Egg Sling-shot.tres" id="16_cma1a"]
-[ext_resource type="Resource" uid="uid://byjsgiqarcws0" path="res://resources/items/Farmer's Bandana.tres" id="17_ef3xj"]
-[ext_resource type="Resource" uid="uid://coqy4rr6dkhtd" path="res://resources/items/Farmer's Hat.tres" id="18_qlk0j"]
-[ext_resource type="Resource" uid="uid://dofbn7e66eikj" path="res://resources/items/Feather Cloak.tres" id="19_wsxnv"]
-[ext_resource type="Resource" uid="uid://bh5deu7ajra2y" path="res://resources/items/Feather Sword.tres" id="20_186w4"]
-[ext_resource type="Resource" uid="uid://3cq4eyionys7" path="res://resources/items/Feather Tunic.tres" id="21_tp4kr"]
-[ext_resource type="Resource" uid="uid://dca8mccloqugq" path="res://resources/items/Fork.tres" id="22_5ln0s"]
-[ext_resource type="Resource" uid="uid://bei2011k5o0g7" path="res://resources/items/Fried Egg Pan.tres" id="23_tedwl"]
-[ext_resource type="Resource" uid="uid://bl66up5n1y7t1" path="res://resources/items/Golden Chicken Ring.tres" id="24_jbymo"]
-[ext_resource type="Resource" uid="uid://cl0eco6r3gllr" path="res://resources/items/Golden Chicken Wing.tres" id="25_yh3qn"]
-[ext_resource type="Resource" uid="uid://cg3f1kjguxah8" path="res://resources/items/Golden Shield.tres" id="26_tpmp1"]
-[ext_resource type="Resource" uid="uid://2lyk62xhgnuk" path="res://resources/items/Hot Sauce.tres" id="27_kxa0q"]
-[ext_resource type="Resource" uid="uid://dc5onwc51jukd" path="res://resources/items/Mascot Hood.tres" id="28_t2f2c"]
-[ext_resource type="Resource" uid="uid://drsdpgidatlhs" path="res://resources/items/Nugget Shield.tres" id="29_hfkvp"]
-[ext_resource type="Resource" uid="uid://wassrpr44eqh" path="res://resources/items/Shell Helmet.tres" id="30_v8be5"]
-[ext_resource type="Resource" uid="uid://5uik6oodl6ag" path="res://resources/items/Skewer.tres" id="31_blxua"]
-[ext_resource type="Resource" uid="uid://bwns2hw2m7pwi" path="res://resources/items/Spatchula.tres" id="32_28y3e"]
-[ext_resource type="Resource" uid="uid://dnuwihmw2flu5" path="res://resources/items/Toast.tres" id="33_ym4wx"]
-[ext_resource type="Resource" uid="uid://c0oawwfigjbde" path="res://resources/items/Whisk.tres" id="34_nktqw"]
+[ext_resource type="Script" uid="uid://ndmtkayqc8vc" path="res://scenes/UI/shop_ui.gd" id="1_5xvhc"]
+[ext_resource type="Script" uid="uid://ceuvhyf720s15" path="res://scripts/progression/items/item.gd" id="2_omp8d"]
+[ext_resource type="Resource" uid="uid://b367fto4rglk4" path="res://resources/items/Barrel Armour.tres" id="3_cma1a"]
+[ext_resource type="Resource" uid="uid://dgsp5ddn1101o" path="res://resources/items/Bucket Helmet.tres" id="4_ef3xj"]
+[ext_resource type="Resource" uid="uid://ct1we2l5t5pk3" path="res://resources/items/Chicken Apron.tres" id="5_qlk0j"]
+[ext_resource type="Resource" uid="uid://2qdf2q7bwuu6" path="res://resources/items/Chicken Breast Plate.tres" id="6_wsxnv"]
+[ext_resource type="Resource" uid="uid://j2j3d5qgka1y" path="res://resources/items/Chicken Bucket.tres" id="7_186w4"]
+[ext_resource type="Resource" uid="uid://ds4kowj3hkaox" path="res://resources/items/Chicken Cleaver.tres" id="8_tp4kr"]
+[ext_resource type="Resource" uid="uid://dv2ppegprd1r1" path="res://resources/items/Chicken Coat.tres" id="9_5ln0s"]
+[ext_resource type="Resource" uid="uid://xwhk20xr4cqr" path="res://resources/items/Chicken Shield.tres" id="10_tedwl"]
+[ext_resource type="Resource" uid="uid://b7wqrtpliut1y" path="res://resources/items/Cob of Corn.tres" id="11_jbymo"]
+[ext_resource type="Resource" uid="uid://dkv3ifq71yrts" path="res://resources/items/Crossbow.tres" id="12_yh3qn"]
+[ext_resource type="Resource" uid="uid://cvf7jr0vt4cv" path="res://resources/items/Egg Amulet.tres" id="13_tpmp1"]
+[ext_resource type="Resource" uid="uid://dpddi833bufyn" path="res://resources/items/Egg Hat.tres" id="14_kxa0q"]
+[ext_resource type="Resource" uid="uid://dmcyikdvpteot" path="res://resources/items/Egg Launcher.tres" id="15_t2f2c"]
+[ext_resource type="Resource" uid="uid://desmdrepo3yfp" path="res://resources/items/Egg Sling-shot.tres" id="16_hfkvp"]
+[ext_resource type="Resource" uid="uid://byjsgiqarcws0" path="res://resources/items/Farmer's Bandana.tres" id="17_v8be5"]
+[ext_resource type="Resource" uid="uid://coqy4rr6dkhtd" path="res://resources/items/Farmer's Hat.tres" id="18_blxua"]
+[ext_resource type="Resource" uid="uid://dofbn7e66eikj" path="res://resources/items/Feather Cloak.tres" id="19_28y3e"]
+[ext_resource type="Resource" uid="uid://bh5deu7ajra2y" path="res://resources/items/Feather Sword.tres" id="20_ym4wx"]
+[ext_resource type="Resource" uid="uid://3cq4eyionys7" path="res://resources/items/Feather Tunic.tres" id="21_nktqw"]
+[ext_resource type="Resource" uid="uid://dca8mccloqugq" path="res://resources/items/Fork.tres" id="22_0dudi"]
+[ext_resource type="Resource" uid="uid://bei2011k5o0g7" path="res://resources/items/Fried Egg Pan.tres" id="23_s3u42"]
+[ext_resource type="Resource" uid="uid://bl66up5n1y7t1" path="res://resources/items/Golden Chicken Ring.tres" id="24_gryrv"]
+[ext_resource type="Resource" uid="uid://cl0eco6r3gllr" path="res://resources/items/Golden Chicken Wing.tres" id="25_s8jma"]
+[ext_resource type="Resource" uid="uid://cg3f1kjguxah8" path="res://resources/items/Golden Shield.tres" id="26_6g7ym"]
+[ext_resource type="Resource" uid="uid://2lyk62xhgnuk" path="res://resources/items/Hot Sauce.tres" id="27_clk8t"]
+[ext_resource type="Resource" uid="uid://dc5onwc51jukd" path="res://resources/items/Mascot Hood.tres" id="28_ni7mg"]
+[ext_resource type="Resource" uid="uid://drsdpgidatlhs" path="res://resources/items/Nugget Shield.tres" id="29_myjaa"]
+[ext_resource type="Resource" uid="uid://wassrpr44eqh" path="res://resources/items/Shell Helmet.tres" id="30_gg7nk"]
+[ext_resource type="Resource" uid="uid://5uik6oodl6ag" path="res://resources/items/Skewer.tres" id="31_clsby"]
+[ext_resource type="Resource" uid="uid://bwns2hw2m7pwi" path="res://resources/items/Spatchula.tres" id="32_io6ay"]
+[ext_resource type="Resource" uid="uid://dnuwihmw2flu5" path="res://resources/items/Toast.tres" id="33_oj36i"]
+[ext_resource type="Resource" uid="uid://c0oawwfigjbde" path="res://resources/items/Whisk.tres" id="34_cnh1j"]
+[ext_resource type="Script" uid="uid://c24n76nrnb3o1" path="res://scripts/progression/abilities/abilities.gd" id="35_acd5m"]
+[ext_resource type="Resource" uid="uid://vg4pw01pqvhx" path="res://resources/abilities/black_hole.tres" id="36_3lcal"]
+[ext_resource type="Resource" uid="uid://d3vkvwb2jb26d" path="res://resources/abilities/bullet_storm.tres" id="37_my2js"]
+[ext_resource type="Resource" uid="uid://cgldn40evkied" path="res://resources/abilities/damage_dash.tres" id="38_8gav2"]
+[ext_resource type="Resource" uid="uid://bqkuj4plfyjfm" path="res://resources/abilities/damage_wave.tres" id="39_fxf2i"]
+[ext_resource type="Resource" uid="uid://c3vnegn3ubcjc" path="res://resources/abilities/orbiting_blades.tres" id="40_mtdup"]
+[ext_resource type="Resource" uid="uid://d3s7evymtd82p" path="res://resources/abilities/shockwave_pulse.tres" id="41_ospih"]
+[ext_resource type="Script" uid="uid://b4oy2lqi0n2ie" path="res://scripts/progression/abilities/passive_ability.gd" id="42_ejqto"]
+[ext_resource type="Resource" uid="uid://dp4svlrxr8qei" path="res://resources/passive_abilities/force_field.tres" id="43_67nvh"]
+[ext_resource type="Resource" uid="uid://binjuw5cgpn2o" path="res://resources/passive_abilities/health_regen_on_kill.tres" id="44_hiube"]
+[ext_resource type="Resource" uid="uid://mhvocebmbmbo" path="res://resources/passive_abilities/second_life.tres" id="45_fljkd"]
 
-[node name="ShopUI" type="CanvasLayer" unique_id=1633812390]
-script = ExtResource("1_5tinp")
-item_pool = Array[ExtResource("8_m2mw0")]([ExtResource("3_gsl77"), ExtResource("4_p3vfx"), ExtResource("5_wefq6"), ExtResource("6_dgggy"), ExtResource("7_lvxca"), ExtResource("8_eoc65"), ExtResource("9_oesyk"), ExtResource("10_g6rnb"), ExtResource("11_elkfa"), ExtResource("12_2ka3b"), ExtResource("13_8kkrh"), ExtResource("14_5xvhc"), ExtResource("15_omp8d"), ExtResource("16_cma1a"), ExtResource("17_ef3xj"), ExtResource("18_qlk0j"), ExtResource("19_wsxnv"), ExtResource("20_186w4"), ExtResource("21_tp4kr"), ExtResource("22_5ln0s"), ExtResource("23_tedwl"), ExtResource("24_jbymo"), ExtResource("25_yh3qn"), ExtResource("26_tpmp1"), ExtResource("27_kxa0q"), ExtResource("28_t2f2c"), ExtResource("29_hfkvp"), ExtResource("30_v8be5"), ExtResource("31_blxua"), ExtResource("32_28y3e"), ExtResource("33_ym4wx"), ExtResource("34_nktqw")])
+[sub_resource type="StyleBoxFlat" id="MainPanel"]
+content_margin_left = 24.0
+content_margin_top = 18.0
+content_margin_right = 24.0
+content_margin_bottom = 18.0
+bg_color = Color(0.035, 0.027, 0.022, 0.97)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+border_color = Color(0.72, 0.36, 0.06, 1)
+corner_radius_top_left = 12
+corner_radius_top_right = 12
+corner_radius_bottom_right = 12
+corner_radius_bottom_left = 12
 
-[node name="CenterContainer" type="CenterContainer" parent="." unique_id=1925415414]
+[sub_resource type="StyleBoxFlat" id="CloseButton"]
+bg_color = Color(0.34, 0.07, 0.025, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.88, 0.31, 0.06, 1)
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_right = 6
+corner_radius_bottom_left = 6
+
+[sub_resource type="StyleBoxFlat" id="CardHover"]
+bg_color = Color(0.075, 0.045, 0.02, 1)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+border_color = Color(1, 0.48, 0.055, 1)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+
+[sub_resource type="StyleBoxFlat" id="Card"]
+content_margin_left = 18.0
+content_margin_top = 16.0
+content_margin_right = 18.0
+content_margin_bottom = 16.0
+bg_color = Color(0.025, 0.025, 0.024, 0.98)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.32, 0.19, 0.07, 1)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+
+[sub_resource type="StyleBoxFlat" id="BuyButton"]
+bg_color = Color(0.22, 0.42, 0.025, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.62, 0.82, 0.1, 1)
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_right = 6
+corner_radius_bottom_left = 6
+
+[sub_resource type="StyleBoxFlat" id="BuyHover"]
+bg_color = Color(0.3, 0.56, 0.035, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.78, 1, 0.18, 1)
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_right = 6
+corner_radius_bottom_left = 6
+
+[sub_resource type="StyleBoxFlat" id="FooterPanel"]
+bg_color = Color(0.025, 0.021, 0.019, 0.98)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.29, 0.18, 0.08, 1)
+corner_radius_top_left = 7
+corner_radius_top_right = 7
+corner_radius_bottom_right = 7
+corner_radius_bottom_left = 7
+
+[sub_resource type="StyleBoxFlat" id="RefreshButton"]
+bg_color = Color(0.16, 0.11, 0.025, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.74, 0.46, 0.09, 1)
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_right = 6
+corner_radius_bottom_left = 6
+
+[node name="ShopUI" type="Control" unique_id=869323745]
+layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+script = ExtResource("1_5xvhc")
+item_pool = Array[ExtResource("2_omp8d")]([ExtResource("3_cma1a"), ExtResource("4_ef3xj"), ExtResource("5_qlk0j"), ExtResource("6_wsxnv"), ExtResource("7_186w4"), ExtResource("8_tp4kr"), ExtResource("9_5ln0s"), ExtResource("10_tedwl"), ExtResource("11_jbymo"), ExtResource("12_yh3qn"), ExtResource("13_tpmp1"), ExtResource("14_kxa0q"), ExtResource("15_t2f2c"), ExtResource("16_hfkvp"), ExtResource("17_v8be5"), ExtResource("18_blxua"), ExtResource("19_28y3e"), ExtResource("20_ym4wx"), ExtResource("21_nktqw"), ExtResource("22_0dudi"), ExtResource("23_s3u42"), ExtResource("24_gryrv"), ExtResource("25_s8jma"), ExtResource("26_6g7ym"), ExtResource("27_clk8t"), ExtResource("28_ni7mg"), ExtResource("29_myjaa"), ExtResource("30_gg7nk"), ExtResource("31_clsby"), ExtResource("32_io6ay"), ExtResource("33_oj36i"), ExtResource("34_cnh1j")])
+ability_pool = Array[ExtResource("35_acd5m")]([ExtResource("36_3lcal"), ExtResource("37_my2js"), ExtResource("38_8gav2"), ExtResource("39_fxf2i"), ExtResource("40_mtdup"), ExtResource("41_ospih")])
+passive_pool = Array[ExtResource("42_ejqto")]([ExtResource("43_67nvh"), ExtResource("44_hiube"), ExtResource("45_fljkd")])
 
-[node name="PanelContainer" type="PanelContainer" parent="CenterContainer" unique_id=1364390019]
-custom_minimum_size = Vector2(1600, 900)
-layout_mode = 2
+[node name="Dimmer" type="ColorRect" parent="." unique_id=1712177748]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(0.012, 0.008, 0.012, 0.68)
 
-[node name="MarginContainer" type="MarginContainer" parent="CenterContainer/PanelContainer" unique_id=341550888]
-layout_mode = 2
-theme_override_constants/margin_left = 30
-theme_override_constants/margin_top = 30
-theme_override_constants/margin_right = 25
-theme_override_constants/margin_bottom = 25
+[node name="Panel" type="PanelContainer" parent="." unique_id=1940398587]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -780.0
+offset_top = -440.0
+offset_right = 780.0
+offset_bottom = 440.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+theme_override_styles/panel = SubResource("MainPanel")
 
-[node name="VBoxContainer" type="VBoxContainer" parent="CenterContainer/PanelContainer/MarginContainer" unique_id=1274354626]
+[node name="VBox" type="VBoxContainer" parent="Panel" unique_id=36893403]
 layout_mode = 2
-theme_override_constants/separation = 50
+mouse_filter = 2
+theme_override_constants/separation = 12
 
-[node name="TitleLabel" type="Label" parent="CenterContainer/PanelContainer/MarginContainer/VBoxContainer" unique_id=758717490]
+[node name="Header" type="HBoxContainer" parent="Panel/VBox" unique_id=1864291879]
+custom_minimum_size = Vector2(0, 92)
 layout_mode = 2
-theme_override_font_sizes/font_size = 32
-text = "CHICKEN SHOP"
-horizontal_alignment = 1
+mouse_filter = 2
+theme_override_constants/separation = 14
 
-[node name="MoneyLabel" type="Label" parent="CenterContainer/PanelContainer/MarginContainer/VBoxContainer" unique_id=554150396]
+[node name="TitleBlock" type="VBoxContainer" parent="Panel/VBox/Header" unique_id=1013572940]
 layout_mode = 2
-theme_override_font_sizes/font_size = 24
-text = "Gold: 125"
-horizontal_alignment = 1
-
-[node name="Upgrades" type="HBoxContainer" parent="CenterContainer/PanelContainer/MarginContainer/VBoxContainer" unique_id=924960573]
-layout_mode = 2
-theme_override_constants/separation = 20
+size_flags_horizontal = 3
+mouse_filter = 2
 alignment = 1
 
-[node name="Upgrade1" type="Button" parent="CenterContainer/PanelContainer/MarginContainer/VBoxContainer/Upgrades" unique_id=1823608752]
-custom_minimum_size = Vector2(220, 220)
+[node name="Title" type="Label" parent="Panel/VBox/Header/TitleBlock" unique_id=140125574]
 layout_mode = 2
-size_flags_horizontal = 3
-autowrap_mode = 3
-
-[node name="Upgrade2" type="Button" parent="CenterContainer/PanelContainer/MarginContainer/VBoxContainer/Upgrades" unique_id=1257161247]
-custom_minimum_size = Vector2(220, 220)
-layout_mode = 2
-size_flags_horizontal = 3
-
-[node name="Upgrade3" type="Button" parent="CenterContainer/PanelContainer/MarginContainer/VBoxContainer/Upgrades" unique_id=846343015]
-custom_minimum_size = Vector2(220, 220)
-layout_mode = 2
-size_flags_horizontal = 3
-
-[node name="ExhaustedLabel" type="Label" parent="CenterContainer/PanelContainer/MarginContainer/VBoxContainer" unique_id=846343016]
-unique_name_in_owner = true
-visible = false
-custom_minimum_size = Vector2(20, 20)
-layout_mode = 2
-theme_override_font_sizes/font_size = 22
-text = "Shop pool exhausted - keep completing runs to unlock new shop gear!"
+theme_override_colors/font_color = Color(1, 0.82, 0.52, 1)
+theme_override_font_sizes/font_size = 44
+text = "SHOP"
 horizontal_alignment = 1
-autowrap_mode = 3
+
+[node name="Subtitle" type="Label" parent="Panel/VBox/Header/TitleBlock" unique_id=320862893]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.62, 0.12, 1)
+theme_override_font_sizes/font_size = 18
+text = "★  SPEND YOUR PLUCK COINS  ★"
+horizontal_alignment = 1
+
+[node name="CoinLabel" type="Label" parent="Panel/VBox/Header" unique_id=330511138]
+custom_minimum_size = Vector2(220, 0)
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.78, 0.3, 1)
+theme_override_font_sizes/font_size = 22
+text = "●  1,240
+PLUCK COINS"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="CloseButton" type="Button" parent="Panel/VBox/Header" unique_id=1950750855]
+custom_minimum_size = Vector2(68, 62)
+layout_mode = 2
+theme_override_font_sizes/font_size = 32
+theme_override_styles/normal = SubResource("CloseButton")
+theme_override_styles/hover = SubResource("CardHover")
+text = "×"
+
+[node name="StockRow" type="HBoxContainer" parent="Panel/VBox" unique_id=1723553521]
+custom_minimum_size = Vector2(0, 42)
+layout_mode = 2
+mouse_filter = 2
+theme_override_constants/separation = 10
+alignment = 1
+
+[node name="LeftRule" type="HSeparator" parent="Panel/VBox/StockRow" unique_id=396515208]
+custom_minimum_size = Vector2(300, 0)
+layout_mode = 2
+mouse_filter = 2
+
+[node name="Label" type="Label" parent="Panel/VBox/StockRow" unique_id=1796404685]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.92, 0.77, 0.53, 1)
+theme_override_font_sizes/font_size = 18
+text = "New stock in:"
+
+[node name="Timer" type="Label" parent="Panel/VBox/StockRow" unique_id=641042858]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.82, 0.42, 1)
+theme_override_font_sizes/font_size = 19
+text = "⌛  02:45"
+
+[node name="RightRule" type="HSeparator" parent="Panel/VBox/StockRow" unique_id=952028510]
+custom_minimum_size = Vector2(300, 0)
+layout_mode = 2
+mouse_filter = 2
+
+[node name="Offers" type="HBoxContainer" parent="Panel/VBox" unique_id=1196008930]
+layout_mode = 2
+size_flags_vertical = 3
+mouse_filter = 2
+theme_override_constants/separation = 14
+
+[node name="Offer1" type="PanelContainer" parent="Panel/VBox/Offers" unique_id=936311421]
+layout_mode = 2
+size_flags_horizontal = 3
+mouse_filter = 2
+theme_override_styles/panel = SubResource("Card")
+
+[node name="VBox" type="VBoxContainer" parent="Panel/VBox/Offers/Offer1" unique_id=1318732617]
+layout_mode = 2
+mouse_filter = 2
+theme_override_constants/separation = 10
+
+[node name="Icon" type="TextureRect" parent="Panel/VBox/Offers/Offer1/VBox" unique_id=1177565930]
+custom_minimum_size = Vector2(0, 160)
+layout_mode = 2
+mouse_filter = 2
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Name" type="Label" parent="Panel/VBox/Offers/Offer1/VBox" unique_id=633521197]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.49, 0.08, 1)
+theme_override_font_sizes/font_size = 25
+text = "EMBER BLADE"
+horizontal_alignment = 1
+
+[node name="Type" type="Label" parent="Panel/VBox/Offers/Offer1/VBox" unique_id=1582482084]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.34, 0.08, 1)
+theme_override_font_sizes/font_size = 17
+text = "LEGENDARY WEAPON"
+horizontal_alignment = 1
+
+[node name="Description" type="Label" parent="Panel/VBox/Offers/Offer1/VBox" unique_id=143565511]
+layout_mode = 2
+text = "A blade forged in eternal flame."
+horizontal_alignment = 1
+autowrap_mode = 2
+
+[node name="Separator" type="HSeparator" parent="Panel/VBox/Offers/Offer1/VBox" unique_id=1489719813]
+layout_mode = 2
+mouse_filter = 2
+
+[node name="Stats" type="Label" parent="Panel/VBox/Offers/Offer1/VBox" unique_id=1452486446]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_font_sizes/font_size = 17
+text = "⚔  Damage                         7.0
+
+🔥  Fire Rate                    +18%"
+autowrap_mode = 2
+
+[node name="BuyButton" type="Button" parent="Panel/VBox/Offers/Offer1/VBox" unique_id=66521815]
+custom_minimum_size = Vector2(0, 66)
+layout_mode = 2
+theme_override_font_sizes/font_size = 23
+theme_override_styles/normal = SubResource("BuyButton")
+theme_override_styles/hover = SubResource("BuyHover")
+text = "●  1,750"
+
+[node name="Offer2" type="PanelContainer" parent="Panel/VBox/Offers" unique_id=1347033950]
+layout_mode = 2
+size_flags_horizontal = 3
+mouse_filter = 2
+theme_override_styles/panel = SubResource("Card")
+
+[node name="VBox" type="VBoxContainer" parent="Panel/VBox/Offers/Offer2" unique_id=320704004]
+layout_mode = 2
+mouse_filter = 2
+theme_override_constants/separation = 10
+
+[node name="Icon" type="TextureRect" parent="Panel/VBox/Offers/Offer2/VBox" unique_id=2040160874]
+custom_minimum_size = Vector2(0, 160)
+layout_mode = 2
+mouse_filter = 2
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Name" type="Label" parent="Panel/VBox/Offers/Offer2/VBox" unique_id=1017328331]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.8, 0.25, 1, 1)
+theme_override_font_sizes/font_size = 25
+text = "EMERALD RING"
+horizontal_alignment = 1
+
+[node name="Type" type="Label" parent="Panel/VBox/Offers/Offer2/VBox" unique_id=1303409481]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.75, 0.25, 1, 1)
+theme_override_font_sizes/font_size = 17
+text = "EPIC ACCESSORY"
+horizontal_alignment = 1
+
+[node name="Description" type="Label" parent="Panel/VBox/Offers/Offer2/VBox" unique_id=685161820]
+layout_mode = 2
+text = "Increases your luck and critical power."
+horizontal_alignment = 1
+autowrap_mode = 2
+
+[node name="Separator" type="HSeparator" parent="Panel/VBox/Offers/Offer2/VBox" unique_id=154497117]
+layout_mode = 2
+mouse_filter = 2
+
+[node name="Stats" type="Label" parent="Panel/VBox/Offers/Offer2/VBox" unique_id=776078260]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_font_sizes/font_size = 17
+text = "☘  Luck                           +15%
+
+✦  Critical Damage                +25%"
+autowrap_mode = 2
+
+[node name="BuyButton" type="Button" parent="Panel/VBox/Offers/Offer2/VBox" unique_id=1694067352]
+custom_minimum_size = Vector2(0, 66)
+layout_mode = 2
+theme_override_font_sizes/font_size = 23
+theme_override_styles/normal = SubResource("BuyButton")
+theme_override_styles/hover = SubResource("BuyHover")
+text = "●  950"
+
+[node name="Offer3" type="PanelContainer" parent="Panel/VBox/Offers" unique_id=1367025983]
+layout_mode = 2
+size_flags_horizontal = 3
+mouse_filter = 2
+theme_override_styles/panel = SubResource("Card")
+
+[node name="VBox" type="VBoxContainer" parent="Panel/VBox/Offers/Offer3" unique_id=577109765]
+layout_mode = 2
+mouse_filter = 2
+theme_override_constants/separation = 10
+
+[node name="Icon" type="TextureRect" parent="Panel/VBox/Offers/Offer3/VBox" unique_id=388590495]
+custom_minimum_size = Vector2(0, 160)
+layout_mode = 2
+mouse_filter = 2
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Name" type="Label" parent="Panel/VBox/Offers/Offer3/VBox" unique_id=1348967958]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.18, 0.58, 1, 1)
+theme_override_font_sizes/font_size = 25
+text = "ORBITING BLADES"
+horizontal_alignment = 1
+
+[node name="Type" type="Label" parent="Panel/VBox/Offers/Offer3/VBox" unique_id=1204723982]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.18, 0.58, 1, 1)
+theme_override_font_sizes/font_size = 17
+text = "RARE ABILITY"
+horizontal_alignment = 1
+
+[node name="Description" type="Label" parent="Panel/VBox/Offers/Offer3/VBox" unique_id=1922247132]
+layout_mode = 2
+text = "Summon blades that orbit around you."
+horizontal_alignment = 1
+autowrap_mode = 2
+
+[node name="Separator" type="HSeparator" parent="Panel/VBox/Offers/Offer3/VBox" unique_id=1186217422]
+layout_mode = 2
+mouse_filter = 2
+
+[node name="Stats" type="Label" parent="Panel/VBox/Offers/Offer3/VBox" unique_id=56167655]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_font_sizes/font_size = 17
+text = "Q / E ACTIVE ABILITY
+
+Cooldown and effect shown here."
+autowrap_mode = 2
+
+[node name="BuyButton" type="Button" parent="Panel/VBox/Offers/Offer3/VBox" unique_id=1137655880]
+custom_minimum_size = Vector2(0, 66)
+layout_mode = 2
+theme_override_font_sizes/font_size = 23
+theme_override_styles/normal = SubResource("BuyButton")
+theme_override_styles/hover = SubResource("BuyHover")
+text = "●  650"
+
+[node name="Footer" type="PanelContainer" parent="Panel/VBox" unique_id=1402302071]
+custom_minimum_size = Vector2(0, 112)
+layout_mode = 2
+mouse_filter = 2
+theme_override_styles/panel = SubResource("FooterPanel")
+
+[node name="HBox" type="HBoxContainer" parent="Panel/VBox/Footer" unique_id=401037969]
+layout_mode = 2
+mouse_filter = 2
+theme_override_constants/separation = 16
+
+[node name="Tip" type="VBoxContainer" parent="Panel/VBox/Footer/HBox" unique_id=282260734]
+layout_mode = 2
+size_flags_horizontal = 3
+mouse_filter = 2
+alignment = 1
+
+[node name="Title" type="Label" parent="Panel/VBox/Footer/HBox/Tip" unique_id=1050835613]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.61, 0.11, 1)
+theme_override_font_sizes/font_size = 19
+text = "🐔  TIP"
+
+[node name="Text" type="Label" parent="Panel/VBox/Footer/HBox/Tip" unique_id=1101297807]
+layout_mode = 2
+text = "Shops offer powerful gear and abilities. Choose wisely — your build depends on it!"
+autowrap_mode = 2
+
+[node name="RefreshInfo" type="VBoxContainer" parent="Panel/VBox/Footer/HBox" unique_id=1334103067]
+custom_minimum_size = Vector2(300, 0)
+layout_mode = 2
+mouse_filter = 2
+alignment = 1
+
+[node name="Title" type="Label" parent="Panel/VBox/Footer/HBox/RefreshInfo" unique_id=765996365]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.68, 0.22, 1)
+theme_override_font_sizes/font_size = 18
+text = "↻  REFRESH STOCK"
+
+[node name="Text" type="Label" parent="Panel/VBox/Footer/HBox/RefreshInfo" unique_id=1567203981]
+layout_mode = 2
+text = "Reroll all 3 options."
+
+[node name="RefreshButton" type="Button" parent="Panel/VBox/Footer/HBox" unique_id=188617365]
+custom_minimum_size = Vector2(180, 62)
+layout_mode = 2
+theme_override_font_sizes/font_size = 21
+theme_override_styles/normal = SubResource("RefreshButton")
+theme_override_styles/hover = SubResource("CardHover")
+text = "●  50"
+
+[node name="CloseHint" type="Label" parent="Panel/VBox" unique_id=95717387]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.78, 0.68, 0.54, 1)
+theme_override_font_sizes/font_size = 16
+text = "ESC   Close Shop"
+horizontal_alignment = 1

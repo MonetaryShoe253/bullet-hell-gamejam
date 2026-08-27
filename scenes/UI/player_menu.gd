@@ -1,33 +1,34 @@
 class_name PlayerMenu
 extends CanvasLayer
 
-const TAB_PATH := "CenterContainer/PanelContainer/MarginContainer/MainVBox/TabContainer"
-
-@onready var close_button: Button = %CloseButton
-
-@onready var inventory_tab: InventoryUI = $CenterContainer/PanelContainer/MarginContainer/MainVBox/TabContainer/Inventory
-@onready var abilities_tab: AbilityMenuUI = $CenterContainer/PanelContainer/MarginContainer/MainVBox/TabContainer/Abilities
-@onready var stats_tab: StatsMenu = $CenterContainer/PanelContainer/MarginContainer/MainVBox/TabContainer/Stats
+@onready var inventory_ui: InventoryUI = $InventoryUI
 
 
 func _ready() -> void:
-	close_button.pressed.connect(hide)
-	hide()
+	process_mode = Node.PROCESS_MODE_ALWAYS
+	visible = true
 
+	if inventory_ui == null:
+		push_error("PlayerMenu: InventoryUI child is missing or does not have inventory_ui.gd attached.")
+		return
 
-## Temporary toggle for testing - reuses the "ability_menu" action (Tab) since
-## nothing else is listening to it anymore now that AbilityMenuUI's own input
-## handling is gone. Revisit once we decide what R/Tab/C should each do (see
-## Phase 5) - this may become its own dedicated action, or one of the
-## existing three might become "open menu" while the others jump straight to
-## a specific tab.
-func _unhandled_input(event: InputEvent) -> void:
-	if event.is_action_pressed("ability_menu"):
-		visible = not visible
-		get_viewport().set_input_as_handled()
+	inventory_ui.hide()
 
 
 func setup(player: Player) -> void:
-	inventory_tab.setup(player)
-	abilities_tab.setup(player)
-	stats_tab.setup(player)
+	if inventory_ui == null:
+		return
+	inventory_ui.setup(player)
+
+
+func _input(event: InputEvent) -> void:
+	if inventory_ui == null:
+		return
+
+	if event.is_action_pressed("ability_menu"):
+		if inventory_ui.visible:
+			inventory_ui.close()
+		else:
+			inventory_ui.open()
+
+		get_viewport().set_input_as_handled()

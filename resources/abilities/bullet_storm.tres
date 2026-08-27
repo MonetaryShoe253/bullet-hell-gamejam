@@ -6,6 +6,7 @@
 
 [resource]
 script = ExtResource("1_bstrm")
+unlock_id = &"Bullet Storm"
 ability_name = "Bullet Storm"
 description = "Unleash a ring of bullets in every direction."
 icon = ExtResource("1_wuhdu")
