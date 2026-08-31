@@ -184,51 +184,73 @@ func _on_level_changed(new_level: int) -> void:
 	if current_level_label:
 		current_level_label.text = "Current Level: %d" % new_level
 
-## Tears down everything from the previous dungeon (player, enemies, gates,
-## stairs, decorations) before a new layout is generated for the next level.
 func _clear_level_entities() -> void:
+	# Clear all geometry from the previous dungeon before generating the next one.
+	# TileMapLayer.clear() also removes the collision associated with those cells.
+	#NOTE: KEEP THESE! Fixes the dungeon bugs we've seen.
+	tile_layer.clear()
+	prop_layer.clear()
 
+	# Remove enemies belonging to the previous level.
 	for enemy in get_tree().get_nodes_in_group("enemy"):
 		if is_instance_valid(enemy) and enemy.get_parent() == gameplay_layer:
 			enemy.queue_free()
 
+	# Remove room controllers.
 	for rc: RoomController in _room_controllers:
 		if is_instance_valid(rc):
 			rc.queue_free()
 	_room_controllers.clear()
 
+	# Remove stairs trigger.
 	if _stairs_trigger and is_instance_valid(_stairs_trigger):
 		_stairs_trigger.queue_free()
 	_stairs_trigger = null
 
+	# Remove shop trigger.
 	if _shop_trigger and is_instance_valid(_shop_trigger):
 		_shop_trigger.queue_free()
 	_shop_trigger = null
 
-	# Godot uniquifies sibling names ("DemonPortal", "DemonPortal2", ...) since
-	# there can be several, so match by prefix rather than tracking an array.
-	# Decorations/barrels are named "Decoration" wherever they live. Cosmetic
-	# sprites are children of this node and barrels live in gameplay_layer, so
-	# both parents need the sweep; permanent cover is TileMap wall geometry now.
+	# Godot uniquifies sibling names ("DemonPortal", "DemonPortal2", ...)
+	# since there can be several, so match by prefix rather than tracking
+	# an array.
+	#
+	# Decorations/barrels are named "Decoration" wherever they live.
+	# Cosmetic sprites are children of this node and barrels live in
+	# gameplay_layer, so both parents need the sweep.
 	# The player is gameplay_layer's only other child and does not match.
 	for child in get_children():
 		if child.name.begins_with("DemonPortal") or child.name.begins_with("Decoration"):
 			child.queue_free()
+
 	for child in gameplay_layer.get_children():
 		if child.name.begins_with("Decoration"):
 			child.queue_free()
 
+	# Hide boss UI ready for the next level.
 	boss_health_bar.visible = false
 
-
+func _debug_dungeon_state(label: String) -> void:
+	print("\n=== ", label, " ===")
+	print("Dungeon tiles: ", $TileMapLayer.get_used_cells().size())
+	print("Prop tiles: ", $PropLayer.get_used_cells().size())
+	print("Gameplay children: ", $GameplayLayer.get_child_count())	
+	
 func generate_dungeon() -> void:
 	
 	if player and is_instance_valid(player):
 		player.global_position = Vector2(-100000, -100000)
 		
+	#_debug_dungeon_state("BEFORE CLEAR")
+
 	_clear_level_entities()
-	# Allow everything we just queue_free()'d to actually disappear.
+
+	#_debug_dungeon_state("AFTER CLEAR")
+
 	await get_tree().process_frame
+
+	#_debug_dungeon_state("AFTER FRAME")
 
 	_generator = DungeonGenerator.new()
 	_generator.map_size = map_size
