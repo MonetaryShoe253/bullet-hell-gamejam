@@ -66,6 +66,7 @@ func _ready() -> void:
 
 	stats.stats_changed.connect(_on_stats_changed)
 	inventory.equipment_changed.connect(_on_equipment_changed)
+	inventory.item_equipped_first_time.connect(_on_item_equipped_first_time)
 
 	dash_cooldown_bar.min_value = 0.0
 	dash_cooldown_bar.max_value = 1.0
@@ -94,8 +95,21 @@ func _on_equipment_changed() -> void:
 	
 func _on_stats_changed() -> void:
 	# Player stats determine the desired max HP. HealthComponent remains generic
-	# so enemies can use it without needing a StatsComponent.
-	health_component.set_max_health(stats.get_max_health(), true)
+	# so enemies can use it without needing a StatsComponent. Equipment can be
+	# toggled on and off, so max health changes here never auto-heal - that
+	# would let de-equipping and re-equipping a max health item farm free
+	# health. Actual healing for a max health gain is granted explicitly,
+	# once, at the point the gain first happens (see
+	# _on_item_equipped_first_time() and apply_upgrade()).
+	health_component.set_max_health(stats.get_max_health(), false)
+
+## Grants the one-time current-health bump for a max health item, the first
+## time it's ever equipped this run. Re-equipping later (after unequipping)
+## only restores the max health cap, not the current health, so swapping an
+## item on and off can't be used to regenerate health for free.
+func _on_item_equipped_first_time(item: Item) -> void:
+	if item.max_health > 0.0:
+		health_component.heal(item.max_health)
 
 
 func _on_died() -> void:
@@ -244,6 +258,11 @@ func _update_animation() -> void:
 	
 func apply_upgrade(upgrade: ShopUpgrade) -> void:
 	stats.apply_shop_upgrade(upgrade)
+
+	# Shop upgrades are permanent (can't be unequipped), so unlike items
+	# there's no farming risk in healing for the full amount immediately.
+	if upgrade.type == ShopUpgrade.UpgradeType.MAX_HEALTH:
+		health_component.heal(upgrade.amount)
 	
 func start_forced_movement(
 	direction: Vector2,

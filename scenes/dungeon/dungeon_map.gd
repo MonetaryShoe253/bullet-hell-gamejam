@@ -262,7 +262,7 @@ func generate_dungeon() -> void:
 	_paint(_generator)
 
 	_spawn_player()
-	_spawner = EnemySpawner.new(gameplay_layer, tile_layer, player)
+	_spawner = EnemySpawner.new(gameplay_layer, tile_layer, player, _generator.seed_used)
 	
 	# Give the physics server a chance to register the player's
 	# new position.

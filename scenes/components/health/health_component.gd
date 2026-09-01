@@ -27,10 +27,9 @@ func set_max_health(new_max_health: float, heal_difference := false) -> void:
 
 	if heal_difference:
 		var difference := max_health - old_max_health
-		if difference > 0.0:
-			current_health += difference
+		current_health += difference
 
-	current_health = min(current_health, max_health)
+	current_health = clamp(current_health, 0.0, max_health)
 
 	health_changed.emit(current_health, max_health)
 

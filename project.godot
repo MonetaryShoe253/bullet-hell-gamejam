@@ -114,4 +114,4 @@ stats_menu={
 textures/canvas_textures/default_texture_filter=0
 rendering_device/driver.windows="d3d12"
 renderer/rendering_method="mobile"
-environment/defaults/default_clear_color=Color(0.145098, 0.0745098, 0.101961, 1)
+environment/defaults/default_clear_color=Color(0, 0, 0, 1)

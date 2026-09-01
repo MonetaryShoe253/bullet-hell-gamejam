@@ -1472,9 +1472,13 @@ func _clean_up() -> void:
 ##     squeezing past each other corner to corner. The convex-corner lookup has
 ##     no answer for that, since both diagonals want the tile to face them.
 ##     Opening the cell lets the ordinary rules take over on the next pass.
-func _carve_pinched_walls() -> int:
+##
+## `bounds` restricts the scan to a small rect instead of the whole map - see
+## fix_pattern_pinches(), which needs this cheap enough to re-run per room.
+func _carve_pinched_walls(bounds: Rect2i = Rect2i()) -> int:
 	var doomed: Dictionary = {}
-	for cell: Vector2i in get_wall_cells():
+	var candidates: Array[Vector2i] = get_wall_cells() if bounds.size == Vector2i.ZERO else _rock_cells_in(bounds)
+	for cell: Vector2i in candidates:
 		var north: bool = grid.has(cell + Vector2i(0, -1))
 		var south: bool = grid.has(cell + Vector2i(0, 1))
 		var east: bool = grid.has(cell + Vector2i(1, 0))
@@ -1555,9 +1559,13 @@ func _rock_reached_from_border() -> Dictionary:
 ## Floor one cell thick has no tile either: the art shades a north edge or a
 ## south edge, never both on one tile. Merging two regions in _carve_pinched_walls
 ## can leave exactly this - a single-cell neck between them - so widen it to two.
-func _widen_thin_floors() -> int:
+##
+## `bounds` restricts the scan to a small rect instead of the whole map - see
+## fix_pattern_pinches(), which needs this cheap enough to re-run per room.
+func _widen_thin_floors(bounds: Rect2i = Rect2i()) -> int:
 	var carved: int = 0
-	for cell: Vector2i in grid.keys():
+	var cells: Array = grid.keys() if bounds.size == Vector2i.ZERO else _floor_cells_in(bounds)
+	for cell: Vector2i in cells:
 		if not grid.has(cell + Vector2i(0, -1)) and not grid.has(cell + Vector2i(0, 1)):
 			if _set_floor(cell + Vector2i(0, 1)) or _set_floor(cell + Vector2i(0, -1)):
 				carved += 1
@@ -1572,14 +1580,23 @@ func _widen_thin_floors() -> int:
 ## one: the gap reads as an hourglass in the art, and it is an opening the player
 ## can sometimes squeeze through and sometimes not depending on their collider.
 ## Opening one of the two blocking cells turns it into a normal doorway.
-func _carve_diagonal_pinches() -> int:
-	var bounds: Rect2i = get_bounds()
-	if bounds.size == Vector2i.ZERO:
-		return 0
+##
+## `bounds` restricts the scan to a small rect instead of the whole map - see
+## fix_pattern_pinches(), which needs this cheap enough to re-run per room.
+## Passed as-is (not further padded); the default (whole-map) case pads its
+## own -1/+1 margin around get_bounds() to match this function's old,
+## unparameterised behaviour.
+func _carve_diagonal_pinches(bounds: Rect2i = Rect2i()) -> int:
+	var scan_bounds: Rect2i = bounds
+	if scan_bounds.size == Vector2i.ZERO:
+		var floor_bounds: Rect2i = get_bounds()
+		if floor_bounds.size == Vector2i.ZERO:
+			return 0
+		scan_bounds = Rect2i(floor_bounds.position - Vector2i.ONE, floor_bounds.size + Vector2i.ONE)
 
 	var doomed: Dictionary = {}
-	for y in range(bounds.position.y - 1, bounds.end.y):
-		for x in range(bounds.position.x - 1, bounds.end.x):
+	for y in range(scan_bounds.position.y, scan_bounds.end.y):
+		for x in range(scan_bounds.position.x, scan_bounds.end.x):
 			var nw: bool = grid.has(Vector2i(x, y))
 			var ne: bool = grid.has(Vector2i(x + 1, y))
 			var sw: bool = grid.has(Vector2i(x, y + 1))
@@ -1594,3 +1611,66 @@ func _carve_diagonal_pinches() -> int:
 		if _set_floor(cell):
 			carved += 1
 	return carved
+
+
+func _rock_cells_in(bounds: Rect2i) -> Array[Vector2i]:
+	var cells: Array[Vector2i] = []
+	for x in range(bounds.position.x, bounds.end.x):
+		for y in range(bounds.position.y, bounds.end.y):
+			var cell := Vector2i(x, y)
+			if not grid.has(cell):
+				cells.append(cell)
+	return cells
+
+
+func _floor_cells_in(bounds: Rect2i) -> Array[Vector2i]:
+	var cells: Array[Vector2i] = []
+	for x in range(bounds.position.x, bounds.end.x):
+		for y in range(bounds.position.y, bounds.end.y):
+			var cell := Vector2i(x, y)
+			if grid.has(cell):
+				cells.append(cell)
+	return cells
+
+
+## Widens any 1-cell-thick floor gap or diagonal-only pinch that ended up next
+## to a just-carved room pattern. RoomGenerator's blocks (see room_decorator.gd)
+## are validated for connectivity - _room_floor_connected() guarantees the
+## room's floor is still one reachable piece - but never for player clearance:
+## two blocks placed close together (e.g. Dining Booths' stacked alcoves) can
+## leave a floor seam only one cell wide, or a corner that only touches
+## diagonally, which a flood fill reads as fine but the player collider cannot
+## fit through - exactly the class of defect DungeonGenerator's own _clean_up()
+## already guarantees can't happen anywhere else on the map.
+##
+## Scoped tightly to the cells the pattern just removed (plus a small margin)
+## rather than the whole room or map: RoomGenerator never carves inside
+## reserved_cells' doorway throat, so this can never reach into a corridor or
+## another room, and staying local keeps it cheap enough to run once per room
+## instead of paying for a full-map cleanup pass on every pattern.
+##
+## Returns whichever originally-removed cells this reopened, so the caller can
+## keep its own wall-cell bookkeeping (room_wall_cells) honest.
+func fix_pattern_pinches(removed_cells: Array[Vector2i]) -> Array[Vector2i]:
+	if removed_cells.is_empty():
+		return []
+
+	var min_c: Vector2i = removed_cells[0]
+	var max_c: Vector2i = removed_cells[0]
+	for cell: Vector2i in removed_cells:
+		min_c = min_c.min(cell)
+		max_c = max_c.max(cell)
+	var local_bounds: Rect2i = Rect2i(min_c, max_c - min_c + Vector2i.ONE).grow(4)
+
+	for _pass in range(8):
+		var carved: int = _carve_pinched_walls(local_bounds) \
+				+ _carve_diagonal_pinches(local_bounds) \
+				+ _widen_thin_floors(local_bounds)
+		if carved == 0:
+			break
+
+	var reopened: Array[Vector2i] = []
+	for cell: Vector2i in removed_cells:
+		if grid.has(cell):
+			reopened.append(cell)
+	return reopened

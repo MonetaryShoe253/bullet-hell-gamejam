@@ -490,6 +490,23 @@ func _try_carve_pattern(gen: DungeonGenerator, room: Rect2i, data: Dictionary, b
 			gen.grid[cell] = DungeonGenerator.Cell.FLOOR
 		return false
 
+	# The composition is connected, but connectivity alone doesn't guarantee
+	# player clearance - two blocks placed close together can leave a floor gap
+	# only one cell wide. fix_pattern_pinches() widens those the same way
+	# DungeonGenerator's own cleanup does everywhere else, and hands back
+	# whichever removed cells it had to reopen so they don't get double-counted
+	# as permanent wall.
+	var reopened: Array[Vector2i] = gen.fix_pattern_pinches(removed)
+	if not reopened.is_empty():
+		var reopened_set: Dictionary = {}
+		for cell: Vector2i in reopened:
+			reopened_set[cell] = true
+		var kept: Array[Vector2i] = []
+		for cell: Vector2i in removed:
+			if not reopened_set.has(cell):
+				kept.append(cell)
+		removed = kept
+
 	var wall_cells: Array = data.wall_cells
 	wall_cells.append_array(removed)
 	return true

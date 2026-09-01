@@ -15,11 +15,11 @@ const SpawnIndicatorScene := preload(
 )
 const SPAWN_WARNING_DURATION := 0.65
 
-func _init(parent: Node, tile_layer: TileMapLayer, player: Node2D) -> void:
+func _init(parent: Node, tile_layer: TileMapLayer, player: Node2D, seed_value: int) -> void:
 	_parent = parent
 	_tile_layer = tile_layer
 	_player = player
-	_rng.randomize()
+	_rng.seed = seed_value
 
 
 func spawn_room(gen: DungeonGenerator, room: Rect2i, room_controller: RoomController) -> void:

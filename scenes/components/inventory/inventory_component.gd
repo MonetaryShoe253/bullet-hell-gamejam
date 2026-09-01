@@ -4,6 +4,7 @@ extends Node
 signal item_added(item: Item)
 signal item_removed(item: Item)
 signal equipment_changed()
+signal item_equipped_first_time(item: Item)
 signal ability_added(ability: Ability)
 signal passive_ability_added(passive: PassiveAbility)
 
@@ -14,6 +15,11 @@ var items: Array[Item] = []
 var equipped_armour: Item
 var equipped_weapon: Item
 var equipped_accessory: Item
+
+## Items that have already been equipped at least once this run - lets
+## callers grant one-time effects (e.g. the current-health bump on a max
+## health item) exactly once instead of every equip/unequip cycle.
+var _ever_equipped: Array[Item] = []
 
 ## Abilities bought with no free AbilityComponent/PassiveAbilityComponent
 ## slot land here, owned but inactive, until manually equipped elsewhere.
@@ -62,6 +68,10 @@ func equip(item: Item) -> void:
 			equipped_accessory = item
 
 	equipment_changed.emit()
+
+	if item not in _ever_equipped:
+		_ever_equipped.append(item)
+		item_equipped_first_time.emit(item)
 	
 func unequip(item: Item) -> void:
 	if equipped_armour == item:
