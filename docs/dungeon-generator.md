@@ -188,3 +188,93 @@ corridors, is why rooms often merge into bigger connected shapes rather than
 staying as discrete boxes. If you want tighter, more separated rooms, cap `rw`
 and `rh` in `_create_rooms()` and raise `room_padding` — both are layout taste,
 not correctness, so they were left as they were.
+
+
+## Generation faults found and fixed (2026-09-10)
+
+Three reported faults, all reproduced and measured with
+`tools/verify_dungeon_layout.gd` before anything was changed:
+
+```
+godot --headless --path . --script res://tools/verify_dungeon_layout.gd
+```
+
+|                              | before | after |
+|------------------------------|--------|-------|
+| stairs cell in solid rock    | 4 / 60 | 0 / 200 |
+| dungeons with an open "blob" | 4 / 60 | 0 / 200 |
+| thickest non-room area       | 49 tiles | 11 tiles |
+| boss arena perimeter gaps    | 4 / 60 | 0 / 200 |
+
+### Root cause: `_carve_enclosed_pockets()` had no size limit
+
+Two of the three faults were the same bug. That pass floods rock inward from
+the map border and floors everything the flood cannot reach, to clear the
+"stray little walled box" a corridor leaves when it clips a room corner. It had
+no upper bound.
+
+When the stairs landing and its corridor happened to wall off the rock between
+themselves and the boss arena, the pass floored **5,310 cells in one go** -
+turning solid rock into one amorphous open area and making the whole map read
+as a single giant room. The same flood ate into the rock ring around the boss
+arena, which is where the "no wall on the boss arena" perimeter gaps came from.
+
+Fixed by flooding each pocket separately and only carving it when it is small
+enough to actually be an artifact (`MAX_ENCLOSED_POCKET = 64`). A larger
+enclosed mass is simply rock that happens to be surrounded; it draws as
+ordinary black void bordered by proper walls, which was confirmed in-game
+before making the change.
+
+Staged instrumentation is what located this. The largest non-room area stayed
+at exactly 5 (the intended corridor width) through `_connect_rooms` and the
+first `_clean_up`, then jumped to 53 on the `_clean_up` immediately after
+`_carve_stairs_room` - which pointed at the pocket flood rather than at
+corridor routing, where the fault looked like it should be.
+
+### `_try_trim()` could bulldoze a room
+
+Sealing an over-wide opening erased `seal_depth` (= `room_padding +
+corridor_width` = 10) cells blindly. The stairs landing is carved only
+`room_padding + 1` = 6 cells from the boss arena, so a wide span on the boss
+wall sealed straight through it, erasing `stairs_cell` and leaving the level
+exit inside solid rock.
+
+Neither existing guard catches this: the map stays fully connected without the
+stairs room, and its cells are reachable rock afterwards. Sealing now stops at
+the edge of any deliberate room (`_is_room_floor()`).
+
+### `_enforce_boss_single_entrance()` assumed the stairs go north
+
+It exempted spans on `boss_room.position.y - 1` from sealing, commented as
+"where the stairs corridor exits". But `_carve_stairs_room()` tries the side
+opposite the entrance first and falls back through all four, so on a seed where
+the stairs left by another wall this would seal the only route to the level
+exit. Now tracked properly via `stairs_side`. (Latent - it was not the cause of
+the observed failures.)
+
+### A failed stairs attempt left dead-end corridors
+
+`_try_carve_stairs_on_side()` reverted with `_erase_rect(stairs_room)`, which
+removed the landing but kept whatever cells a failed `_carve_corridor()` had
+already carved - stubs leading to a room that no longer exists. It now snapshots
+the grid and restores it wholesale.
+
+### The boss doorway had no barrier art
+
+`_paint_gate()` skipped the boss entrance span on the theory that the demon
+portals were "the threshold". They are not: `_place_boss_portal_span()` offsets
+every portal `half_span + 2` cells *along* the wall, so the doorway itself
+stayed empty while the gate colliders still sealed it - an invisible wall
+between two portals. The boss entrance is gated like any other opening now.
+
+### Note on `tools/verify_dungeon.gd`
+
+Its "no rock sealed inside the floor" assertion has been passing **vacuously**:
+`RoomGenerator.new()` cannot resolve its `class_name` in `--script` main-loop
+mode, so `generate_all()` silently no-ops there and room interiors are never
+exercised. Had it run, the check would have failed on every seed, because
+RoomGenerator carves cover as island-shaped rock by design.
+
+The assertion is now narrowed to what its comment actually describes - *small*
+islands outside any room - and `verify_dungeon_layout.gd` covers traversal
+separately. Room interiors still are not covered by either tool.

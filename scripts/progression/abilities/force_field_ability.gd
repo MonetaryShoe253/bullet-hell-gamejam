@@ -11,10 +11,10 @@ var _field: ForceField = null
 
 func equip(player: Player) -> void:
 	_field = field_scene.instantiate()
-	# Added to current_scene rather than as a child of Player - Player has
-	# scale = Vector2(1.5, 1.5) on itself, which would inherit down and
-	# scale the field's radius unexpectedly. ForceField tracks the player's
-	# position itself each frame instead (see its _physics_process()).
+	# Added to current_scene rather than as a child of Player so the field's
+	# radius stays in world units and cannot be affected by any transform on
+	# the Player. ForceField tracks the player's position itself each frame
+	# instead (see its _physics_process()).
 	player.get_tree().current_scene.add_child(_field)
 	_field.activate(player, contact_damage_multiplier, tick_damage_multiplier, radius)
 

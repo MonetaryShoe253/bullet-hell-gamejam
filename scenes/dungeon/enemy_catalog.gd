@@ -10,6 +10,10 @@ const SlimeScene := preload("res://scenes/enemies/slime/slime.tscn")
 const BurgerScene := preload("res://scenes/enemies/burger/burger.tscn")
 const TacoScene := preload("res://scenes/enemies/taco/taco.tscn")
 const PizzaScene := preload("res://scenes/enemies/pizza/pizza.tscn")
+const WingTrooperScene := preload("res://scenes/enemies/wing_trooper/wing_trooper.tscn")
+const SaucyWingScene := preload("res://scenes/enemies/saucy_wing/saucy_wing.tscn")
+const CeleryScene := preload("res://scenes/enemies/celery/celery.tscn")
+const BucketBruteScene := preload("res://scenes/enemies/bucket_brute/bucket_brute.tscn")
 
 const SlimeProjectile := preload(
 	"res://scenes/projectiles/enemybullet/enemybullet.tscn"
@@ -22,6 +26,15 @@ const TacoProjectile := preload(
 )
 const PizzaProjectile := preload(
 	"res://scenes/projectiles/enemybullet/pepperoni.tscn"
+)
+const WingProjectile := preload(
+	"res://scenes/projectiles/enemybullet/dorito.tscn"
+)
+const SauceProjectile := preload(
+	"res://scenes/projectiles/enemybullet/enemybullet.tscn"
+)
+const CeleryProjectile := preload(
+	"res://scenes/projectiles/enemybullet/lettuce.tscn"
 )
 
 const ENEMIES: Array[Dictionary] = [
@@ -64,6 +77,37 @@ const ENEMIES: Array[Dictionary] = [
 		"fire_rate": 0.5, "money_reward": 5,
 		"shot_pattern": Enemy.ShotPattern.SPREAD,
 		"movement_pattern": Enemy.MovementPattern.KITE,
+	},
+	{
+		"id": &"wing_trooper", "scene": WingTrooperScene,
+		"projectile_scene": WingProjectile,
+		"theme": DungeonGenerator.RoomTheme.WING, "min_level": 1,
+		"cost": 1.5, "weight": 1.0, "role": SpawnRole.FRONTLINE,
+		"health": 26.0, "damage": 7.0, "move_speed": 105.0,
+		"fire_rate": 0.9, "money_reward": 5,
+		"shot_pattern": Enemy.ShotPattern.SINGLE,
+		"movement_pattern": Enemy.MovementPattern.CHASE,
+	},
+	{
+		"id": &"saucy_wing", "scene": SaucyWingScene,
+		"projectile_scene": SauceProjectile,
+		"theme": DungeonGenerator.RoomTheme.WING, "min_level": 1,
+		"cost": 1.5, "weight": 1.0, "role": SpawnRole.BACKLINE,
+		"health": 20.0, "damage": 8.0, "move_speed": 95.0,
+		"fire_rate": 0.5, "money_reward": 5,
+		"shot_pattern": Enemy.ShotPattern.SPREAD,
+		"movement_pattern": Enemy.MovementPattern.KITE,
+		"preferred_distance": 190.0,
+	},
+	{
+		"id": &"celery", "scene": CeleryScene,
+		"projectile_scene": CeleryProjectile,
+		"theme": DungeonGenerator.RoomTheme.WING, "min_level": 1,
+		"cost": 1.5, "weight": 1.0, "role": SpawnRole.FLANKER,
+		"health": 15.0, "damage": 5.0, "move_speed": 165.0,
+		"fire_rate": 0.35, "money_reward": 4,
+		"shot_pattern": Enemy.ShotPattern.SINGLE,
+		"movement_pattern": Enemy.MovementPattern.STRAFE,
 	}
 ]
 
@@ -78,7 +122,7 @@ const BOSSES: Array[Dictionary] = [
 	"move_speed": 85.0,
 	"fire_rate": 0.65,
 	"money_reward": 100,
-	"scale": 2.6,
+	"scale": 2,
 	"shot_pattern": Enemy.ShotPattern.RING_GAP,
 	"movement_pattern": Enemy.MovementPattern.CHASE,
 	"ring_gap_projectiles": 22,
@@ -97,7 +141,7 @@ const BOSSES: Array[Dictionary] = [
 		"move_speed": 400.0,
 		"fire_rate": 0.30,
 		"money_reward": 70,		
-		"scale": 2.4,
+		"scale": 2,
 		"shot_pattern": Enemy.ShotPattern.SPIRAL,
 		"movement_pattern": Enemy.MovementPattern.ORBIT,
 		"spiral_projectiles": 4,
@@ -114,7 +158,7 @@ const BOSSES: Array[Dictionary] = [
 		"move_speed": 190.0,
 		"fire_rate": 0.8,
 		"money_reward": 85,
-		"scale": 2.4,
+		"scale": 2,
 		"shot_pattern": Enemy.ShotPattern.CROSS_BURST,
 		"movement_pattern": Enemy.MovementPattern.STRAFE,
 		"cross_burst_count": 4,
@@ -135,12 +179,31 @@ const BOSSES: Array[Dictionary] = [
 	"move_speed": 70.0,
 	"fire_rate": 0.2,
 	"money_reward": 60,
-	"scale": 2.4,
+	"scale": 2,
 	"shot_pattern": Enemy.ShotPattern.SPIRAL,
 	"movement_pattern": Enemy.MovementPattern.CHASE,
 	"spiral_projectiles": 12,
 	"spiral_rotation_speed": 7.0,
-}
+	},
+	{
+		"id": &"bucket_brute",
+		"scene": BucketBruteScene,
+		"projectile_scene": WingProjectile,
+		"color": Color(0.75, 0.3, 0.95, 1),
+		"health": 340.0,
+		"damage": 16.0,
+		"move_speed": 90.0,
+		"fire_rate": 0.55,
+		"money_reward": 90,
+		"scale": 2,
+		"shot_pattern": Enemy.ShotPattern.RING_GAP,
+		"movement_pattern": Enemy.MovementPattern.CHASE,
+		"ring_gap_projectiles": 18,
+		"ring_gap_size": 60.0,
+		"ring_gap_rotation_speed": 26.0,
+		"preferred_distance": 110.0,
+		"distance_tolerance": 25.0,
+	}
 ]
 
 

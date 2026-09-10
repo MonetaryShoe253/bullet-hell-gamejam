@@ -22,7 +22,7 @@ enum RoomKind { NORMAL, START, SHOP, BOSS }
 ## room's decorations/enemies belong to. Assigned in _assign_themes(); the
 ## renderer and enemy spawner both read it via theme_of() to keep a room's
 ## props and its enemies matching.
-enum RoomTheme { NONE, BURGER, TACO, PIZZA }
+enum RoomTheme { NONE, BURGER, TACO, PIZZA, WING }
 
 # --- Tuning knobs (set these before calling generate()) ---
 # A 16px tile at the player camera's 3x zoom on a 1920x1080 viewport shows
@@ -66,6 +66,10 @@ var player_spawn := Vector2i.ZERO  # centre cell of start_room
 ## boss room's exit couldn't be worked out (only possible with 1 room).
 var stairs_room := Rect2i()
 var stairs_cell := Vector2i.ZERO
+## Which boss-room wall the stairs corridor leaves through; ZERO when no stairs
+## room was carved. _enforce_boss_single_entrance() needs it so it does not seal
+## the very corridor that reaches the level exit.
+var stairs_side := Vector2i.ZERO
 
 ## The two doorway cells on the boss room's north wall, same spot the gate prop
 ## is drawn on. Filled in by _carve_stairs_room() so the renderer and the room
@@ -180,6 +184,7 @@ func generate(seed_value: int = -1, level: int = 1) -> void:
 	player_spawn = Vector2i.ZERO
 	stairs_room = Rect2i()
 	stairs_cell = Vector2i.ZERO
+	stairs_side = Vector2i.ZERO
 	boss_gate_cells.clear()
 	boss_entrance_direction = Vector2i.ZERO
 	_last_corridor_route.clear()
@@ -502,7 +507,7 @@ func _assign_roles() -> void:
 ## _assign_roles() so start/shop/boss are already excluded by kind_of().
 func _assign_themes() -> void:
 	room_themes.clear()
-	var themes: Array = [RoomTheme.BURGER, RoomTheme.TACO, RoomTheme.PIZZA]
+	var themes: Array = [RoomTheme.BURGER, RoomTheme.TACO, RoomTheme.PIZZA, RoomTheme.WING]
 	for room: Rect2i in rooms:
 		if kind_of(room) == RoomKind.NORMAL:
 			room_themes[room] = themes[rng.randi_range(0, themes.size() - 1)]
@@ -848,16 +853,24 @@ func _try_carve_stairs_on_side(side: Vector2i) -> bool:
 	if _touches_floor(candidate.grow(1)):
 		return false
 
+	# Snapshot so a rejected landing can be undone wholesale. The old code called
+	# _erase_rect(stairs_room) instead, which left behind whatever cells a failed
+	# _carve_corridor() had already carved - dead-end corridor stubs leading to a
+	# landing that no longer exists.
+	var before_grid: Dictionary = grid.duplicate()
+
 	stairs_room = candidate
 	_carve_rect(stairs_room)
 	stairs_cell = _center(stairs_room)
 
 	if not _carve_corridor(corridor_start, stairs_cell, boss_room, stairs_room):
-		_erase_rect(stairs_room)
+		grid = before_grid
 		stairs_room = Rect2i()
 		stairs_cell = Vector2i.ZERO
+		stairs_side = Vector2i.ZERO
 		return false
 
+	stairs_side = side
 	boss_gate_cells = _boss_gate_cells_on_side(side)
 	return true
 
@@ -922,12 +935,20 @@ func _enforce_boss_single_entrance() -> bool:
 	if boss_room.size == Vector2i.ZERO:
 		return false
 
-	var north_y: int = boss_room.position.y - 1  # where the stairs corridor exits
+	# Never treat the stairs corridor as an "extra" opening. This used to test
+	# `cell.y != boss_room.position.y - 1`, i.e. it assumed the stairs always
+	# leave through the north wall - but _carve_stairs_room() tries the side
+	# opposite the entrance first and then falls back through all four. On a seed
+	# where the stairs left by another wall, this sealed the only route to the
+	# level exit.
 	var entrance_spans: Array = []
 	for span: Array in get_room_exits(boss_room):
-		var cell: Vector2i = span[0]
-		if cell.y != north_y:
-			entrance_spans.append(span)
+		if span.is_empty():
+			continue
+		var outward := _span_direction(boss_room, span[0])
+		if stairs_side != Vector2i.ZERO and outward == stairs_side:
+			continue
+		entrance_spans.append(span)
 
 	if entrance_spans.size() <= 1:
 		return false
@@ -1149,6 +1170,17 @@ func _try_trim(span: Array, dir: Vector2i, seal_depth: int, keep_start: int, kee
 			var cell: Vector2i = span[i]
 			for d in range(seal_depth):
 				var seal_cell: Vector2i = cell + dir * d
+				# Stop at the edge of any deliberate room. A trim narrows an
+				# *opening*; it must never eat a room that happens to sit within
+				# seal_depth of it. The stairs landing is carved room_padding + 1
+				# cells from the arena while seal_depth is room_padding +
+				# corridor_width, so a wide boss-wall span used to seal straight
+				# through it, erasing stairs_cell and leaving the level exit
+				# inside solid rock. Neither existing guard catches that: the map
+				# stays fully connected without the stairs room, and its cells are
+				# reachable rock afterwards.
+				if _is_room_floor(seal_cell):
+					break
 				if grid.has(seal_cell):
 					grid.erase(seal_cell)
 					removed.append(seal_cell)
@@ -1166,6 +1198,17 @@ func _try_trim(span: Array, dir: Vector2i, seal_depth: int, keep_start: int, kee
 
 	for cell: Vector2i in removed:
 		grid[cell] = Cell.FLOOR
+	return false
+
+
+## True when `cell` lies inside a deliberately carved room, including the
+## post-boss stairs landing. Keeps destructive passes off room interiors.
+func _is_room_floor(cell: Vector2i) -> bool:
+	if stairs_room.size != Vector2i.ZERO and stairs_room.has_point(cell):
+		return true
+	for room: Rect2i in rooms:
+		if room.has_point(cell):
+			return true
 	return false
 
 
@@ -1511,16 +1554,48 @@ func _carve_pinched_walls(bounds: Rect2i = Rect2i()) -> int:
 ## sitting in the middle of an arena, which reads as a rendering fault rather
 ## than as level design. Flooding the rock inward from outside the map and
 ## carving everything the flood cannot reach clears them all in one go.
+## Largest pocket still treated as a scrap worth flooring. The artifact this
+## pass exists to remove is a handful of cells. A big enclosed mass is simply
+## rock that happens to be surrounded: it draws as ordinary black void bordered
+## by proper walls, and flooring it turns thousands of cells into open floor,
+## which is what collapsed whole dungeons into one amorphous blob.
+const MAX_ENCLOSED_POCKET := 64
+
+
 func _carve_enclosed_pockets() -> int:
 	var area: Rect2i = Rect2i(Vector2i.ZERO, map_size).grow(1)
 	var reached: Dictionary = _rock_reached_from_border()
-
+	var seen: Dictionary = {}
 	var carved: int = 0
+
 	for y in range(area.position.y, area.end.y):
 		for x in range(area.position.x, area.end.x):
-			var cell := Vector2i(x, y)
-			if not grid.has(cell) and not reached.has(cell) and _set_floor(cell):
-				carved += 1
+			var start := Vector2i(x, y)
+			if grid.has(start) or reached.has(start) or seen.has(start):
+				continue
+
+			# Flood each pocket on its own so its size can be judged, instead of
+			# carving every unreached cell in one indiscriminate sweep.
+			var pocket: Array[Vector2i] = []
+			var queue: Array[Vector2i] = [start]
+			seen[start] = true
+			while not queue.is_empty():
+				var cell: Vector2i = queue.pop_back()
+				pocket.append(cell)
+				for d: Vector2i in [Vector2i(1, 0), Vector2i(-1, 0), Vector2i(0, 1), Vector2i(0, -1)]:
+					var n: Vector2i = cell + d
+					if not area.has_point(n) or seen.has(n):
+						continue
+					if grid.has(n) or reached.has(n):
+						continue
+					seen[n] = true
+					queue.append(n)
+
+			if pocket.size() > MAX_ENCLOSED_POCKET:
+				continue
+			for cell: Vector2i in pocket:
+				if _set_floor(cell):
+					carved += 1
 	return carved
 
 

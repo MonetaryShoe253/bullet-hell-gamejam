@@ -362,15 +362,13 @@ func _paint_gate(rc: RoomController, locked: bool) -> void:
 		if span.is_empty():
 			continue
 
-		# The deliberate dungeon entrance uses the demon-portal threshold instead
-		# of ordinary door tiles. Other boss openings (notably the post-boss stairs
-		# side) still use normal gate art, so portal props never overlap the stairs.
-		if rc.kind == DungeonGenerator.RoomKind.BOSS:
-			var boss_entrance: Array = _generator.get_boss_entrance_span()
-			if _same_span(span, boss_entrance):
-				for cell: Vector2i in span:
-					prop_layer.set_cell(cell, -1)
-				continue
+		# The boss entrance used to be skipped here on the theory that the demon
+		# portals were "the threshold" and stood in for door tiles. They do not:
+		# _place_boss_portal_span() offsets every portal half_span + 2 cells ALONG
+		# the wall, so the doorway itself stayed empty while the gate colliders
+		# still sealed it - an invisible wall between two portals. It is gated
+		# like any other opening now; the portals flank the shutter rather than
+		# replacing it.
 
 		# Exit spans on north/south walls run along X and use the gate art as drawn.
 		# Exit spans on west/east walls run along Y, so rotate each atlas tile 90 degrees.
@@ -388,15 +386,6 @@ func _paint_gate(rc: RoomController, locked: bool) -> void:
 				prop_layer.set_cell(cell, tile_source_id, PROP_GATE[i % PROP_GATE.size()], transform)
 			else:
 				prop_layer.set_cell(cell, -1)
-
-
-func _same_span(a: Array, b: Array) -> bool:
-	if a.size() != b.size() or a.is_empty():
-		return false
-	for cell: Vector2i in a:
-		if not b.has(cell):
-			return false
-	return true
 
 
 ## A stairway up appears once the boss is dead, at the small landing carved

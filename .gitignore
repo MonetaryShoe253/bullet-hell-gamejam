@@ -4,3 +4,7 @@
 
 # Godot editor save residue
 *.tmp
+.artscratch/
+
+# Python tooling
+__pycache__/

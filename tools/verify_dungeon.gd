@@ -84,10 +84,34 @@ func _check(gen: DungeonGenerator, seed_value: int) -> void:
 			_fail(seed_value, "diagonal pinch at %s (%d floor diagonals)" % [cell, diagonals])
 
 	# Rock islands sealed inside the floor draw as stray walled boxes.
+	#
+	# Only SMALL islands are that artifact. Two kinds of large enclosed mass are
+	# legitimate and must not be flagged:
+	#   * cover carved inside a room by RoomGenerator, which is island-shaped by
+	#     design;
+	#   * rock that simply ends up surrounded, which draws as ordinary black void
+	#     bordered by proper walls. DungeonGenerator.MAX_ENCLOSED_POCKET is the
+	#     line between the two, and flooring everything above it turned whole
+	#     dungeons into one open blob.
+	#
+	# Note this check was passing vacuously before: RoomGenerator.new() cannot
+	# resolve its class_name in --script main-loop mode, so generate_all() no-ops
+	# here and room interiors are never actually exercised by this tool.
 	var enclosed := _find_enclosed_rock(gen)
-	if not enclosed.is_empty():
-		_fail(seed_value, "%d cells of rock sealed inside the floor, first at %s"
-				% [enclosed.size(), enclosed[0]])
+	var artifacts: Array[Vector2i] = []
+	for pocket: Array in _group_pockets(gen, enclosed):
+		if pocket.size() > DungeonGenerator.MAX_ENCLOSED_POCKET:
+			continue
+		var in_room := false
+		for room: Rect2i in gen.rooms:
+			if room.has_point(pocket[0]):
+				in_room = true
+				break
+		if not in_room:
+			artifacts.append(pocket[0])
+	if not artifacts.is_empty():
+		_fail(seed_value, "%d small rock island(s) left sealed in the floor, first at %s"
+				% [artifacts.size(), artifacts[0]])
 
 	# Floor thinner than two cells has no tile either: the art can only shade one
 	# of a pair of opposite edges.
@@ -172,3 +196,28 @@ func _find_enclosed_rock(gen: DungeonGenerator) -> Array[Vector2i]:
 
 func _fail(seed_value: int, message: String) -> void:
 	_failures.append("seed %d: %s" % [seed_value, message])
+
+
+## Splits a flat list of enclosed rock cells into connected pockets, so each can
+## be sized independently.
+func _group_pockets(gen: DungeonGenerator, cells: Array) -> Array:
+	var remaining: Dictionary = {}
+	for cell: Vector2i in cells:
+		remaining[cell] = true
+	var pockets: Array = []
+	for cell: Vector2i in cells:
+		if not remaining.has(cell):
+			continue
+		var pocket: Array[Vector2i] = []
+		var queue: Array[Vector2i] = [cell]
+		remaining.erase(cell)
+		while not queue.is_empty():
+			var c: Vector2i = queue.pop_back()
+			pocket.append(c)
+			for d: Vector2i in [Vector2i(1, 0), Vector2i(-1, 0), Vector2i(0, 1), Vector2i(0, -1)]:
+				var n: Vector2i = c + d
+				if remaining.has(n):
+					remaining.erase(n)
+					queue.append(n)
+		pockets.append(pocket)
+	return pockets

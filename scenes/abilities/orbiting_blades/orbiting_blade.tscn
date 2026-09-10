@@ -8,9 +8,7 @@ script = ExtResource("1_4jruv")
 
 [node name="Glow" type="Sprite2D" parent="." unique_id=2129314706]
 modulate = Color(1, 1, 1, 0.27450982)
-scale = Vector2(0.3, 0.3)
 texture = ExtResource("1_q1f3u")
 
 [node name="Sprite2D" type="Sprite2D" parent="." unique_id=1677986456]
-scale = Vector2(0.3, 0.3)
 texture = ExtResource("1_q1f3u")

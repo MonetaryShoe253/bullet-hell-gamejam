@@ -27,4 +27,3 @@ texture_filter = 1
 sprite_frames = SubResource("SpriteFrames_portal")
 animation = &"pulse"
 autoplay = "pulse"
-scale = Vector2(0.35, 0.35)

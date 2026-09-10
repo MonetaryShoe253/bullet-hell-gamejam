@@ -4,7 +4,6 @@
 [ext_resource type="Texture2D" uid="uid://b63qdg64p72su" path="res://assets/enemies/projectiles/pepperoni.png" id="2_tex"]
 
 [node name="EnemyBullet" type="Area2D" unique_id=423892251]
-scale = Vector2(0.4, 0.4)
 collision_layer = 16
 collision_mask = 3
 script = ExtResource("1_cxore")
@@ -17,6 +16,6 @@ texture = ExtResource("2_tex")
 
 [node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="." unique_id=1812327032]
 visible = false
-polygon = PackedVector2Array(-8, -5, -6, -5, -6, -4, 11, -4, 11, -3, 14, -3, 14, -2, 15, -2, 15, 2, 14, 2, 14, 3, 11, 3, 11, 4, -6, 4, -6, 5, -8, 5, -8, 2, -10, 2, -10, 1, -13, 1, -13, 0, -15, 0, -15, -1, -12, -1, -12, -2, -8, -2)
+polygon = PackedVector2Array(-3.2, -2, -2.4, -2, -2.4, -1.6, 4.4, -1.6, 4.4, -1.2, 5.6, -1.2, 5.6, -0.8, 6, -0.8, 6, 0.8, 5.6, 0.8, 5.6, 1.2, 4.4, 1.2, 4.4, 1.6, -2.4, 1.6, -2.4, 2, -3.2, 2, -3.2, 0.8, -4, 0.8, -4, 0.4, -5.2, 0.4, -5.2, 0, -6, 0, -6, -0.4, -4.8, -0.4, -4.8, -0.8, -3.2, -0.8)
 
 [node name="VisibleOnScreenNotifier2D" type="VisibleOnScreenNotifier2D" parent="." unique_id=1872963254]

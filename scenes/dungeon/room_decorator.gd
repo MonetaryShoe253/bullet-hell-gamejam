@@ -151,6 +151,9 @@ func _pick_type(
 			DungeonGenerator.RoomTheme.PIZZA:
 				if room_type in [Type.LANES, Type.CROSSFIRE, Type.KILLBOX]:
 					weight *= 1.18
+			DungeonGenerator.RoomTheme.WING:
+				if room_type in [Type.BOOTHS, Type.CLUSTERS, Type.OPEN]:
+					weight *= 1.18
 
 		if not recent.is_empty() and room_type == recent[-1]:
 			weight *= RECENT_REPEAT_MULTIPLIER

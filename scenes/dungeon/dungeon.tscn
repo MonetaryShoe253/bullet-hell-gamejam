@@ -2,7 +2,7 @@
 
 [ext_resource type="Script" uid="uid://bk4xj87f0qe8a" path="res://scenes/dungeon/dungeon_map.gd" id="1_sub6p"]
 [ext_resource type="PackedScene" uid="uid://cgkmebodaryei" path="res://scenes/player/player.tscn" id="2_frwky"]
-[ext_resource type="Texture2D" uid="uid://bgexe38k1v26c" path="res://assets/2D Pixel Dungeon Asset Pack/New_tilemap.png" id="3_h6dl1"]
+[ext_resource type="Texture2D" uid="uid://dauhsvdp4swd7" path="res://assets/Dungeon/kitchen_tileset.png" id="3_h6dl1"]
 [ext_resource type="PackedScene" path="res://scenes/UI/boss_health_bar.tscn" id="4_boss_hp"]
 [ext_resource type="Script" uid="uid://clmn8utdyvei6" path="res://scenes/UI/minimap.gd" id="5_minimap"]
 [ext_resource type="PackedScene" uid="uid://mwup4wqqbvni" path="res://scenes/UI/shop_ui.tscn" id="5_vhky6"]

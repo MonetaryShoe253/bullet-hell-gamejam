@@ -1,0 +1,206 @@
+{
+  "_readme": "Target spec per asset group. See docs/art_spec.md. Globs are POSIX-style, relative to the repo root. 'fit' is one of: scale_canvas (resize the whole canvas; use for animation frame sets so frames stay aligned), trim_pad (trim to content, scale to fit, re-pad; use for standalone props), keep (palette only, no geometry change). 'anchor' is center or bottom. 'ramp' optionally restricts the palette to one ramp plus INK. 'conform: false' means audit it but never rewrite it.",
+
+  "palette": "assets/palette/wingpunk40.gpl",
+  "source_dir": "assets/_source",
+  "alpha_cut": 128,
+  "despeckle": 4,
+  "despeckle_fraction": 0.0,
+
+  "groups": [
+    {
+      "name": "generated_enemies",
+      "glob": "assets/enemies/wing_trooper.png,assets/enemies/saucy_wing.png,assets/enemies/bucket_brute.png,assets/enemies/celery.png",
+      "canvas": [48, 48],
+      "fit": "trim_pad",
+      "anchor": "center",
+      "key_background": true,
+      "key_tolerance": 90,
+      "exclude_ramps": ["VIOLET"],
+      "despeckle_fraction": 0.03,
+      "note": "Gemini output, 1408x768 JPEG on a magenta field. MUST precede the 'enemies' group, which is fit:keep and would leave these at full size. key_tolerance is high because JPEG ringing makes the 'flat' magenta noisy at the subject edge. Excludes the VIOLET ramp: the magenta key leaves a blended rim on the outer silhouette that otherwise snaps to VIOLET, giving every sprite a purple halo. VIOLET is reserved for boss/cursed/rare (art_spec.md section 3), so no prop or enemy texture should reach for it anyway."
+    },
+    {
+      "name": "generated_props",
+      "glob": "assets/Dungeon/decorations/heat_lamp.png,assets/Dungeon/decorations/deep_fryer.png,assets/Dungeon/decorations/sauce_taps.png,assets/Dungeon/decorations/wing_warmer.png,assets/Dungeon/decorations/sauce_vat.png",
+      "canvas": [32, 32],
+      "fit": "trim_pad",
+      "anchor": "bottom",
+      "key_background": true,
+      "key_tolerance": 90,
+      "exclude_ramps": ["VIOLET"],
+      "despeckle_fraction": 0.03,
+      "note": "Roughly square props, 2x2 tiles. anchor:bottom so they stand on their cell instead of floating -- DungeonDecorator relies on the art's base sitting at the canvas bottom. Excludes the VIOLET ramp: the magenta key leaves a blended rim on the outer silhouette that otherwise snaps to VIOLET, giving every sprite a purple halo. VIOLET is reserved for boss/cursed/rare (art_spec.md section 3), so no prop or enemy texture should reach for it anyway."
+    },
+    {
+      "name": "generated_props_tall",
+      "glob": "assets/Dungeon/decorations/mop_bucket.png,assets/Dungeon/decorations/freezer_door.png",
+      "canvas": [32, 48],
+      "fit": "trim_pad",
+      "anchor": "bottom",
+      "key_background": true,
+      "key_tolerance": 90,
+      "exclude_ramps": ["VIOLET"],
+      "despeckle_fraction": 0.03,
+      "note": "Tall props, 2x3 tiles. freezer_door.png is the middle door cropped out of a 3-variant sheet the model returned. Excludes the VIOLET ramp: the magenta key leaves a blended rim on the outer silhouette that otherwise snaps to VIOLET, giving every sprite a purple halo. VIOLET is reserved for boss/cursed/rare (art_spec.md section 3), so no prop or enemy texture should reach for it anyway."
+    },
+    {
+      "name": "generated_props_wide",
+      "glob": "assets/Dungeon/decorations/prep_counter.png",
+      "canvas": [48, 32],
+      "fit": "trim_pad",
+      "anchor": "bottom",
+      "key_background": true,
+      "key_tolerance": 90,
+      "exclude_ramps": ["VIOLET"],
+      "despeckle_fraction": 0.03,
+      "note": "Wide prop, 3x2 tiles -- content aspect was 1.88, so a 32x32 canvas would have shrunk it to half height. Excludes the VIOLET ramp: the magenta key leaves a blended rim on the outer silhouette that otherwise snaps to VIOLET, giving every sprite a purple halo. VIOLET is reserved for boss/cursed/rare (art_spec.md section 3), so no prop or enemy texture should reach for it anyway."
+    },
+    {
+      "name": "staging",
+      "glob": "assets/_staging/*.png",
+      "canvas": null,
+      "fit": "keep",
+      "conform": false,
+      "note": "AUDIT ONLY. Raw generator handoff plus contact sheets. Carries a .gdignore so Godot does not import it. The full-res masters now live in assets/_source/, so this folder is safe to delete once the art is wired in."
+    },
+    {
+      "name": "player_anim",
+      "glob": "assets/Player/player_anim/*/*.png",
+      "canvas": [32, 32],
+      "fit": "scale_canvas",
+      "note": "112 frames, 8 directions. scale_canvas (never trim) so frames stay aligned. The old net scale was 1.5 * 0.25 = 0.375: 68px of art crushed onto 25.5 world px at 1.12 screen px per texel. 24x24 would preserve that size exactly but the face falls apart; 32x32 costs a 25% size increase and keeps the character readable next to 48px enemies. Sprite scale becomes 1.0 and hitboxes are unchanged."
+    },
+    {
+      "name": "player_portrait",
+      "glob": "assets/Player/mascot_hero.png",
+      "canvas": null,
+      "fit": "keep",
+      "note": "Menu chrome, not world-space -- palette only, size left alone. NOTE: main_menu.tscn draws it at custom_minimum_size 180px tall from a 160px source, i.e. 1.125x, which is off the pixel grid. Setting that to 160 makes it exact. Left alone here because it is a UI layout change, not an art change."
+    },
+    {
+      "name": "player_bullet",
+      "glob": "assets/Player/projectiles/*.png",
+      "canvas": [16, 16],
+      "fit": "trim_pad",
+      "anchor": "center",
+      "despeckle_fraction": 0.15,
+      "note": "Golden drumstick. READABILITY: this reads almost identically to the enemy flame bullet mid-fight. To force it cool, add \"ramp\": \"COOL\" here -- but that costs the chicken theme, so an INK+COOL_3 rim is probably the better fix. Design call, left to you."
+    },
+    {
+      "name": "enemy_bullets",
+      "glob": "assets/enemies/projectiles/*.png",
+      "canvas": [16, 16],
+      "fit": "trim_pad",
+      "anchor": "center",
+      "despeckle_fraction": 0.15,
+      "note": "Single-subject sprites, so a detached fragment under 15% of the main blob is safely noise. lettuce.png carries a stray 33px grey bar below the sprite (10.8% of the subject) that would otherwise land in the content bbox and shove the sprite off-centre when re-padded."
+    },
+    {
+      "name": "enemies",
+      "glob": "assets/enemies/*.png",
+      "canvas": [48, 48],
+      "fit": "keep",
+      "note": "Already on grid at scale 1.0. Palette only. Bosses reuse these at integer scale 2."
+    },
+    {
+      "name": "decorations",
+      "glob": "assets/Dungeon/decorations/*.png",
+      "canvas": null,
+      "fit": "keep",
+      "note": "32x32 and 32x40, placed at scale 1.0 on integer tile positions by dungeon_decorator.gd. Geometry is already correct; resizing would shift their centres. Palette only."
+    },
+    {
+      "name": "obstacles",
+      "glob": "assets/Dungeon/obstacles/*.png",
+      "canvas": null,
+      "fit": "keep",
+      "note": "32x48 / 32x40 at scale 1.0. Palette only."
+    },
+    {
+      "name": "dungeon_props",
+      "glob": "assets/Dungeon/shopkeeper.png,assets/Dungeon/vending_machine.png",
+      "canvas": null,
+      "fit": "keep",
+      "note": "64x48 and 32x48 at scale 1.0. Palette only."
+    },
+    {
+      "name": "spawn_indicator",
+      "glob": "assets/Dungeon/spawn_indicator.png",
+      "canvas": [80, 80],
+      "fit": "trim_pad",
+      "anchor": "center",
+      "note": "Was 256x256 at scale 0.3 -- 0.9 screen px per texel, i.e. sub-pixel, detail thrown away entirely. 5268 colours."
+    },
+    {
+      "name": "portal",
+      "glob": "assets/Demon Portal/*.png",
+      "canvas": [64, 80],
+      "fit": "scale_canvas",
+      "note": "3 animation frames -- scale_canvas keeps them aligned. Was 192x236 at scale 0.35, ~19k colours (not pixel art)."
+    },
+    {
+      "name": "egg_blade",
+      "glob": "assets/Bullets/eggBlade.png",
+      "canvas": [32, 32],
+      "fit": "trim_pad",
+      "anchor": "center",
+      "note": "Orbiting blade ability. Was 125x125 at scale 0.3, 1886 colours."
+    },
+    {
+      "name": "sodas",
+      "glob": "assets/Sodas/*.png",
+      "canvas": null,
+      "fit": "keep",
+      "note": "32x32, already on grid. Palette only."
+    },
+    {
+      "name": "shop_icons",
+      "glob": "assets/shop/items/*.png,assets/shop/abilities/*.png",
+      "canvas": [32, 32],
+      "fit": "trim_pad",
+      "anchor": "center",
+      "note": "70 files at 128x128 with 4.5k-11.7k colours -- smooth painterly AI images, the single biggest style break in the game. shop_ui.tscn shows them at 160px with KEEP_ASPECT_CENTERED, so 32x32 lands on an exact 5x integer zoom."
+    },
+    {
+      "name": "kitchen_tileset",
+      "glob": "assets/Dungeon/kitchen_tileset.png",
+      "canvas": null,
+      "fit": "keep",
+      "conform": false,
+      "note": "GENERATED, never conformed -- tools/make_kitchen_tileset.py draws it and is the single source of truth. Running conform on it would copy it into assets/_source/ and create a second, stale master. It is palette-perfect and seam-checked by construction; re-run the generator with --check after editing it. 160x160 atlas of 16x16 tiles; only 37 cells are used, the 6x6 block at (0,0)-(5,5) plus SOLID_ROCK at (8,7), a layout dictated by scenes/dungeon/dungeon_renderer.gd."
+    },
+    {
+      "name": "old_tileset",
+      "glob": "assets/2D Pixel Dungeon Asset Pack/New_tilemap.png,assets/2D Pixel Dungeon Asset Pack/Kitchen_tilemap.png",
+      "canvas": null,
+      "fit": "keep",
+      "conform": false,
+      "note": "AUDIT ONLY. Superseded by kitchen_tileset.png and no longer referenced by any scene. Safe to delete along with the rest of the dungeon pack."
+    },
+    {
+      "name": "ui",
+      "glob": "assets/UI/*.png",
+      "canvas": null,
+      "fit": "keep",
+      "conform": false,
+      "note": "AUDIT ONLY, never rewritten. Menu buttons are 210x55 with 7k+ colours and baked-in text; the logo is 39k colours; panel.png is 9-sliced. Quantising these to 40 colours would wreck the text and the 9-slice borders, and their sizes are coupled to Control layout. Restyling the UI is a separate pass. GUI_4x.png (153 colours) is the one genuinely pixel-art file here."
+    },
+    {
+      "name": "unused_pack",
+      "glob": "assets/2D Pixel Dungeon Asset Pack/**/*.png",
+      "canvas": null,
+      "fit": "keep",
+      "conform": false,
+      "note": "AUDIT ONLY. ~180 files from the free pack, almost all unreferenced. Not worth conforming; delete when the kitchen tileset lands."
+    },
+    {
+      "name": "unreferenced",
+      "glob": "assets/Status Effects/**/*.png,assets/Bullets/sprites/*.png,assets/Bullets/bullets_fullsheet.png,assets/Bullets/ship.png,assets/Crosshair/*.png,assets/Player/player_idle.png",
+      "canvas": null,
+      "fit": "keep",
+      "conform": false,
+      "note": "AUDIT ONLY. Nothing in scenes/, scripts/ or resources/ references these -- 374 status-effect frames, the spare bullet sheet, the crosshair and the superseded player_idle.png. Conforming dead weight is wasted effort; wire them up (then move them into a real group) or delete them."
+    }
+  ]
+}

@@ -14,6 +14,5 @@ uv = PackedVector2Array(192, 80, 223.99994, 112, 192, 143.99998, 160, 112)
 script = ExtResource("1_eimd0")
 
 [node name="Sprite2D" type="Sprite2D" parent="." unique_id=1970723449]
-scale = Vector2(0.3, 0.3)
 texture = ExtResource("2_2ebxt")
 script = ExtResource("1_eimd0")

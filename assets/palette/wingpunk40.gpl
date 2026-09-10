@@ -1,0 +1,58 @@
+GIMP Palette
+Name: Wingpunk40
+Columns: 8
+# Locked palette for Bullethell Gamejam. Derived from the histogram of the
+# game's existing pixel art (fried gold, sauce red and warm browns dominated),
+# then curated into ten ramps.
+#
+# Hue roles are load-bearing, not decorative:
+#   COOL   = player-owned (bullets, energy, dash) -- reads instantly vs warm
+#   SAUCE  = enemy-owned (bullets, damage, telegraphs)
+#   GOLD   = the wing/batter identity; pickups, coins, hero surfaces.
+#            GOLD_3 is #F7912C exactly -- the player's hoodie orange, the
+#            single most common colour in the game. Do not drift it.
+#   VIOLET = boss / cursed / rare tier
+#   STEEL  = stainless kitchen equipment (fryers, counters, cleavers, armour)
+#   SKIN   = character faces and hands
+# Do not add colours. Recolour by remapping within a ramp.
+#
+  15  10  12	INK_0 outline
+  36  26  29	INK_1
+  62  49  54	INK_2
+  95  82  89	INK_3
+  58  64  72	STEEL_0
+  98 110 120	STEEL_1
+ 148 162 172	STEEL_2
+ 201 212 218	STEEL_3
+ 166 102  74	SKIN_0
+ 214 148 110	SKIN_1
+ 245 199 164	SKIN_2
+  74  42  14	GOLD_0
+ 140  78  20	GOLD_1
+ 197 106  24	GOLD_2
+ 247 145  44	GOLD_3 signature orange
+ 255 196 107	GOLD_4
+  90  18  22	SAUCE_0
+ 161  31  35	SAUCE_1
+ 220  59  44	SAUCE_2
+ 242 112  90	SAUCE_3
+  46  28  21	WOOD_0
+  87  55  38	WOOD_1
+ 138  91  60	WOOD_2
+ 185 138  94	WOOD_3
+ 126 116 102	CREAM_0
+ 180 171 151	CREAM_1
+ 228 220 196	CREAM_2
+ 251 243 222	CREAM_3
+  27  51  32	GREEN_0
+  58  96  51	GREEN_1
+ 106 158  72	GREEN_2
+ 168 206 107	GREEN_3
+  13  42  58	COOL_0
+  29  94 119	COOL_1
+  53 160 181	COOL_2
+ 127 227 224	COOL_3
+  36  16  54	VIOLET_0
+  75  36 112	VIOLET_1
+ 123  69 174	VIOLET_2
+ 181 123 232	VIOLET_3
